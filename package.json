@@ -1,0 +1,27 @@
+{
+  "name": "lossless-json",
+  "version": "0.0.1",
+  "description": "Parse JSON without the risk of losing numeric information",
+  "main": "./dist/lossless-json.js",
+  "scripts": {
+    "test": "ava",
+    "build": "rollup --config rollup.config.js"
+  },
+  "keywords": [
+    "json",
+    "lossless",
+    "parse",
+    "stringify",
+    "number"
+  ],
+  "author": "Jos de Jong",
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.11.0",
+    "babel-preset-es2015-rollup": "^1.1.1",
+    "rollup": "^0.25.3",
+    "rollup-plugin-babel": "^2.3.9",
+    "rollup-plugin-uglify": "^0.2.0",
+    "uglify-js": "^2.6.1"
+  }
+}

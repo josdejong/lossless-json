@@ -1,0 +1,6 @@
+lib
+node_modules
+test
+.babelrc
+.gitignore
+rollup.config.js
