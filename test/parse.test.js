@@ -59,8 +59,10 @@ test('parse - LosslessNumber', function (t) {
 
 test('parse - string', function (t) {
   t.same(parse('"str"'), 'str', 'should parse a string');
-  t.same(parse('"\\\\\\/\\b\\f\\n\\r\\t"'), '\\/\b\f\n\r\t', 'should parse a string with escape characters');
+  t.same(parse('"\\"\\\\\\/\\b\\f\\n\\r\\t"'), '"\\/\b\f\n\r\t', 'should parse a string with escape characters');
+  t.same(JSON.parse('"\\"\\\\\\/\\b\\f\\n\\r\\t"'), '"\\/\b\f\n\r\t', 'should parse a string with escape characters');
   t.same(parse('"\\u260E"'), '\u260E', 'should parse a string with unicode');
+  t.same(JSON.parse('"\\u260E"'), '\u260E', 'should parse a string with unicode');
 });
 
 test('parse - keywords', function (t) {

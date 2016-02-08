@@ -29,7 +29,14 @@ test('stringify', function (t) {
 
   t.same(stringify('str'), '"str"', 'should stringify string');
   t.same(stringify(new String('str')), '"str"', 'should stringify String');
-  // TODO: test stringifying escape characters
+  t.same(stringify('\"'), '"\\""', 'should stringify a string with control characters');
+  t.same(stringify('\\'), '"\\\\"', 'should stringify a string with control characters');
+  t.same(stringify('\b'), '"\\b"', 'should stringify a string with control characters');
+  t.same(stringify('\f'), '"\\f"', 'should stringify a string with control characters');
+  t.same(stringify('\n'), '"\\n"', 'should stringify a string with control characters');
+  t.same(stringify('\r'), '"\\r"', 'should stringify a string with control characters');
+  t.same(stringify('\t'), '"\\t"', 'should stringify a string with control characters');
+  t.same(JSON.stringify('\"\\/\b\f\n\r\t'), '"\\"\\\\/\\b\\f\\n\\r\\t"', 'should stringify a string with control characters');
 
   t.same(stringify(new Date('2016-02-08T14:00:00Z')), '"2016-02-08T14:00:00.000Z"', 'should stringify a Date');
 
