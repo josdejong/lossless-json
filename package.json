@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Parse JSON without the risk of losing numeric information",
   "main": "./dist/lossless-json.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/josdejong/lossless-json.git"
+  },
   "scripts": {
     "test": "ava",
     "build": "rollup --config rollup.config.js"
