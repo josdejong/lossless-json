@@ -8,7 +8,7 @@ Features:
 - No risk of information loss when parsing large numbers which cannot be
   represented in the native JavaScript `number` type.
 
-<!-- TODO: write when to use and motivation -->
+<!-- TODO: write when to use, how does it work, and motivation -->
 
 Missing
 
@@ -60,6 +60,28 @@ let json2 = LosslessJSON.parse(text);
 let text2 = LosslessJSON.stringify(json2);  // '{"big":2.3e+500}'
                                             // yippee! no information loss :)
 ```
+
+Instead of regular numbers, `lossless-json` parses numbers as `LosslessNumber`,
+a class which stores the numeric value as a string. One can perform regular
+operations with `LosslessNumber`. It will throw an error when this would yield
+losing information:
+
+
+```js
+let text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}';
+let json = LosslessJSON.parse(text);
+
+console.log(json.normal.isLosslessNumber); // true
+console.log(json.normal.valueOf());        // number, 2.3
+console.log(json.normal + 2);              // 4.3
+
+// the following operations will throw an error as they would result in
+// information loss
+console.log(json.long + 1); // throws Error Cannot convert to number: value
+                            //   contains more than 15 digits
+console.log(json.big + 1);  // throws Error Cannot convert to number: number overflow
+```
+
 
 ## API
 
