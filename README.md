@@ -2,20 +2,33 @@
 
 Parse JSON without the risk of losing numeric information.
 
+```js
+let text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}';
+
+// JSON.parse will lose some digits and a whole number:
+console.log(JSON.stringify(JSON.parse(text)));
+    // '{"normal":2.3,"long":123456789012345680000,"big":null}'  whoops...
+
+// LosslessJSON will preserve large numbers:
+console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
+    // '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}'
+```
+
+**How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of large numbers. Instead of regular numbers, `lossless-json` parses numbers into a `LosslessNumber`, a data type which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
+
+**When to use?** Never. Unless you're writing a middleware which (using JSON data) interoperates with applications written in languages like C++, Java, and C#. These languages support data types like `long`. Parsing a `long` into a JavaScript `number` can result in losing information because a `long` can hold more digits than a `number`.
+
 Features:
 
-- Compatible with the native `JSON.parse` and `JSON.stringify`.
-- No risk of information loss when parsing large numbers which cannot be
-  represented in the native JavaScript `number` type.
+- No risk of losing numeric information when parsing JSON containing large numbers.
+- Compatible with the native `JSON.parse` and `JSON.stringify` functions.
 - Less then 3kB when minified and gzipped.
 
-<!-- TODO: write when to use, how does it work, and motivation -->
-
-Missing
+Missing:
 
 - support for reviver, replacer, space.
 - easy integration with big number libraries.
-- docs, examples
+- handle circular dependencies.
 
 
 ## Install
@@ -27,7 +40,7 @@ npm install lossless-json
 
 ## Use
 
-The library works exactly the same as the native `JSON.parse` and `JSON.stringify`.
+Parsing and stringification:
 
 ```js
 const LosslessJSON = require('lossless-json');
@@ -36,37 +49,7 @@ let text = LosslessJSON.stringify({foo: 'bar'}); // '{"foo":"bar"}'
 let json = LosslessJSON.parse(text);             // {foo: 'bar'}
 ```
 
-Difference with the native `JSON` functions is that `lossless-json` preserves large numbers:
-
-```js
-let text = '{"long":123456789012345678901}';
-let json1 = JSON.parse(text);
-let text1 = JSON.stringify(json1);          // '{"long":123456789012345680000}'
-                                            // whoops the last digits are lost :(
-
-let json2 = LosslessJSON.parse(text);
-let text2 = LosslessJSON.stringify(json2);  // '{"long":123456789012345678901}'
-                                            // yippee! no information loss :)
-```
-
-Here another example:
-
-```js
-let text = '{"big":2.3e+500}';
-let json1 = JSON.parse(text);
-let text1 = JSON.stringify(json1);          // '{"big":null}'
-                                            // whoops the value is completely gone :(
-
-let json2 = LosslessJSON.parse(text);
-let text2 = LosslessJSON.stringify(json2);  // '{"big":2.3e+500}'
-                                            // yippee! no information loss :)
-```
-
-Instead of regular numbers, `lossless-json` parses numbers as `LosslessNumber`,
-a class which stores the numeric value as a string. One can perform regular
-operations with `LosslessNumber`. It will throw an error when this would yield
-losing information:
-
+Numbers are parsed into a `LosslessNumber`, which can be used like a regular number. It will throw an error when this would result in losing information.
 
 ```js
 let text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}';

@@ -1,6 +1,6 @@
 {
   "name": "lossless-json",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Parse JSON without the risk of losing numeric information",
   "main": "./dist/lossless-json.js",
   "repository": {
@@ -16,7 +16,8 @@
     "lossless",
     "parse",
     "stringify",
-    "number"
+    "number",
+    "long"
   ],
   "author": "Jos de Jong",
   "license": "MIT",
