@@ -176,3 +176,4 @@ This will generate an ES5 compatible bundle `./dist/lossless-json.js` which can 
 ## License
 
 Released under the [MIT license](LICENSE.md).
+
