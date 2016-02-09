@@ -16,7 +16,7 @@ console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
 
 **How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of large numbers. Instead of regular numbers, `lossless-json` parses numbers into a `LosslessNumber`, a data type which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
 
-**When to use?** Never. Unless you're writing a middleware which (using JSON data) interoperates with applications written in languages like C++, Java, and C#. These languages support data types like `long`. Parsing a `long` into a JavaScript `number` can result in losing information because a `long` can hold more digits than a `number`.
+**When to use?** Never. If you have to deal with large numbers in JSON, it smells. It's best to fix the cause, as this can give trouble on many places in your software stack. These cases can occur for example when interoperating with applications written in C++, Java, or C#, which support data types like `long`. Parsing a `long` into a JavaScript `number` can result in losing information because a `long` can hold more digits than a `number`. If possible, it's preferable to change these applications such that they serialize large numbers in a safer way, for example in a stringified form. Anyway, if you really have to deal with large numbers in JSON, `lossless-json` is there to help you out.
 
 Features:
 
@@ -62,7 +62,7 @@ console.log(json.normal + 2);              // number, 4.3
 // the following operations will throw an error as they would result in
 // information loss
 console.log(json.long + 1); // throws Error Cannot convert to number: value
-                            //   contains more than 15 digits
+                            //     contains more than 15 digits
 console.log(json.big + 1);  // throws Error Cannot convert to number: number overflow
 ```
 
@@ -145,6 +145,15 @@ Then run the tests:
 ```
 npm test
 ```
+
+To run a benchmark to compare the performance with the native `JSON` parser:
+
+```
+npm run benchmark
+```
+
+(Spoiler: `lossless-json` is much slower)
+
 
 
 ## Build
