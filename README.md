@@ -26,9 +26,9 @@ Features:
 
 Missing:
 
-- support for reviver, replacer, space.
+- stringify doesn't yet support replacer and indentation.
+- handle circular dependencies in stringify.
 - easy integration with big number libraries.
-- handle circular dependencies.
 
 
 ## Install
@@ -72,7 +72,7 @@ console.log(json.big + 1);  // throws Error Cannot convert to number: number ove
 
 ### LosslessJSON.parse(text [, reviver])
 
-The JSON.parse() method parses a string as JSON, optionally transforming the value produced by parsing.
+The LosslessJSON.parse() method parses a string as JSON, optionally transforming the value produced by parsing.
 
 - **@param** `{string} text`
   The string to parse as JSON. See the JSON object for a description of JSON syntax.
@@ -85,7 +85,7 @@ The JSON.parse() method parses a string as JSON, optionally transforming the val
 
 ### LosslessJSON.stringify(value [, replacer [, space]])
 
-The JSON.stringify() method converts a JavaScript value to a JSON string,
+The LosslessJSON.stringify() method converts a JavaScript value to a JSON string,
 optionally replacing values if a replacer function is specified, or
 optionally including only the specified properties if a replacer array is specified.
 

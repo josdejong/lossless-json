@@ -1,5 +1,14 @@
 # History
 
+## not yet released, version 0.1.0
+
+- Implemented reviver argument for `parse`.
+- Only parses `LosslessNumber` when a value cannot be represented in a regular
+  number.
+- Throw error in case of underflow.
+- Performance improvements.
+
+
 ## 2016-02-08, version 0.0.2
 
 - The `LosslessNumber` class now throws errors when you would lose information

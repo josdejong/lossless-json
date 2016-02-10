@@ -5,14 +5,14 @@ import 'babel-core/register';
 
 import { LosslessNumber } from '../lib/LosslessNumber';
 
-test('LosslessNumber - create from string', function (t) {
-  var n = new LosslessNumber('42');
+test('create a LosslessNumber from string', function (t) {
+  let n = new LosslessNumber('42');
   t.ok(n.isLosslessNumber, 'should be a lossless number');
   t.same(n.value, '42', 'should contain the right value');
 
 });
 
-test('LosslessNumber - throw when creating from invalid string', function (t) {
+test('throw an error when when creating a LosslessNumber from invalid string', function (t) {
   // invalid
   t.throws(() => new LosslessNumber('a'), /Invalid number/);
   t.throws(() => new LosslessNumber('22.'), /Invalid number/);
@@ -27,19 +27,19 @@ test('LosslessNumber - throw when creating from invalid string', function (t) {
   new LosslessNumber('-42E-4');
 });
 
-test('LosslessNumber - create from number', function (t) {
-  var n = new LosslessNumber(42);
+test('create a LosslessNumber from number', function (t) {
+  let n = new LosslessNumber(42);
   t.ok(n.isLosslessNumber, 'should be a lossless number');
   t.same(n.value, '42', 'should contain the right value');
 });
 
-test('LosslessNumber - throw when creating from invalid number', function (t) {
+test('throw an error when creating a LosslessNumber from invalid number', function (t) {
   t.throws(() => new LosslessNumber(Math.PI), /Invalid number: contains more than 15 digits/);
   t.throws(() => new LosslessNumber(Infinity), /Invalid number: Infinity/);
   t.throws(() => new LosslessNumber(NaN), /Invalid number: NaN/);
 });
 
-test('LosslessNumber - valueOf', function (t) {
+test('get valueOf a LosslessNumber', function (t) {
   t.same(new LosslessNumber('23.4').valueOf(), 23.4);
   t.same(new LosslessNumber('23e4').valueOf(), 230000);
 
@@ -47,6 +47,8 @@ test('LosslessNumber - valueOf', function (t) {
       /Cannot convert to number: value contains more than 15 digits/);
   t.throws(() => new LosslessNumber('2.3e+500').valueOf(),
       /Cannot convert to number: number overflow/);
+  t.throws(() => new LosslessNumber('2.3e-500').valueOf(),
+      /Cannot convert to number: number underflow/);
 });
 
 test('LosslessNumber - toString', function (t) {

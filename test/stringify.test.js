@@ -53,7 +53,7 @@ test('stringify', function (t) {
   // TODO: ignore non-enumerable properties
 });
 
-test('stringify - full JSON object', function (t) {
+test('stringify a full JSON object', function (t) {
   let expected = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
   let json = {a: lln(123), b:'str', c: null, d: false, e:[1, 2, 3]};
 
@@ -63,14 +63,14 @@ test('stringify - full JSON object', function (t) {
 });
 
 
-test('stringify - replacer', function (t) {
+test('stringify with replacer', function (t) {
   // TODO
 });
 
-test('stringify - space - number', function (t) {
+test('stringify with numeric space', function (t) {
   // TODO
 });
 
-test('stringify - space - string', function (t) {
+test('stringify with string space', function (t) {
   // TODO
 });

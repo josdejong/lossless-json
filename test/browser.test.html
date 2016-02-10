@@ -5,8 +5,10 @@
   <title>LosslessJSON  browser test</title>
   <script src="../dist/lossless-json.js"></script>
   <script>
-    var jsonStr = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-    var json = LosslessJSON.parse(jsonStr);
+    'use strict';
+
+    let jsonStr = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
+    let json = LosslessJSON.parse(jsonStr);
 
     console.log('parsed:', json);
     console.log('json.a:', json.a);

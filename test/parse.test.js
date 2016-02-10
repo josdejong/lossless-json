@@ -11,53 +11,57 @@ function lln (value) {
   return new LosslessNumber(value);
 }
 
-test('parse - full JSON object', function (t) {
+test('full JSON object', function (t) {
+  let text = '{"a":2.3e500,"b":"str","c":null,"d":false,"e":[1,2,3]}';
+  let expected = {a: lln('2.3e500'), b:'str', c: null, d: false, e:[1, 2, 3]};
+  let parsed = parse(text);
 
-  let jsonStr = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-  let expected = {a: lln(123), b:'str', c: null, d: false, e:[lln(1), lln(2), lln(3)]};
-  let parsed = parse(jsonStr);
   t.same(parsed, expected, 'should parse a JSON object correctly');
 });
 
-test('parse - object', function (t) {
+test('object', function (t) {
   t.same(parse('{}'), {}, 'should parse an empty object');
   t.same(parse('  { \n } \t '), {}, 'should parse an empty object with whitespaces');
   t.same(parse('{"a": {}}'), {a: {}}, 'should parse an object containing an object');
   t.same(parse('{"a": "b"}'), {a: 'b'}, 'should parse a non-empty object');
-  t.same(parse('{"a": 2}'), {a: lln(2)}, 'should parse a non-empty object');
+  t.same(parse('{"a": 2}'), {a: 2}, 'should parse a non-empty object');
 });
 
-test('parse - array', function (t) {
+test('array', function (t) {
   t.same(parse('[]'), [], 'should parse an empty array');
   t.same(parse('[{}]'), [{}], 'should parse an array containing an object');
   t.same(parse('{"a":[]}'), {a:[]}, 'should parse an object containing an array');
-  t.same(parse('[1, "hi", true, false, null, {}, []]'), [lln(1), "hi", true, false, null, {}, []], 'should parse a non-empty array');
+  t.same(parse('[1, "hi", true, false, null, {}, []]'), [1, "hi", true, false, null, {}, []], 'should parse a non-empty array');
 });
 
-test('parse - number', function (t) {
-  t.ok(parse('23').isLosslessNumber, 'should parse a number into a LosslessNumber');
-  t.same(parse('23').valueOf(), 23, 'should parse a number');
-  t.same(parse('0').valueOf(), 0, 'should parse a number');
-  t.same(parse('2.3').valueOf(), 2.3, 'should parse a number');
-  t.same(parse('2300e3').valueOf(), 2.3e+6, 'should parse a number');
-  t.same(parse('2300e+3').valueOf(), 2.3e+6, 'should parse a number');
-  t.same(parse('-2').valueOf(), -2, 'should parse a negative number');
-  t.same(parse('2e-3').valueOf(), 0.002, 'should parse a number');
-  t.same(parse('2.3e-3').valueOf(), 0.0023, 'should parse a number');
+test('number', function (t) {
+  t.ok(parse('2.3e500').isLosslessNumber, 'should parse a large number into a LosslessNumber');
+  t.ok(parse('123456789012345678901234567890').isLosslessNumber, 'should parse a large number into a LosslessNumber');
+  t.same(parse('23'), 23, 'should parse a number');
+  t.same(parse('0'), 0, 'should parse a number');
+  t.same(parse('0e+2'), 0, 'should parse a number');
+  t.same(parse('0.0'), 0, 'should parse a number');
+  t.same(parse('-0'), 0, 'should parse a number');
+  t.same(parse('2.3'), 2.3, 'should parse a number');
+  t.same(parse('2300e3'), 2.3e+6, 'should parse a number');
+  t.same(parse('2300e+3'), 2.3e+6, 'should parse a number');
+  t.same(parse('-2'), -2, 'should parse a negative number');
+  t.same(parse('2e-3'), 0.002, 'should parse a number');
+  t.same(parse('2.3e-3'), 0.0023, 'should parse a number');
 });
 
-test('parse - LosslessNumber', function (t) {
-  var str = '22222222222222222222';
+test('LosslessNumber', function (t) {
+  let str = '22222222222222222222';
   t.same(parse(str), lln(str), 'should parse a LosslessNumber without information loss');
 
-  var str2 = '2.3e+500';
+  let str2 = '2.3e+500';
   t.same(parse(str2), lln(str2), 'should parse a LosslessNumber without information loss');
 
-  var str3 = '2.3e-500';
+  let str3 = '2.3e-500';
   t.same(parse(str3), lln(str3), 'should parse a LosslessNumber without information loss');
 });
 
-test('parse - string', function (t) {
+test('string', function (t) {
   t.same(parse('"str"'), 'str', 'should parse a string');
   t.same(parse('"\\"\\\\\\/\\b\\f\\n\\r\\t"'), '"\\/\b\f\n\r\t', 'should parse a string with escape characters');
   t.same(JSON.parse('"\\"\\\\\\/\\b\\f\\n\\r\\t"'), '"\\/\b\f\n\r\t', 'should parse a string with escape characters');
@@ -65,17 +69,56 @@ test('parse - string', function (t) {
   t.same(JSON.parse('"\\u260E"'), '\u260E', 'should parse a string with unicode');
 });
 
-test('parse - keywords', function (t) {
+test('keywords', function (t) {
   t.is(parse('true'), true, 'should parse true');
   t.is(parse('false'), false, 'should parse false');
   t.is(parse('null'), null, 'should parse null');
 });
 
-test('parse - reviver', function (t) {
-  // TODO
+test('reviver - replace values', function (t) {
+  let text = '{"a":123,"b":"str"}';
+
+  let json = parse(text, function (key, value) {
+    return {
+      type: typeof value,
+      value
+    };
+  });
+
+  t.same(json, {
+    type: 'object',
+    value: {
+      a: {type: 'number', value: 123},
+      b: {type: 'string', value: 'str'}
+    }
+  });
 });
 
-test('parse - throw exceptions', function (t) {
+test('reviver - invoke callbacks with key/value', function (t) {
+  let text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
+
+  let logs = [];
+  let expected = [
+    {key: 'a', value: 123},
+    {key: 'b', value: 'str'},
+    {key: 'c', value: null},
+    {key: 'd', value: false},
+    {key: '0', value: 1},
+    {key: '1', value: 2},
+    {key: '2', value: 3},
+    {key: 'e', value: [1,2,3]},
+    {key: '', value: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }}
+  ];
+
+  parse(text, function (key, value) {
+    logs.push({key, value});
+    return value;
+  });
+
+  t.same(logs, expected);
+});
+
+test('throw exceptions', function (t) {
   t.throws(function () {parse('')}, /Unexpected end of json string/, 'should throw an exception when parsing an invalid number');
 
   t.throws(function () {parse('{')}, /Object key expected/, 'should throw an exception when parsing an invalid number');
