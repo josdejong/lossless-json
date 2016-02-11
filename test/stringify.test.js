@@ -99,11 +99,15 @@ test('stringify with replacer function', function (t) {
 });
 
 test('stringify with replacer function (2)', function (t) {
-  let text = {"a":123,"b":"str"};
+  let json = {"a":123,"b":"str","c":"ignoreMe"};
 
   let expected = '{"a":"number:a:123","b":"string:b:str"}';
 
   function replacer (key, value) {
+    if (key === 'c') {
+      return undefined;
+    }
+
     if (typeof value === 'number') {
       return 'number:' + key + ':' + value;
     }
@@ -114,14 +118,23 @@ test('stringify with replacer function (2)', function (t) {
     return value;
   }
 
-  t.same(stringify(text, replacer), expected);
+  t.same(stringify(json, replacer), expected);
 
   // validate expected outcome with native JSON.parse
-  t.same(JSON.stringify(text, replacer), expected);
+  t.same(JSON.stringify(json, replacer), expected);
 });
 
 test('stringify with replacer Array', function (t) {
-  // TODO
+  let json = {a:1,c:{a:1,b:2,c:3,d:4},b:[1,2,3],d:4, '42': 'universe'};
+  let replacer = ['a', 'b', 'c', 42];
+
+  let expected = '{"42":"universe","a":1,"c":{"a":1,"b":2,"c":3},"b":[1,2,3]}';
+  t.is(stringify(json, replacer), expected);
+
+  // validate expected outcome with native JSON.parse
+  // note: stringified order differs. can happen.
+  let expected2 = '{"a":1,"b":[1,2,3],"c":{"a":1,"b":2,"c":3},"42":"universe"}';
+  t.is(JSON.stringify(json, replacer), expected2);
 });
 
 test('stringify with numeric space', function (t) {
