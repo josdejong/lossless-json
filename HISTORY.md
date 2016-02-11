@@ -2,7 +2,7 @@
 
 ## not yet released, version 0.1.0
 
-- Implemented reviver argument for `parse`.
+- Implemented replacer for stringify and reviver for parse.
 - Only parses `LosslessNumber` when a value cannot be represented in a regular
   number.
 - Throw error in case of underflow.

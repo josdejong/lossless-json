@@ -78,26 +78,30 @@ test('keywords', function (t) {
 test('reviver - replace values', function (t) {
   let text = '{"a":123,"b":"str"}';
 
-  let json = parse(text, function (key, value) {
-    return {
-      type: typeof value,
-      value
-    };
-  });
-
-  t.same(json, {
+  let expected = {
     type: 'object',
     value: {
       a: {type: 'number', value: 123},
       b: {type: 'string', value: 'str'}
     }
-  });
+  };
+
+  function reviver (key, value) {
+    return {
+      type: typeof value,
+      value
+    };
+  }
+
+  t.same(parse(text, reviver), expected);
+
+  // validate expected outcome against native JSON.parse
+  t.same(JSON.parse(text, reviver), expected);
 });
 
 test('reviver - invoke callbacks with key/value', function (t) {
   let text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
 
-  let logs = [];
   let expected = [
     {key: 'a', value: 123},
     {key: 'b', value: 'str'},
@@ -110,12 +114,20 @@ test('reviver - invoke callbacks with key/value', function (t) {
     {key: '', value: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }}
   ];
 
+  let logs = [];
   parse(text, function (key, value) {
     logs.push({key, value});
     return value;
   });
-
   t.same(logs, expected);
+
+  // validate expected outcome against native JSON.parse
+  let logs2 = [];
+  JSON.parse(text, function (key, value) {
+    logs2.push({key, value});
+    return value;
+  });
+  t.same(logs2, expected);
 });
 
 test('throw exceptions', function (t) {

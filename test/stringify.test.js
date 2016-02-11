@@ -36,6 +36,9 @@ test('stringify', function (t) {
   t.same(stringify('\n'), '"\\n"', 'should stringify a string with control characters');
   t.same(stringify('\r'), '"\\r"', 'should stringify a string with control characters');
   t.same(stringify('\t'), '"\\t"', 'should stringify a string with control characters');
+  t.same(stringify('\"\\/\b\f\n\r\t'), '"\\"\\\\/\\b\\f\\n\\r\\t"', 'should stringify a string with control characters');
+
+  // validate expected outcome against native JSON.stringify
   t.same(JSON.stringify('\"\\/\b\f\n\r\t'), '"\\"\\\\/\\b\\f\\n\\r\\t"', 'should stringify a string with control characters');
 
   t.same(stringify(new Date('2016-02-08T14:00:00Z')), '"2016-02-08T14:00:00.000Z"', 'should stringify a Date');
@@ -63,7 +66,61 @@ test('stringify a full JSON object', function (t) {
 });
 
 
-test('stringify with replacer', function (t) {
+test('stringify with replacer function', function (t) {
+  let json = {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]};
+
+  let expected = [
+    {key: '', value: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }},
+    {key: 'a', value: 123},
+    {key: 'b', value: 'str'},
+    {key: 'c', value: null},
+    {key: 'd', value: false},
+    {key: 'e', value: [1,2,3]},
+    {key: '0', value: 1},
+    {key: '1', value: 2},
+    {key: '2', value: 3}
+  ];
+
+  let logs = [];
+  stringify(json, function (key, value) {
+    logs.push({key, value});
+    return value;
+  });
+  t.same(logs, expected);
+
+  // validate expected outcome against native JSON.stringify
+  let logs2 = [];
+  JSON.stringify(json, function (key, value) {
+    logs2.push({key, value});
+    return value;
+  });
+  t.same(logs2, expected);
+
+});
+
+test('stringify with replacer function (2)', function (t) {
+  let text = {"a":123,"b":"str"};
+
+  let expected = '{"a":"number:a:123","b":"string:b:str"}';
+
+  function replacer (key, value) {
+    if (typeof value === 'number') {
+      return 'number:' + key + ':' + value;
+    }
+    if (typeof value === 'string') {
+      return 'string:' + key + ':' + value;
+    }
+
+    return value;
+  }
+
+  t.same(stringify(text, replacer), expected);
+
+  // validate expected outcome with native JSON.parse
+  t.same(JSON.stringify(text, replacer), expected);
+});
+
+test('stringify with replacer Array', function (t) {
   // TODO
 });
 
