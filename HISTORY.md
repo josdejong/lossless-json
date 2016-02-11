@@ -2,7 +2,7 @@
 
 ## not yet released, version 0.1.0
 
-- Implemented replacer for stringify and reviver for parse.
+- Implemented support for reviver, replacer, and indentation (space).
 - Only parses `LosslessNumber` when a value cannot be represented in a regular
   number.
 - Throw error in case of underflow.

@@ -120,7 +120,7 @@ test('stringify with replacer function (2)', function (t) {
 
   t.same(stringify(json, replacer), expected);
 
-  // validate expected outcome with native JSON.parse
+  // validate expected outcome against native JSON.stringify
   t.same(JSON.stringify(json, replacer), expected);
 });
 
@@ -131,16 +131,56 @@ test('stringify with replacer Array', function (t) {
   let expected = '{"42":"universe","a":1,"c":{"a":1,"b":2,"c":3},"b":[1,2,3]}';
   t.is(stringify(json, replacer), expected);
 
-  // validate expected outcome with native JSON.parse
+  // validate expected outcome against native JSON.stringify
   // note: stringified order differs. can happen.
   let expected2 = '{"a":1,"b":[1,2,3],"c":{"a":1,"b":2,"c":3},"42":"universe"}';
   t.is(JSON.stringify(json, replacer), expected2);
 });
 
 test('stringify with numeric space', function (t) {
-  // TODO
+  let json = {a: 1, b: [1,2,null,undefined,{c:3}], d: null};
+
+  let expected =
+      '{\n' +
+      '  "a": 1,\n' +
+      '  "b": [\n' +
+      '    1,\n' +
+      '    2,\n' +
+      '    null,\n' +
+      '    null,\n' +
+      '    {\n' +
+      '      "c": 3\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "d": null\n' +
+      '}';
+
+  t.is(stringify(json, null, 2), expected);
+
+  // validate expected outcome against native JSON.stringify
+  t.is(JSON.stringify(json, null, 2), expected);
 });
 
 test('stringify with string space', function (t) {
-  // TODO
+  let json = {a: 1, b: [1,2,null,undefined,{c:3}], d: null};
+
+  let expected =
+      '{\n' +
+      '~"a": 1,\n' +
+      '~"b": [\n' +
+      '~~1,\n' +
+      '~~2,\n' +
+      '~~null,\n' +
+      '~~null,\n' +
+      '~~{\n' +
+      '~~~"c": 3\n' +
+      '~~}\n' +
+      '~],\n' +
+      '~"d": null\n' +
+      '}';
+
+  t.is(stringify(json, null, '~'), expected);
+
+  // validate expected outcome against native JSON.stringify
+  t.is(JSON.stringify(json, null, '~'), expected);
 });
