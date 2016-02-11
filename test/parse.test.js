@@ -103,20 +103,56 @@ test('reviver - invoke callbacks with key/value', function (t) {
   let text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
 
   let expected = [
-    {key: 'a', value: 123},
-    {key: 'b', value: 'str'},
-    {key: 'c', value: null},
-    {key: 'd', value: false},
-    {key: '0', value: 1},
-    {key: '1', value: 2},
-    {key: '2', value: 3},
-    {key: 'e', value: [1,2,3]},
-    {key: '', value: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }}
+    {
+      context: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] },
+      key: 'a',
+      value: 123
+    },
+    {
+      context: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] },
+      key: 'b',
+      value: 'str'
+    },
+    {
+      context: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] },
+      key: 'c',
+      value: null
+    },
+    {
+      context: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] },
+      key: 'd',
+      value: false
+    },
+    {
+      context: [1, 2, 3],
+      key: '0',
+      value: 1
+    },
+    {
+      context: [1, 2, 3],
+      key: '1',
+      value: 2
+    },
+    {
+      context: [1, 2, 3],
+      key: '2',
+      value: 3
+    },
+    {
+      context: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] },
+      key: 'e',
+      value: [1,2,3]
+    },
+    {
+      context: {'': { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }},
+      key: '',
+      value: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }
+    }
   ];
 
   let logs = [];
   parse(text, function (key, value) {
-    logs.push({key, value});
+    logs.push({context: JSON.parse(JSON.stringify(this)), key, value});
     return value;
   });
   t.same(logs, expected);
@@ -124,7 +160,7 @@ test('reviver - invoke callbacks with key/value', function (t) {
   // validate expected outcome against native JSON.parse
   let logs2 = [];
   JSON.parse(text, function (key, value) {
-    logs2.push({key, value});
+    logs2.push({context: JSON.parse(JSON.stringify(this)), key, value});
     return value;
   });
   t.same(logs2, expected);

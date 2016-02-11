@@ -26,7 +26,6 @@ Features:
 
 Missing:
 
-- stringify doesn't yet support replacer and indentation.
 - handle circular dependencies in stringify.
 - easy integration with big number libraries.
 
@@ -152,7 +151,7 @@ To run a benchmark to compare the performance with the native `JSON` parser:
 npm run benchmark
 ```
 
-(Spoiler: `lossless-json` is much slower)
+(Spoiler: `lossless-json` is much slower than native)
 
 
 

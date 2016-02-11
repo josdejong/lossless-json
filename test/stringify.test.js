@@ -70,20 +70,55 @@ test('stringify with replacer function', function (t) {
   let json = {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]};
 
   let expected = [
-    {key: '', value: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }},
-    {key: 'a', value: 123},
-    {key: 'b', value: 'str'},
-    {key: 'c', value: null},
-    {key: 'd', value: false},
-    {key: 'e', value: [1,2,3]},
-    {key: '0', value: 1},
-    {key: '1', value: 2},
-    {key: '2', value: 3}
+    {
+      context: {'': { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }},
+      key: '',
+      value: { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }},
+    {
+      context: {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]},
+      key: 'a',
+      value: 123
+    },
+    {
+      context: {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]},
+      key: 'b',
+      value: 'str'
+    },
+    {
+      context: {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]},
+      key: 'c',
+      value: null
+    },
+    {
+      context: {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]},
+      key: 'd',
+      value: false
+    },
+    {
+      context: {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]},
+      key: 'e',
+      value: [1,2,3]
+    },
+    {
+      context: [1,2,3],
+      key: '0',
+      value: 1
+    },
+    {
+      context: [1,2,3],
+      key: '1',
+      value: 2
+    },
+    {
+      context: [1,2,3],
+      key: '2',
+      value: 3
+    }
   ];
 
   let logs = [];
   stringify(json, function (key, value) {
-    logs.push({key, value});
+    logs.push({context: this, key, value});
     return value;
   });
   t.same(logs, expected);
@@ -91,7 +126,7 @@ test('stringify with replacer function', function (t) {
   // validate expected outcome against native JSON.stringify
   let logs2 = [];
   JSON.stringify(json, function (key, value) {
-    logs2.push({key, value});
+    logs2.push({context: this, key, value});
     return value;
   });
   t.same(logs2, expected);
