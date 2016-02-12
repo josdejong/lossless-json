@@ -1,6 +1,6 @@
 # History
 
-## not yet released, version 0.1.0
+## 2016-02-12, version 0.1.0
 
 - Implemented support for reviver, replacer, and indentation (space).
 - Throw error in case of underflow.
