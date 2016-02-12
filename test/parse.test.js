@@ -5,6 +5,7 @@ import 'babel-core/register';
 
 import { LosslessNumber } from '../lib/LosslessNumber';
 import { parse } from '../lib/parse';
+import { stringify } from '../lib/stringify';
 
 // helper function to create a lossless number
 function lln (value) {
@@ -13,7 +14,7 @@ function lln (value) {
 
 test('full JSON object', function (t) {
   let text = '{"a":2.3e500,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-  let expected = {a: lln('2.3e500'), b:'str', c: null, d: false, e:[1, 2, 3]};
+  let expected = {a: lln('2.3e500'), b:'str', c: null, d: false, e:[lln(1), lln(2), lln(3)]};
   let parsed = parse(text);
 
   t.same(parsed, expected, 'should parse a JSON object correctly');
@@ -24,30 +25,31 @@ test('object', function (t) {
   t.same(parse('  { \n } \t '), {}, 'should parse an empty object with whitespaces');
   t.same(parse('{"a": {}}'), {a: {}}, 'should parse an object containing an object');
   t.same(parse('{"a": "b"}'), {a: 'b'}, 'should parse a non-empty object');
-  t.same(parse('{"a": 2}'), {a: 2}, 'should parse a non-empty object');
+  t.same(parse('{"a": 2}'), {a: lln(2)}, 'should parse a non-empty object');
 });
 
 test('array', function (t) {
   t.same(parse('[]'), [], 'should parse an empty array');
   t.same(parse('[{}]'), [{}], 'should parse an array containing an object');
   t.same(parse('{"a":[]}'), {a:[]}, 'should parse an object containing an array');
-  t.same(parse('[1, "hi", true, false, null, {}, []]'), [1, "hi", true, false, null, {}, []], 'should parse a non-empty array');
+  t.same(parse('[1, "hi", true, false, null, {}, []]'), [lln(1), "hi", true, false, null, {}, []], 'should parse a non-empty array');
 });
 
 test('number', function (t) {
   t.ok(parse('2.3e500').isLosslessNumber, 'should parse a large number into a LosslessNumber');
   t.ok(parse('123456789012345678901234567890').isLosslessNumber, 'should parse a large number into a LosslessNumber');
-  t.same(parse('23'), 23, 'should parse a number');
-  t.same(parse('0'), 0, 'should parse a number');
-  t.same(parse('0e+2'), 0, 'should parse a number');
-  t.same(parse('0.0'), 0, 'should parse a number');
-  t.same(parse('-0'), 0, 'should parse a number');
-  t.same(parse('2.3'), 2.3, 'should parse a number');
-  t.same(parse('2300e3'), 2.3e+6, 'should parse a number');
-  t.same(parse('2300e+3'), 2.3e+6, 'should parse a number');
-  t.same(parse('-2'), -2, 'should parse a negative number');
-  t.same(parse('2e-3'), 0.002, 'should parse a number');
-  t.same(parse('2.3e-3'), 0.0023, 'should parse a number');
+  t.same(parse('23'), lln('23'), 'should parse a number');
+  t.same(parse('0'), lln('0'), 'should parse a number');
+  t.same(parse('0e+2'), lln('0e+2'), 'should parse a number');
+  t.same(parse('0e+2').valueOf(), 0, 'should parse a number');
+  t.same(parse('0.0'), lln('0.0'), 'should parse a number');
+  t.same(parse('-0'), lln('-0'), 'should parse a number');
+  t.same(parse('2.3'), lln(2.3), 'should parse a number');
+  t.same(parse('2300e3'), lln('2300e3'), 'should parse a number');
+  t.same(parse('2300e+3'), lln('2300e+3'), 'should parse a number');
+  t.same(parse('-2'), lln('-2'), 'should parse a negative number');
+  t.same(parse('2e-3'), lln('2e-3'), 'should parse a number');
+  t.same(parse('2.3e-3'), lln('2.3e-3'), 'should parse a number');
 });
 
 test('LosslessNumber', function (t) {
@@ -81,7 +83,7 @@ test('reviver - replace values', function (t) {
   let expected = {
     type: 'object',
     value: {
-      a: {type: 'number', value: 123},
+      a: {type: 'object', value: lln(123)},
       b: {type: 'string', value: 'str'}
     }
   };
@@ -94,12 +96,9 @@ test('reviver - replace values', function (t) {
   }
 
   t.same(parse(text, reviver), expected);
-
-  // validate expected outcome against native JSON.parse
-  t.same(JSON.parse(text, reviver), expected);
 });
 
-test('reviver - invoke callbacks with key/value', function (t) {
+test('reviver - invoke callbacks with key/value and correct context', function (t) {
   let text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
 
   let expected = [
@@ -150,9 +149,18 @@ test('reviver - invoke callbacks with key/value', function (t) {
     }
   ];
 
+  // convert LosslessNumbers to numbers for easy comparison with native JSON
+  function toRegularJSON(json) {
+    return JSON.parse(stringify(json))
+  }
+
   let logs = [];
   parse(text, function (key, value) {
-    logs.push({context: JSON.parse(JSON.stringify(this)), key, value});
+    logs.push({
+      context: toRegularJSON(this),
+      key,
+      value: toRegularJSON(value)
+    });
     return value;
   });
   t.same(logs, expected);
@@ -164,6 +172,20 @@ test('reviver - invoke callbacks with key/value', function (t) {
     return value;
   });
   t.same(logs2, expected);
+});
+
+test('reviver - revive a lossless number correctly', function (t) {
+  let text = '2.3e+500';
+  let expected = [
+    {key: '', value: lln('2.3e+500')}
+  ];
+  let logs = [];
+
+  parse(text, function (key, value) {
+    logs.push({key, value});
+    return value;
+  });
+  t.same(logs, expected);
 });
 
 test('throw exceptions', function (t) {
