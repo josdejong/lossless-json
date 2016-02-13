@@ -21,12 +21,9 @@ console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
 Features:
 
 - No risk of losing numeric information when parsing JSON containing big numbers.
-- Compatible with the native `JSON.parse` and `JSON.stringify` functions.
+- Supports circular references.
+- Compatible with the native `JSON.parse` and `JSON.stringify`.
 - Less then 3kB when minified and gzipped.
-
-Missing:
-
-- handle circular dependencies in stringify.
 
 
 ## Install
@@ -139,6 +136,25 @@ let result = {                                    // {result: new Decimal('4.6e5
   result: json.value.times(2)
 };
 let str = LosslessJSON.stringify(json, replacer); // '{"result":4.6e500}'
+```
+
+### Circular references
+
+`lossless-json` automatically stringifies and restores circular references. Circular references are encoded as a [JSON Pointer URI fragment](https://tools.ietf.org/html/rfc6901#section-6).
+
+```js
+'use strict';
+const LosslessJSON = require('lossless-json');
+
+let json = {
+  foo: {
+    bar: {}
+  }
+};
+json.foo.bar.foo = json.foo; // create a circular reference to `foo` inside `bar`
+
+let text = LosslessJSON.stringify(json);
+// text = '"{"foo":{"bar":{"foo":{"$ref":"#/foo"}}}}"'
 ```
 
 

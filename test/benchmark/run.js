@@ -6,7 +6,7 @@ import { parse, stringify } from '../../lib';
 const json = JSON.parse(readFileSync(__dirname + '/largefile.json', 'utf-8'));
 const text = JSON.stringify(json);
 
-const MAX = 10;
+const MAX = 25;
 
 // benchmark native JSON.parse
 console.time('JSON.parse');

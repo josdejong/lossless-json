@@ -188,6 +188,27 @@ test('reviver - revive a lossless number correctly', function (t) {
   t.same(logs, expected);
 });
 
+test('parse circular reference (1)', function (t) {
+  let text = '{"a":{"b":{"$ref":"#/"}}}';
+  let json = parse(text);
+
+  t.is(json.a.b, json);
+});
+
+test('parse circular reference (2)', function (t) {
+  let text = '{"a":{"b":{"b":{"$ref":"#/a/b"}}}}';
+  let json  = parse(text);
+
+  t.is(json.a.b.b, json.a.b);
+});
+
+test('parse circular reference (3)', function (t) {
+  let text = '{"a":[{},{"b":{"a":{"$ref":"#/a"}}}]}';
+  let json = parse(text);
+
+  t.is(json.a[1].b.a, json.a);
+});
+
 test('throw exceptions', function (t) {
   t.throws(function () {parse('')}, /Unexpected end of json string/, 'should throw an exception when parsing an invalid number');
 

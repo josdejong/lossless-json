@@ -219,3 +219,31 @@ test('stringify with string space', function (t) {
   // validate expected outcome against native JSON.stringify
   t.is(JSON.stringify(json, null, '~'), expected);
 });
+
+test('stringify circular reference (1)', function (t) {
+  let json = {};
+  json.a = {b: json};
+  let expected = '{"a":{"b":{"$ref":"#/"}}}';
+  let text = stringify(json);
+
+  t.same(text, expected);
+});
+
+test('stringify circular reference (2)', function (t) {
+  let obj = {a: {b: {}}};
+  obj.a.b.b = obj.a.b;
+  let expected = '{"a":{"b":{"b":{"$ref":"#/a/b"}}}}';
+  let text = stringify(obj);
+
+  t.same(text, expected);
+});
+
+test('stringify circular reference (3)', function (t) {
+  let obj = {a: [{}, {b: {}}]};
+  obj.a[1].b.a = obj.a;
+
+  let expected = '{"a":[{},{"b":{"a":{"$ref":"#/a"}}}]}';
+  let text = stringify(obj);
+
+  t.same(text, expected);
+});
