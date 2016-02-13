@@ -1,6 +1,6 @@
 # lossless-json
 
-Parse JSON without the risk of losing numeric information.
+Parse JSON without risk of losing numeric information.
 
 ```js
 let text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}';
@@ -146,20 +146,60 @@ let str = LosslessJSON.stringify(json, replacer); // '{"result":4.6e500}'
 'use strict';
 const LosslessJSON = require('lossless-json');
 
+// create an object containing a circular reference to `foo` inside `bar`
 let json = {
   foo: {
     bar: {}
   }
 };
-json.foo.bar.foo = json.foo; // create a circular reference to `foo` inside `bar`
+json.foo.bar.foo = json.foo;
 
 let text = LosslessJSON.stringify(json);
 // text = '"{"foo":{"bar":{"foo":{"$ref":"#/foo"}}}}"'
 ```
 
+In case resolving of circular references is not desirable, resolving circular references can be turned off:
+
+```
+'use strict';
+const LosslessJSON = require('lossless-json');
+
+// disable circular references
+LosslessJSON.config({circularRefs: false});
+
+// create an object containing a circular reference to `foo` inside `bar`
+let json = {
+  foo: {
+    bar: {}
+  }
+};
+json.foo.bar.foo = json.foo;
+
+try {
+  let text = LosslessJSON.stringify(json);
+}
+catch (err) {
+  console.log(err); // Error: Circular reference at "#/foo/bar/foo"
+}
+```
+
 
 ## API
 
+
+### config([options])
+
+Get and/or set configuration options for `lossless-json`.
+
+- **@param** `[{circularRefs: boolean}] [options]`
+  Optional new configuration to be applied.
+- **@returns** `{{circularRefs}}`
+  Returns an object with the current configuration.
+
+The following options are available:
+
+- `{boolean} circularRefs : true`
+  When `true` (default), `LosslessJSON.stringify` will resolve circular references. When `false`, the function will throw an error when a circular reference is encountered.
 
 ### parse(text [, reviver])
 

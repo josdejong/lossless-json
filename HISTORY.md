@@ -1,9 +1,14 @@
 # History
 
+
+## 2016-02-13, version 1.0.0
+
+- Implemented support for circular references (configurable).
+
+
 ## 2016-02-12, version 0.1.0
 
 - Implemented support for reviver, replacer, and indentation (space).
-- Implemented support for circular references.
 - Throw error in case of underflow.
 - Performance improvements.
 
