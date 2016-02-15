@@ -16,7 +16,7 @@ console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
 
 **How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a data type which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
 
-**When to use?** You need `lossless-json` when you have to create some sort of data processing middleware which has to process arbitrary JSON without risk of screwing up. JSON objects containing big numbers are rare in the wild. It can occur for example when interoperating with applications written in C++, Java, or C#, which support data types like `long`. Parsing a `long` into a JavaScript `number` can result in losing information because a `long` can hold more digits than a `number`. If possible, it's preferable to change these applications such that they serialize big numbers in a safer way, for example in a stringified form.
+**When to use?** You need `lossless-json` when you have to create some sort of data processing middleware which has to process arbitrary JSON without risk of screwing up. JSON objects containing big numbers are rare in the wild. It can occur for example when interoperating with applications written in C++, Java, or C#, which support data types like `long`. Parsing a `long` into a JavaScript `number` can result in losing information because a `long` can hold more digits than a `number`. If possible, it's preferable to change these applications such that they serialize big numbers in a safer way, for example in a stringified form. If that's not possible, `lossless-json` is here to help you out.
 
 Features:
 
@@ -27,6 +27,8 @@ Features:
 
 
 ## Install
+
+Install via [npm](https://www.npmjs.com/package/lossless-json):
 
 ```
 npm install lossless-json
@@ -43,8 +45,8 @@ Parsing and stringification works as you're used to:
 'use strict';
 const LosslessJSON = require('lossless-json');
 
-let text = LosslessJSON.stringify({foo: 'bar'}); // '{"foo":"bar"}'
-let json = LosslessJSON.parse(text);             // {foo: 'bar'}
+let json = LosslessJSON.parse('{"foo":"bar"}'); // {foo: 'bar'}
+let text = LosslessJSON.stringify(json);        // '{"foo":"bar"}'
 ```
 
 ### LosslessNumbers
@@ -68,7 +70,7 @@ console.log(json.long + 1); // throws Error Cannot convert to number: number wou
 console.log(json.big + 1);  // throws Error Cannot convert to number: number would overflow
 ```
 
-If you want parse a json string into an object with regular numbers, but want to validate that no numeric information is lost, you can parse the json string using `lossless-json` and immediately convert LosslessNumbers into numbers:
+If you want parse a json string into an object with regular numbers, but want to validate that no numeric information is lost, you can parse the json string using `lossless-json` and immediately convert LosslessNumbers into numbers using a reviver:
 
 ```js
 'use strict';
@@ -89,7 +91,7 @@ function convertLosslessNumber (key, value) {
 let json = LosslessJSON.parse('[1,2,3]', convertLosslessNumber);
 console.log(json);  // [1, 2, 3] (regular numbers)
 
-// will throw an error when some of the values are too large to represent correctly
+// will throw an error when some of the values are too large to represent correctly as number
 try {
   let json = LosslessJSON.parse('[1,2e+500,3]', convertLosslessNumber);
 }
@@ -158,7 +160,7 @@ let text = LosslessJSON.stringify(json);
 // text = '"{"foo":{"bar":{"foo":{"$ref":"#/foo"}}}}"'
 ```
 
-In case resolving of circular references is not desirable, resolving circular references can be turned off:
+When resolving circular references is not desirable, resolving circular references can be turned off:
 
 ```
 'use strict';
@@ -251,7 +253,7 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 
 - `valueOf() : number`
   Convert the LosslessNumber to a regular number.
-  Throws an Error when this would result in loss of information: when the number contains more then 15 digits, or when the number would become infinite.
+  Throws an Error when this would result in loss of information: when the numbers digits would be truncated, or when the number would overflow or underflow.
 - `toString() : string`
   Get the string representation of the lossless number.
 
