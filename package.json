@@ -1,7 +1,7 @@
 {
   "name": "lossless-json",
   "version": "1.0.0",
-  "description": "Parse JSON without risk of losing numeric information or breaking circular references",
+  "description": "Parse JSON without risk of losing numeric information",
   "main": "./dist/lossless-json.js",
   "repository": {
     "type": "git",

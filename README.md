@@ -7,9 +7,9 @@ let text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}';
 
 // JSON.parse will lose some digits and a whole number:
 console.log(JSON.stringify(JSON.parse(text)));
-    // '{"normal":2.3,"long":123456789012345680000,"big":null}'  whoops...
+    // '{"normal":2.3,"long":123456789012345680000,"big":null}'      WHOOPS!!!
 
-// LosslessJSON will preserve big numbers:
+// LosslessJSON.parse will preserve big numbers:
 console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
     // '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}'
 ```
