@@ -23,6 +23,7 @@ Features:
 - No risk of losing numeric information when parsing JSON containing big numbers.
 - Supports circular references.
 - Compatible with the native `JSON.parse` and `JSON.stringify`.
+- Works in browsers and node.js.
 - Less then 3kB when minified and gzipped.
 
 
