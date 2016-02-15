@@ -163,7 +163,7 @@ let text = LosslessJSON.stringify(json);
 
 When resolving circular references is not desirable, resolving circular references can be turned off:
 
-```
+```js
 'use strict';
 const LosslessJSON = require('lossless-json');
 
