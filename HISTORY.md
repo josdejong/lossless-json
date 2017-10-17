@@ -1,6 +1,11 @@
 # History
 
 
+## 2017-10-17, version 1.0.1
+
+- Upgraded all dev dependencies, fixes broken build script. See #2.
+
+
 ## 2016-02-13, version 1.0.0
 
 - Implemented support for circular references (configurable).
