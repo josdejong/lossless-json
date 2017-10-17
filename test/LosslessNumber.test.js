@@ -7,8 +7,8 @@ import { LosslessNumber } from '../lib/LosslessNumber';
 
 test('create a LosslessNumber from string', function (t) {
   let n = new LosslessNumber('42');
-  t.ok(n.isLosslessNumber, 'should be a lossless number');
-  t.same(n.value, '42', 'should contain the right value');
+  t.truthy(n.isLosslessNumber, 'should be a lossless number');
+  t.is(n.value, '42', 'should contain the right value');
 
 });
 
@@ -29,19 +29,19 @@ test('throw an error when when creating a LosslessNumber from invalid string', f
 
 test('create a LosslessNumber from number', function (t) {
   let n = new LosslessNumber(42);
-  t.ok(n.isLosslessNumber, 'should be a lossless number');
-  t.same(n.value, '42', 'should contain the right value');
+  t.truthy(n.isLosslessNumber, 'should be a lossless number');
+  t.is(n.value, '42', 'should contain the right value');
 });
 
 test('create a LosslessNumber from some object', function (t) {
   let n = new LosslessNumber(new Date('2016-02-12T00:00:00.000Z'));
-  t.same(n.toString(), '1455235200000', 'should create from date');
+  t.is(n.toString(), '1455235200000', 'should create from date');
 
   let someObj = {
     valueOf: () => '2.3e-500'
   };
   let n2 = new LosslessNumber(someObj);
-  t.same(n2.toString(), '2.3e-500', 'should create via valueOf');
+  t.is(n2.toString(), '2.3e-500', 'should create via valueOf');
 });
 
 test('throw an error when creating a LosslessNumber from invalid number', function (t) {
@@ -51,8 +51,8 @@ test('throw an error when creating a LosslessNumber from invalid number', functi
 });
 
 test('get valueOf a LosslessNumber', function (t) {
-  t.same(new LosslessNumber('23.4').valueOf(), 23.4);
-  t.same(new LosslessNumber('23e4').valueOf(), 230000);
+  t.is(new LosslessNumber('23.4').valueOf(), 23.4);
+  t.is(new LosslessNumber('23e4').valueOf(), 230000);
 
   t.throws(() => new LosslessNumber('123456789012345678901234').valueOf(),
       /Cannot convert to number: number would be truncated/);
@@ -63,5 +63,5 @@ test('get valueOf a LosslessNumber', function (t) {
 });
 
 test('LosslessNumber - toString', function (t) {
-  t.same(new LosslessNumber('23.4').toString(), '23.4');
+  t.is(new LosslessNumber('23.4').toString(), '23.4');
 });
