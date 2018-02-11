@@ -184,6 +184,16 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   t.deepEqual(logs2, expected);
 });
 
+test('correctly handle strings equaling a JSON delimiter', function (t) {
+  t.deepEqual(parse('""'), "");
+  t.deepEqual(parse('"["'), "[");
+  t.deepEqual(parse('"]"'), "]");
+  t.deepEqual(parse('"{"'), "{");
+  t.deepEqual(parse('"}"'), "}");
+  t.deepEqual(parse('":"'), ":");
+  t.deepEqual(parse('","'), ",");
+});
+
 test('reviver - revive a lossless number correctly', function (t) {
   let text = '2.3e+500';
   let expected = [

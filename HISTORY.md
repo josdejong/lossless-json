@@ -1,6 +1,12 @@
 # History
 
 
+## 2018-02-11, version 1.0.2
+
+- Fixed #4: parser not handling strings equaling a JSON delimiter
+  like `"["` correctly.
+
+
 ## 2017-10-17, version 1.0.1
 
 - Upgraded all dev dependencies, fixes broken build script. See #2.
