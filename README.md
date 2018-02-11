@@ -307,6 +307,16 @@ npm run build
 This will generate an ES5 compatible bundle `./dist/lossless-json.js` which can be executed in browsers and node.js.
 
 
+## Deploy
+
+- Update version number in `package.json`
+- Describe changes is `HISTORY.md`
+- run `npm test` to see whether everything works correctly.
+- merge changes from `develop` into `master`
+- create git tag and push it: `git tag v1.0.2 && git push --tags`
+- publish via `npm publish` (this will first run `npm test && npm run build` before actually publishing the library).
+
+
 ## License
 
 Released under the [MIT license](LICENSE.md).
