@@ -1,6 +1,12 @@
 # History
 
 
+## 2018-07-31, version 1.0.3
+
+- Improved performance of `stringify` by using `JSON.stringify` where
+  possible. Thanks @SergeyFromHell for the suggestion (see #5).
+
+
 ## 2018-02-11, version 1.0.2
 
 - Fixed #4: parser not handling strings equaling a JSON delimiter
