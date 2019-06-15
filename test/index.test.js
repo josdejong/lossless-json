@@ -1,7 +1,4 @@
-'use strict';
-
 import test from 'ava';
-import 'babel-core/register';
 
 import { parse, stringify, config, LosslessNumber } from '../lib/index';
 
