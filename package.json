@@ -3,6 +3,7 @@
   "version": "1.0.3",
   "description": "Parse JSON without risk of losing numeric information",
   "main": "./dist/lossless-json.js",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/josdejong/lossless-json.git"
