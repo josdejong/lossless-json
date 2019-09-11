@@ -276,6 +276,12 @@ To test the library, first install dependencies once:
 npm install
 ```
 
+Then generate a bundle (some tests validate the created bundle):
+
+```
+npm run build
+```
+
 Then run the tests:
 
 ```
