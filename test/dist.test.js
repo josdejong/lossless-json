@@ -4,7 +4,6 @@ import * as LosslessJson from '../dist/lossless-json';
 
 // note that the following test will fail if the library isn't build beforehand
 test('Test bundle in dist', function (t) {
-  console.log('parse', LosslessJson.parse('{"a":2}'))
   t.deepEqual(
     LosslessJson.parse('{"a":2}'),
     {a: new LosslessJson.LosslessNumber(2)},
