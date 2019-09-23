@@ -27,7 +27,7 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/preset-env": "7.6.2",
-    "@babel/register": "7.6.0",
+    "@babel/register": "7.6.2",
     "ava": "2.4.0",
     "rollup": "1.21.4",
     "rollup-plugin-babel": "4.3.3",
