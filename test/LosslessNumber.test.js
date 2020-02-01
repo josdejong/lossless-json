@@ -11,12 +11,12 @@ test('create a LosslessNumber from string', function (t) {
 
 test('throw an error when when creating a LosslessNumber from invalid string', function (t) {
   // invalid
-  t.throws(() => new LosslessNumber('a'), /Invalid number/);
-  t.throws(() => new LosslessNumber('22.'), /Invalid number/);
-  t.throws(() => new LosslessNumber('0.2e'), /Invalid number/);
-  t.throws(() => new LosslessNumber('2e3.4'), /Invalid number/);
-  t.throws(() => new LosslessNumber('2.3.4'), /Invalid number/);
-  t.throws(() => new LosslessNumber('+24'), /Invalid number/);
+  t.throws(() => new LosslessNumber('a'), { message: /Invalid number/ });
+  t.throws(() => new LosslessNumber('22.'), { message: /Invalid number/ });
+  t.throws(() => new LosslessNumber('0.2e'), { message: /Invalid number/ });
+  t.throws(() => new LosslessNumber('2e3.4'), { message: /Invalid number/ });
+  t.throws(() => new LosslessNumber('2.3.4'), { message: /Invalid number/ });
+  t.throws(() => new LosslessNumber('+24'), { message: /Invalid number/ });
 
   // valid
   new LosslessNumber('42e+4');
@@ -42,9 +42,9 @@ test('create a LosslessNumber from some object', function (t) {
 });
 
 test('throw an error when creating a LosslessNumber from invalid number', function (t) {
-  t.throws(() => new LosslessNumber(Math.PI), /Invalid number: contains more than 15 digits/);
-  t.throws(() => new LosslessNumber(Infinity), /Invalid number: Infinity/);
-  t.throws(() => new LosslessNumber(NaN), /Invalid number: NaN/);
+  t.throws(() => new LosslessNumber(Math.PI), { message: /Invalid number: contains more than 15 digits/ });
+  t.throws(() => new LosslessNumber(Infinity), { message: /Invalid number: Infinity/ });
+  t.throws(() => new LosslessNumber(NaN), { message: /Invalid number: NaN/ });
 });
 
 test('get valueOf a LosslessNumber', function (t) {
@@ -52,11 +52,11 @@ test('get valueOf a LosslessNumber', function (t) {
   t.is(new LosslessNumber('23e4').valueOf(), 230000);
 
   t.throws(() => new LosslessNumber('123456789012345678901234').valueOf(),
-      /Cannot convert to number: number would be truncated/);
+    { message: /Cannot convert to number: number would be truncated/ });
   t.throws(() => new LosslessNumber('2.3e+500').valueOf(),
-      /Cannot convert to number: number would overflow/);
+    { message: /Cannot convert to number: number would overflow/ });
   t.throws(() => new LosslessNumber('2.3e-500').valueOf(),
-      /Cannot convert to number: number would underflow/);
+    { message: /Cannot convert to number: number would underflow/ });
 });
 
 test('LosslessNumber - toString', function (t) {

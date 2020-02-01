@@ -20,7 +20,7 @@ test('set configuration', function (t) {
   // disable circular references
   let c = config({circularRefs: false});
   t.deepEqual(c, {circularRefs: false});
-  t.throws(() => stringify(json), /Circular reference at "#\/a\/b"/);
+  t.throws(() => stringify(json), { message: 'Circular reference at "#\/a\/b"' });
   t.deepEqual (parse(expected), {a: {b: {$ref:'#/'}}});
 
   // enable circular references again

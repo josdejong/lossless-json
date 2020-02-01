@@ -227,28 +227,28 @@ test('parse circular reference (3)', function (t) {
 });
 
 test('throw exceptions', function (t) {
-  t.throws(function () {parse('')}, /Unexpected end of json string/, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('')}, { message: /Unexpected end of json string/ }, 'should throw an exception when parsing an invalid number');
 
-  t.throws(function () {parse('{')}, /Object key expected/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('{"a",')}, /Colon expected/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('{a:2}')}, /Object key expected/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('{"a":2,}')}, /Object key expected/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('{"a" "b"}')}, /Colon expected/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('{}{}')}, /Unexpected characters/, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('{')}, { message: /Object key expected/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('{"a",')}, { message: /Colon expected/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('{a:2}')}, { message: /Object key expected/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('{"a":2,}')}, { message: /Object key expected/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('{"a" "b"}')}, { message: /Colon expected/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('{}{}')}, { message: /Unexpected characters/ }, 'should throw an exception when parsing an invalid number');
 
-  t.throws(function () {parse('[')}, /Unexpected end of json string/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('[2,')}, /Unexpected end of json string/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('[2,]')}, /Value expected/, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('[')}, { message: /Unexpected end of json string/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('[2,')}, { message: /Unexpected end of json string/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('[2,]')}, { message: /Value expected/ }, 'should throw an exception when parsing an invalid number');
 
-  t.throws(function () {parse('2.3.4')}, /Syntax error in part ".4" \(char 3\)/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('2..3')}, /Invalid number, digit expected \(char 2\)/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('2e3.4')}, /Syntax error in part ".4" \(char 3\)/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('2e')}, /Invalid number, digit expected \(char 2\)/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('-')}, /Invalid number, digit expected \(char 1\)/, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('2.3.4')}, { message: /Syntax error in part ".4" \(char 3\)/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('2..3')}, { message: /Invalid number, digit expected \(char 2\)/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('2e3.4')}, { message: /Syntax error in part ".4" \(char 3\)/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('2e')}, { message: /Invalid number, digit expected \(char 2\)/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('-')}, { message: /Invalid number, digit expected \(char 1\)/ }, 'should throw an exception when parsing an invalid number');
 
-  t.throws(function () {parse('"a')}, /End of string expected/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('foo')}, /Unknown symbol "foo"/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('"\\a"')}, /Invalid escape character "\\a" /, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('"\\u26"')}, /Invalid unicode character/, 'should throw an exception when parsing an invalid number');
-  t.throws(function () {parse('"\\uZ000"')}, /Invalid unicode character/, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('"a')}, { message: /End of string expected/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('foo')}, { message: /Unknown symbol "foo"/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('"\\a"')}, { message: /Invalid escape character "\\a" / }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('"\\u26"')}, { message: /Invalid unicode character/ }, 'should throw an exception when parsing an invalid number');
+  t.throws(function () {parse('"\\uZ000"')}, { message: /Invalid unicode character/ }, 'should throw an exception when parsing an invalid number');
 });

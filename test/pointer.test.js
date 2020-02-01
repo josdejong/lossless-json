@@ -17,5 +17,5 @@ test('parse a JSON pointer', function (t) {
 
 
 test('throw an exception if not starting with #', function (t) {
-  t.throws(() => parse('/foo/bar'), /Cannot parse JSON Pointer/);
+  t.throws(() => parse('/foo/bar'), { message: /Cannot parse JSON Pointer/ });
 });
