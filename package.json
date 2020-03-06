@@ -26,8 +26,8 @@
   "author": "Jos de Jong",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "7.8.6",
-    "@babel/preset-env": "7.8.6",
+    "@babel/core": "7.8.7",
+    "@babel/preset-env": "7.8.7",
     "@babel/register": "7.8.6",
     "ava": "3.5.0",
     "rollup": "1.32.0",
