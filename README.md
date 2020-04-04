@@ -1,7 +1,5 @@
 # lossless-json
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/josdejong/lossless-json.svg)](https://greenkeeper.io/)
-
 Parse JSON without risk of losing numeric information.
 
 ```js
