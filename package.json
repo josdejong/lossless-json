@@ -34,6 +34,12 @@
     "rollup-plugin-babel": "4.4.0",
     "rollup-plugin-uglify": "6.0.4"
   },
+  "files": [
+    "dist",
+    "HISTORY.md",
+    "LICENSE.md",
+    "README.md"
+  ],
   "ava": {
     "require": [
       "@babel/register"

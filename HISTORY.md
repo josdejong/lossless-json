@@ -1,6 +1,11 @@
 # History
 
 
+## 2020-05-08, version 1.0.4
+
+- Fix #117: remove unnecessary configuration files from npm package.
+
+
 ## 2018-07-31, version 1.0.3
 
 - Improved performance of `stringify` by using `JSON.stringify` where

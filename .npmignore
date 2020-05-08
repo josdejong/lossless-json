@@ -1,7 +1,0 @@
-lib
-node_modules
-test
-.babelrc
-.gitignore
-.travis.yml
-rollup.config.js
