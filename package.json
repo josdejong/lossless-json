@@ -1,6 +1,6 @@
 {
   "name": "lossless-json",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Parse JSON without risk of losing numeric information",
   "main": "./dist/lossless-json.js",
   "repository": {
@@ -29,8 +29,8 @@
     "@babel/core": "7.9.6",
     "@babel/preset-env": "7.9.6",
     "@babel/register": "7.9.0",
-    "ava": "3.8.1",
-    "rollup": "2.7.6",
+    "ava": "3.8.2",
+    "rollup": "2.8.2",
     "rollup-plugin-babel": "4.4.0",
     "rollup-plugin-uglify": "6.0.4"
   },
