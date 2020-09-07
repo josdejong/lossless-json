@@ -30,7 +30,7 @@
     "@babel/preset-env": "7.11.0",
     "@babel/register": "7.10.5",
     "ava": "3.12.1",
-    "rollup": "2.26.8",
+    "rollup": "2.26.10",
     "rollup-plugin-babel": "4.4.0",
     "rollup-plugin-uglify": "6.0.4"
   },
