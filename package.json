@@ -32,7 +32,7 @@
     "ava": "3.13.0",
     "rollup": "2.32.1",
     "rollup-plugin-babel": "4.4.0",
-    "rollup-plugin-uglify": "5.0.2"
+    "rollup-plugin-uglify": "6.0.4"
   },
   "files": [
     "dist",
