@@ -28,7 +28,7 @@
   "devDependencies": {
     "@babel/core": "7.12.9",
     "@babel/preset-env": "7.12.7",
-    "@babel/register": "7.12.1",
+    "@babel/register": "7.12.10",
     "ava": "3.13.0",
     "rollup": "2.34.1",
     "rollup-plugin-babel": "4.4.0",
