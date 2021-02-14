@@ -26,11 +26,11 @@
   "author": "Jos de Jong",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "7.12.10",
-    "@babel/preset-env": "7.12.11",
-    "@babel/register": "7.12.10",
-    "ava": "3.14.0",
-    "rollup": "2.35.1",
+    "@babel/core": "7.12.16",
+    "@babel/preset-env": "7.12.16",
+    "@babel/register": "7.12.13",
+    "ava": "3.15.0",
+    "rollup": "2.39.0",
     "rollup-plugin-babel": "4.4.0",
     "rollup-plugin-uglify": "6.0.4"
   },
