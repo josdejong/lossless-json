@@ -46,6 +46,16 @@ test('stringify', function (t) {
   t.is(stringify({a:2,b:"str",c:null,d: undefined, e:function() {}}),
       '{"a":2,"b":"str","c":null}', 'should stringify Object');
 
+  t.is(stringify({'\\\\d': 1}),
+      '{\"\\\\\\\\d\":1}',
+      'should stringify a string with control characters');
+
+  // validate exepected outcome against native JSON.stringify
+  t.is(JSON.stringify({'\\\\d': 1}),
+      '{\"\\\\\\\\d\":1}',
+      'should stringify a string with control characters');
+
+
   t.is(stringify({a:2,toJSON: function () {return 'foo'}}),
       '"foo"', 'should stringify object with toJSON method');
 
