@@ -1,6 +1,12 @@
 # History
 
 
+## 2021-07-22, version 1.0.5
+
+- Fixed special characters like backslash not being transformed when 
+  stringifing an object key, see #239. Thanks @mengfanliao.
+
+
 ## 2020-05-08, version 1.0.4
 
 - Fix #117: remove unnecessary configuration files from npm package.
