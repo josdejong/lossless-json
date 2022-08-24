@@ -9,9 +9,9 @@ const text = JSON.stringify(json);
 
 const suite = new Benchmark.Suite()
 suite
-  .add('JSON.parse            ', () => JSON.parse(text))
+  .add('        JSON.parse    ', () => JSON.parse(text))
   .add('LosslessJSON.parse    ', () => LosslessJSON.parse(text))
-  .add('JSON.stringify        ', () => JSON.stringify(json))
+  .add('        JSON.stringify', () => JSON.stringify(json))
   .add('LosslessJSON.stringify', () => LosslessJSON.stringify(json))
   .on('cycle', function (event) {
     console.log(String(event.target))
