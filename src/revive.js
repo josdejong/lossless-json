@@ -42,15 +42,16 @@ function reviveValue (context, key, value, reviver) {
  * @return {Object}
  */
 function reviveObject (object, reviver) {
-  let revived = {};
-
-  for (let key in object) {
-    if (object.hasOwnProperty(key)) {
-      revived[key] = reviveValue(object, key, object[key], reviver);
+  Object.keys(object).forEach(key => {
+    const value = reviveValue(object, key, object[key], reviver);
+    if (value !== undefined) {
+      object[key] = value
+    } else {
+      delete object[key]
     }
-  }
+  })
 
-  return revived;
+  return object;
 }
 
 /**
@@ -60,11 +61,9 @@ function reviveObject (object, reviver) {
  * @return {Array}
  */
 function reviveArray (array, reviver) {
-  let revived = [];
-
   for (let i = 0; i < array.length; i++) {
-    revived[i] = reviveValue(array, i + '', array[i], reviver);
+    array[i] = reviveValue(array, i + '', array[i], reviver)
   }
 
-  return revived;
+  return array;
 }

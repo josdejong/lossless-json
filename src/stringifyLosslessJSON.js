@@ -1,7 +1,7 @@
 'use strict';
 
-import { config } from './config'
-import { stringify as stringifyPointer } from './pointer';
+import { config } from './config.js'
+import { stringify as stringifyPointer } from './pointer.js';
 
 // Keep track of the stack to handle circular references
 // https://github.com/manuelstofer/json-pointer/blob/master/index.js
@@ -35,7 +35,7 @@ let stack = []; // objects (Object or Array) on the current stack
  *
  * @returns {string | undefined} Returns the string representation of the JSON object.
  */
-export function stringify(value, replacer, space) {
+export function stringifyLosslessJSON(value, replacer, space) {
   // clear stack
   stack = [];
   path = [];
@@ -163,7 +163,7 @@ function stringifyObject(object, replacer, space, indent) {
   let str = space ? '{\n' : '{';
 
   if (typeof object.toJSON === 'function') {
-    return stringify(object.toJSON(), replacer, space);
+    return stringifyLosslessJSON(object.toJSON(), replacer, space);
   }
 
   // check for circular reference

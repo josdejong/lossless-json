@@ -1,20 +1,14 @@
-import test from 'ava';
-
 import * as LosslessJson from '../dist/lossless-json';
 
 // note that the following test will fail if the library isn't build beforehand
-test('Test bundle in dist', function (t) {
-  t.deepEqual(
-    LosslessJson.parse('{"a":2}'),
-    {a: new LosslessJson.LosslessNumber(2)},
-    'parse json');
+test('Test bundle in dist', function () {
+  expect(LosslessJson.parse('{"a":2}'))
+    .toEqual({a: new LosslessJson.LosslessNumber(2)});
 
-  t.is(
-    LosslessJson.stringify({a:2}),
-    '{"a":2}',
-    'stringify json');
+  expect(LosslessJson.stringify({a:2}))
+    .toEqual('{"a":2}');
 
-  t.deepEqual(LosslessJson.config(), {circularRefs: true}, 'get config');
+  expect(LosslessJson.config()).toEqual({circularRefs: true});
 
-  t.truthy(new LosslessJson.LosslessNumber(2).isLosslessNumber, 'create lossless number');
+  expect(new LosslessJson.LosslessNumber(2).isLosslessNumber).toBe(true);
 });
