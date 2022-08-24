@@ -8,9 +8,9 @@
  * @returns {string}
  */
 export function escape (str) {
-  return encodeURIComponent(str
+  return str
       .replace(/\//g, '~1')
-      .replace(/~/g, '~0'));
+      .replace(/~/g, '~0')
 }
 
 /**
@@ -20,9 +20,9 @@ export function escape (str) {
  * @returns {string}
  */
 export function unescape (str) {
-  return decodeURIComponent(str)
+  return str
       .replace(/~1/g, '/')
-      .replace(/~0/g, '~');
+      .replace(/~0/g, '~')
 }
 
 /**
@@ -36,7 +36,7 @@ export function unescape (str) {
  * @param {Array.<string>} array
  * @returns {string}
  */
-export function stringify(array) {
+export function stringifyJSONPointer(array) {
   return '#/' + array.map(escape).join('/');
 }
 
@@ -45,7 +45,7 @@ export function stringify(array) {
  * @param {string} pointer
  * @return {Array.<string>}
  */
-export function parse(pointer) {
+export function parseJSONPointer(pointer) {
   let array = pointer.split('/').map(unescape);
 
   // remove the hash

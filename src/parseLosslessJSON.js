@@ -1,8 +1,8 @@
 'use strict'
 
+import { resolveCircularReferences } from './circular.js'
 import { config } from './config.js'
 import { LosslessNumber } from './LosslessNumber.js'
-import { parse as parsePointer } from './pointer.js'
 import { revive } from './revive.js'
 
 /**
@@ -26,12 +26,17 @@ import { revive } from './revive.js'
 export function parseLosslessJSON(text, reviver = undefined) {
   let i = 0
 
-  const value = parseValue()
+  let value = parseValue()
   expectEndOfInput()
 
-  return reviver
-    ? revive(value, reviver)
-    : value
+  // TODO: create a plugin system
+  if (reviver) {
+    value = revive(value, reviver)
+  }
+  if (config().circularRefs) {
+    value = resolveCircularReferences(value)
+  }
+  return value
 
   function parseObject() {
     if (text[i] === "{") {
@@ -39,15 +44,15 @@ export function parseLosslessJSON(text, reviver = undefined) {
       skipWhitespace()
 
       const object = {}
-
       let initial = true
-      // if it is not '}',
-      // we take the path of string -> whitespace -> ':' -> value -> ...
       while (i < text.length && text[i] !== "}") {
         if (!initial) {
           eatComma()
           skipWhitespace()
+        } else {
+          initial = false
         }
+
         const key = parseString()
         if (key === undefined) {
           expectObjectKey()
@@ -55,7 +60,6 @@ export function parseLosslessJSON(text, reviver = undefined) {
         skipWhitespace()
         eatColon()
         object[key] = parseValue()
-        initial = false
       }
       expectNotEndOfInput("}")
       // move to the next character of '}'
@@ -75,13 +79,14 @@ export function parseLosslessJSON(text, reviver = undefined) {
       while (i < text.length && text[i] !== "]") {
         if (!initial) {
           eatComma()
+        } else {
+          initial = false
         }
+
         const value = parseValue()
         array.push(value)
-        initial = false
       }
       expectNotEndOfInput("]")
-      // move to the next character of ']'
       i++
 
       return array
@@ -164,6 +169,7 @@ export function parseLosslessJSON(text, reviver = undefined) {
       i++
       expectDigit(start)
     }
+
     if (text[i] === "0") {
       i++
     } else if (isNonZeroDigit(text[i])) {
@@ -180,6 +186,7 @@ export function parseLosslessJSON(text, reviver = undefined) {
         i++
       }
     }
+
     if (text[i] === "e" || text[i] === "E") {
       i++
       if (text[i] === "-" || text[i] === "+") {
@@ -190,9 +197,9 @@ export function parseLosslessJSON(text, reviver = undefined) {
         i++
       }
     }
+
     if (i > start) {
       return new LosslessNumber(text.slice(start, i))
-      // return parseFloat(str.slice(start, i))
     }
   }
 

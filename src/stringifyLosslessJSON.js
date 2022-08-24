@@ -1,7 +1,7 @@
 'use strict';
 
 import { config } from './config.js'
-import { stringify as stringifyPointer } from './pointer.js';
+import { stringifyJSONPointer as stringifyPointer } from './jsonPointer.js';
 
 // Keep track of the stack to handle circular references
 // https://github.com/manuelstofer/json-pointer/blob/master/index.js
