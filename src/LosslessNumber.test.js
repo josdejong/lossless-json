@@ -1,4 +1,4 @@
-import { LosslessNumber } from '../src/LosslessNumber';
+import { LosslessNumber } from './LosslessNumber.js';
 
 test('create a LosslessNumber from string', function() {
   let n = new LosslessNumber('42');

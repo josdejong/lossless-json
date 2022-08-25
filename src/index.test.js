@@ -1,4 +1,4 @@
-import { parse, stringify, LosslessNumber } from '../src/index';
+import { parse, stringify, LosslessNumber } from './index.js';
 
 test('Public API', function () {
   expect(parse('{}')).toEqual({});

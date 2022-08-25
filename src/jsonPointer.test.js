@@ -1,4 +1,4 @@
-import { parseJSONPointer, stringifyJSONPointer } from '../src/jsonPointer.js';
+import { parseJSONPointer, stringifyJSONPointer } from './jsonPointer.js';
 
 test('stringify a JSON pointer', function () {
   expect(stringifyJSONPointer([])).toBe('#/');

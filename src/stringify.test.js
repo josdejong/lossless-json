@@ -1,5 +1,5 @@
-import { LosslessNumber } from '../src/LosslessNumber';
-import { stringify } from '../src/stringify.js';
+import { LosslessNumber } from './LosslessNumber.js';
+import { stringify } from './stringify.js';
 
 // helper function to create a lossless number
 function lln (value) {

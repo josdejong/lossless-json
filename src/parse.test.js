@@ -1,9 +1,9 @@
-import { config } from '../src/index.js'
-import { LosslessNumber } from '../src/LosslessNumber'
-import { parseNumberAndBigInt } from '../src/numberParsers.js'
-import { parse } from '../src/parse.js'
-import { stringify } from '../src/stringify.js'
-import { isInteger } from '../src/utils.js'
+import { config } from './index.js'
+import { LosslessNumber } from './LosslessNumber.js'
+import { parseNumberAndBigInt } from './numberParsers.js'
+import { parse } from './parse.js'
+import { stringify } from './stringify.js'
+import { isInteger } from './utils.js'
 
 // helper function to create a lossless number
 function lln (value) {
