@@ -16,7 +16,7 @@
     "test:lib": "npm run build && jest --rootDir='test-lib'",
     "build": "npm-run-all build:**",
     "build:clean": "del-cli lib",
-    "build:esm": "babel src --out-dir lib/esm --extensions \".ts\" --source-maps --config-file ./babel-esm.config.json",
+    "build:esm": "babel src --out-dir lib/esm --extensions \".ts\" --source-maps --config-file ./babel.config.json",
     "build:umd": "rollup ./lib/esm/index.js --format umd --name 'LosslessJSON' --sourcemap --output.file lib/umd/lossless-json.js && cpy tools/cjs/package.json lib/umd --flat",
     "build:types": "tsc --project tsconfig-types.json",
     "lint": "prettier --ignore-path .gitignore lib --check . && eslint src/**/*.ts test/**/*.ts test-lib/**/*.mjs tools/**/*.mjs",
