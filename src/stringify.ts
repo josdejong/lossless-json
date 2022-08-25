@@ -35,33 +35,33 @@ import { repeat } from './utils.js'
  *
  * @returns Returns the string representation of the JSON object.
  */
-export function stringify (
+export function stringify(
   value: unknown,
   replacer?: Replacer,
   space?: number | string,
   valueStringifiers?: ValueStringifier[]
-) : string | undefined {
+): string | undefined {
   const resolvedSpace = resolveSpace(space)
 
-  const replacedValue = (typeof replacer === 'function')
-    ? replacer.call({ '': value }, '', value)
-    : value
+  const replacedValue =
+    typeof replacer === 'function' ? replacer.call({ '': value }, '', value) : value
 
   return _stringifyValue(replacedValue, '')
 
   /**
    * Stringify a value
    */
-  function _stringifyValue (value: unknown, indent: string) : string | undefined {
+  function _stringifyValue(value: unknown, indent: string): string | undefined {
     if (Array.isArray(valueStringifiers)) {
-      const stringifier = valueStringifiers.find(item => item.test(value))
+      const stringifier = valueStringifiers.find((item) => item.test(value))
       if (stringifier) {
         return stringifier.stringify(value)
       }
     }
 
     // boolean, null, number, string, or date
-    if (typeof value === 'boolean' ||
+    if (
+      typeof value === 'boolean' ||
       typeof value === 'number' ||
       typeof value === 'string' ||
       value === null ||
@@ -101,14 +101,13 @@ export function stringify (
   /**
    * Stringify an array
    */
-  function stringifyArray (array: Array<unknown>, indent: string) : string {
-    const childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined
+  function stringifyArray(array: Array<unknown>, indent: string): string {
+    const childIndent = resolvedSpace ? indent + resolvedSpace : undefined
     let str = resolvedSpace ? '[\n' : '['
 
     for (let i = 0; i < array.length; i++) {
-      const item = (typeof replacer === 'function')
-        ? replacer.call(array, String(i), array[i])
-        : array[i]
+      const item =
+        typeof replacer === 'function' ? replacer.call(array, String(i), array[i]) : array[i]
 
       if (resolvedSpace) {
         str += childIndent
@@ -125,15 +124,15 @@ export function stringify (
       }
     }
 
-    str += resolvedSpace ? ('\n' + indent + ']') : ']'
+    str += resolvedSpace ? '\n' + indent + ']' : ']'
     return str
   }
 
   /**
    * Stringify an object
    */
-  function stringifyObject (object: GenericObject<unknown>, indent: string) : string {
-    const childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined
+  function stringifyObject(object: GenericObject<unknown>, indent: string): string {
+    const childIndent = resolvedSpace ? indent + resolvedSpace : undefined
     let first = true
     let str = resolvedSpace ? '{\n' : '{'
 
@@ -143,10 +142,9 @@ export function stringify (
 
     const keys: string[] = Array.isArray(replacer) ? replacer.map(String) : Object.keys(object)
 
-    keys.forEach(key => {
-      const value = (typeof replacer === 'function')
-        ? replacer.call(object, key, object[key])
-        : object[key]
+    keys.forEach((key) => {
+      const value =
+        typeof replacer === 'function' ? replacer.call(object, key, object[key]) : object[key]
 
       if (includeProperty(key, value)) {
         if (first) {
@@ -157,25 +155,21 @@ export function stringify (
 
         const keyStr = JSON.stringify(key)
 
-        str += resolvedSpace
-          ? (childIndent + keyStr + ': ')
-          : keyStr + ':'
+        str += resolvedSpace ? childIndent + keyStr + ': ' : keyStr + ':'
 
         str += _stringifyValue(value, childIndent)
       }
     })
 
-    str += resolvedSpace ? ('\n' + indent + '}') : '}'
+    str += resolvedSpace ? '\n' + indent + '}' : '}'
     return str
   }
 
   /**
    * Test whether to include a property in a stringified object or not.
    */
-  function includeProperty (key: string, value: unknown) : boolean {
-    return typeof value !== 'undefined' &&
-      typeof value !== 'function' &&
-      typeof value !== 'symbol'
+  function includeProperty(key: string, value: unknown): boolean {
+    return typeof value !== 'undefined' && typeof value !== 'function' && typeof value !== 'symbol'
   }
 }
 
@@ -183,7 +177,7 @@ export function stringify (
  * Resolve a JSON stringify space:
  * replace a number with a string containing that number of spaces
  */
-function resolveSpace (space : number | string | undefined) : string | undefined {
+function resolveSpace(space: number | string | undefined): string | undefined {
   if (typeof space === 'number') {
     return repeat(' ', space)
   }

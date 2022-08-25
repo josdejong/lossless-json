@@ -1,4 +1,3 @@
-
 export default {
   input: 'src/index.ts',
   output: {
@@ -8,4 +7,4 @@ export default {
     compact: true,
     sourcemap: true
   }
-};
+}

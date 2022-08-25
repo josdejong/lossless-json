@@ -25,7 +25,7 @@ import type { NumberParser, Reviver } from './types'
  *
  * @throws Throws a SyntaxError exception if the string to parse is not valid JSON.
  */
-export function parse (
+export function parse(
   text: string,
   reviver?: Reviver,
   parseNumber: NumberParser = parseLosslessNumber
@@ -34,11 +34,9 @@ export function parse (
   const value = parseValue()
   expectEndOfInput()
 
-  return reviver
-    ? revive(value, reviver)
-    : value
+  return reviver ? revive(value, reviver) : value
 
-  function parseObject () : GenericObject<unknown> | undefined {
+  function parseObject(): GenericObject<unknown> | undefined {
     if (text[i] === '{') {
       i++
       skipWhitespace()
@@ -69,7 +67,7 @@ export function parse (
     }
   }
 
-  function parseArray () : Array<unknown> | unknown {
+  function parseArray(): Array<unknown> | unknown {
     if (text[i] === '[') {
       i++
       skipWhitespace()
@@ -93,7 +91,7 @@ export function parse (
     }
   }
 
-  function parseValue () : unknown {
+  function parseValue(): unknown {
     skipWhitespace()
 
     const value =
@@ -110,20 +108,20 @@ export function parse (
     return value
   }
 
-  function parseKeyword (name: string, value: unknown) : unknown | undefined {
+  function parseKeyword(name: string, value: unknown): unknown | undefined {
     if (text.slice(i, i + name.length) === name) {
       i += name.length
       return value
     }
   }
 
-  function skipWhitespace () {
+  function skipWhitespace() {
     while (isWhitespace(text[i])) {
       i++
     }
   }
 
-  function parseString () {
+  function parseString() {
     if (text[i] === '"') {
       i++
       let result = ''
@@ -141,9 +139,7 @@ export function parse (
               isHex(text[i + 4]) &&
               isHex(text[i + 5])
             ) {
-              result += String.fromCharCode(
-                parseInt(text.slice(i + 2, i + 6), 16)
-              )
+              result += String.fromCharCode(parseInt(text.slice(i + 2, i + 6), 16))
               i += 5
             } else {
               i += 2
@@ -163,7 +159,7 @@ export function parse (
     }
   }
 
-  function parseNumeric () {
+  function parseNumeric() {
     const start = i
     if (text[i] === '-') {
       i++
@@ -203,32 +199,32 @@ export function parse (
     }
   }
 
-  function eatComma () {
+  function eatComma() {
     expectCharacter(',')
     i++
   }
 
-  function eatColon () {
+  function eatColon() {
     expectCharacter(':')
     i++
   }
 
   // error handling
-  function expectNotEndOfInput (expected: string) {
+  function expectNotEndOfInput(expected: string) {
     if (i === text.length) {
       printCodeSnippet(`Expecting a \`${expected}\` here`)
       throw new Error('JSON_ERROR_0001 Unexpected End of Input')
     }
   }
 
-  function expectEndOfInput () {
+  function expectEndOfInput() {
     if (i < text.length) {
       printCodeSnippet('Expecting to end here')
       throw new Error('JSON_ERROR_0002 Expected End of Input')
     }
   }
 
-  function expectObjectKey () {
+  function expectObjectKey() {
     printCodeSnippet(`Expecting object key here
 
 For example:
@@ -237,14 +233,14 @@ For example:
     throw new Error('JSON_ERROR_0003 Expecting JSON Key')
   }
 
-  function expectCharacter (expected: string) {
+  function expectCharacter(expected: string) {
     if (text[i] !== expected) {
       printCodeSnippet(`Expecting a \`${expected}\` here`)
       throw new Error('JSON_ERROR_0004 Unexpected token')
     }
   }
 
-  function expectDigit (start: number) {
+  function expectDigit(start: number) {
     const numSoFar = text.slice(start, i)
     if (!(text[i] >= '0' && text[i] <= '9')) {
       printCodeSnippet(`JSON_ERROR_0005 Expecting a digit here
@@ -256,7 +252,7 @@ ${' '.repeat(numSoFar.length)}^`)
     }
   }
 
-  function expectEscapeCharacter (strSoFar: string) {
+  function expectEscapeCharacter(strSoFar: string) {
     printCodeSnippet(`JSON_ERROR_0007 Expecting escape character
 
 For example:
@@ -266,7 +262,7 @@ List of escape characters are: \\", \\\\, \\/, \\b, \\f, \\n, \\r, \\t, \\u`)
     throw new Error('JSON_ERROR_0008 Expecting an escape character')
   }
 
-  function expectEscapeUnicode (strSoFar: string) {
+  function expectEscapeUnicode(strSoFar: string) {
     printCodeSnippet(`Expect escape unicode
 
 For example:
@@ -275,7 +271,7 @@ ${' '.repeat(strSoFar.length + 1)}^^^^^^`)
     throw new Error('JSON_ERROR_0009 Expecting an escape unicode')
   }
 
-  function printCodeSnippet (message: string) {
+  function printCodeSnippet(message: string) {
     const from = Math.max(0, i - 10)
     const trimmed = from > 0
     const padding = (trimmed ? 4 : 0) + (i - from)
@@ -288,19 +284,19 @@ ${' '.repeat(strSoFar.length + 1)}^^^^^^`)
   }
 }
 
-function isWhitespace (char: string) : boolean {
+function isWhitespace(char: string): boolean {
   return whitespaceCharacters[char] === true
 }
 
-function isHex (char: string) : boolean {
+function isHex(char: string): boolean {
   return /^[0-9a-fA-F]/.test(char)
 }
 
-function isDigit (char: string) : boolean {
+function isDigit(char: string): boolean {
   return /[0-9]/.test(char)
 }
 
-function isNonZeroDigit (char: string) : boolean {
+function isNonZeroDigit(char: string): boolean {
   return /[1-9]/.test(char)
 }
 

@@ -4,7 +4,7 @@ import { stringify } from '../src/stringify'
 import { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
-function lln (value: string | number) {
+function lln(value: string | number) {
   return new LosslessNumber(value)
 }
 
@@ -44,21 +44,44 @@ test('stringify', function () {
 
   expect(stringify(new Date('2016-02-08T14:00:00Z'))).toEqual('"2016-02-08T14:00:00.000Z"')
 
-  expect(stringify([2, 'str', null, undefined, true, function () { console.log('test') }]))
-    .toEqual('[2,"str",null,null,true,null]')
+  expect(
+    stringify([
+      2,
+      'str',
+      null,
+      undefined,
+      true,
+      function () {
+        console.log('test')
+      }
+    ])
+  ).toEqual('[2,"str",null,null,true,null]')
 
-  expect(stringify({ a: 2, b: 'str', c: null, d: undefined, e: function () { console.log('test') } }))
-    .toEqual('{"a":2,"b":"str","c":null}')
+  expect(
+    stringify({
+      a: 2,
+      b: 'str',
+      c: null,
+      d: undefined,
+      e: function () {
+        console.log('test')
+      }
+    })
+  ).toEqual('{"a":2,"b":"str","c":null}')
 
-  expect(stringify({ '\\\\d': 1 }))
-    .toEqual('{"\\\\\\\\d":1}')
+  expect(stringify({ '\\\\d': 1 })).toEqual('{"\\\\\\\\d":1}')
 
   // validate exepected outcome against native JSON.stringify
-  expect(JSON.stringify({ '\\\\d': 1 }))
-    .toEqual('{"\\\\\\\\d":1}')
+  expect(JSON.stringify({ '\\\\d': 1 })).toEqual('{"\\\\\\\\d":1}')
 
-  expect(stringify({ a: 2, toJSON: function () { return 'foo' } }))
-    .toEqual('"foo"')
+  expect(
+    stringify({
+      a: 2,
+      toJSON: function () {
+        return 'foo'
+      }
+    })
+  ).toEqual('"foo"')
 
   // TODO: Symbol
   // TODO: ignore non-enumerable properties
@@ -79,8 +102,7 @@ test('stringify bigint', function () {
 })
 
 test('stringify Date', function () {
-  expect(stringify([new Date('2022-08-25T09:39:19.288Z')]))
-    .toEqual('["2022-08-25T09:39:19.288Z"]')
+  expect(stringify([new Date('2022-08-25T09:39:19.288Z')])).toEqual('["2022-08-25T09:39:19.288Z"]')
 })
 
 test('stringify Decimal', function () {
@@ -92,8 +114,9 @@ test('stringify Decimal', function () {
 
   const a = new Decimal('123456789123456789123456789')
 
-  expect(stringify(a, undefined, undefined, valueStringifiers))
-    .toEqual('1.23456789123456789123456789e+26')
+  expect(stringify(a, undefined, undefined, valueStringifiers)).toEqual(
+    '1.23456789123456789123456789e+26'
+  )
 
   const values = [
     new Decimal('1.23456789123456789123456789e+26'),
@@ -101,8 +124,9 @@ test('stringify Decimal', function () {
     new Decimal('123')
   ]
 
-  expect(stringify(values, undefined, undefined, valueStringifiers))
-    .toEqual('[1.23456789123456789123456789e+26,2.3,123]')
+  expect(stringify(values, undefined, undefined, valueStringifiers)).toEqual(
+    '[1.23456789123456789123456789e+26,2.3,123]'
+  )
 })
 
 test('stringify should keep formatting of a lossless number', function () {
@@ -187,7 +211,7 @@ test('stringify with replacer function (2)', function () {
 
   const expected = '{"a":"number:a:123","b":"string:b:str"}'
 
-  function replacer (key: string, value: unknown) : JSONValue {
+  function replacer(key: string, value: unknown): JSONValue {
     if (key === 'c') {
       return undefined
     }
@@ -223,19 +247,19 @@ test('stringify with numeric space', function () {
   const json: JSONValue = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
 
   const expected =
-      '{\n' +
-      '  "a": 1,\n' +
-      '  "b": [\n' +
-      '    1,\n' +
-      '    2,\n' +
-      '    null,\n' +
-      '    null,\n' +
-      '    {\n' +
-      '      "c": 3\n' +
-      '    }\n' +
-      '  ],\n' +
-      '  "d": null\n' +
-      '}'
+    '{\n' +
+    '  "a": 1,\n' +
+    '  "b": [\n' +
+    '    1,\n' +
+    '    2,\n' +
+    '    null,\n' +
+    '    null,\n' +
+    '    {\n' +
+    '      "c": 3\n' +
+    '    }\n' +
+    '  ],\n' +
+    '  "d": null\n' +
+    '}'
 
   expect(stringify(json, null, 2)).toEqual(expected)
 
@@ -247,19 +271,19 @@ test('stringify with string space', function () {
   const json: JSONValue = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
 
   const expected =
-      '{\n' +
-      '~"a": 1,\n' +
-      '~"b": [\n' +
-      '~~1,\n' +
-      '~~2,\n' +
-      '~~null,\n' +
-      '~~null,\n' +
-      '~~{\n' +
-      '~~~"c": 3\n' +
-      '~~}\n' +
-      '~],\n' +
-      '~"d": null\n' +
-      '}'
+    '{\n' +
+    '~"a": 1,\n' +
+    '~"b": [\n' +
+    '~~1,\n' +
+    '~~2,\n' +
+    '~~null,\n' +
+    '~~null,\n' +
+    '~~{\n' +
+    '~~~"c": 3\n' +
+    '~~}\n' +
+    '~],\n' +
+    '~"d": null\n' +
+    '}'
 
   expect(stringify(json, null, '~')).toEqual(expected)
 

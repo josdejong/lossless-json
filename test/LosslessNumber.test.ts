@@ -59,12 +59,15 @@ test('get valueOf a LosslessNumber', function () {
   expect(new LosslessNumber('23.4').valueOf()).toBe(23.4)
   expect(new LosslessNumber('23e4').valueOf()).toBe(230000)
 
-  expect(() => new LosslessNumber('123456789012345678901234').valueOf())
-    .toThrow(/Cannot convert to number: number would be truncated/)
-  expect(() => new LosslessNumber('2.3e+500').valueOf())
-    .toThrow(/Cannot convert to number: number would overflow/)
-  expect(() => new LosslessNumber('2.3e-500').valueOf())
-    .toThrow(/Cannot convert to number: number would underflow/)
+  expect(() => new LosslessNumber('123456789012345678901234').valueOf()).toThrow(
+    /Cannot convert to number: number would be truncated/
+  )
+  expect(() => new LosslessNumber('2.3e+500').valueOf()).toThrow(
+    /Cannot convert to number: number would overflow/
+  )
+  expect(() => new LosslessNumber('2.3e-500').valueOf()).toThrow(
+    /Cannot convert to number: number would underflow/
+  )
 })
 
 test('can do operations like add a number and a LosslessNumber', () => {

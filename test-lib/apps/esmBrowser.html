@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>LosslessJSON  browser test (ESM)</title>
-  <script type="module">
-    import { parse, stringify } from '../../src/index.ts'
+  <head>
+    <meta charset="UTF-8" />
+    <title>LosslessJSON browser test (ESM)</title>
+    <script type="module">
+      import { parse, stringify } from '../../src/index.ts'
 
-    const text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-    const json = parse(text);
+      const text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}'
+      const json = parse(text)
 
-    console.log('parsed:', json);
-    console.log('json.a:', json.a);
-    console.log('stringified:', stringify(json));
-  </script>
-</head>
-<body>
-  see developer console...
-</body>
+      console.log('parsed:', json)
+      console.log('json.a:', json.a)
+      console.log('stringified:', stringify(json))
+    </script>
+  </head>
+  <body>
+    see developer console...
+  </body>
 </html>

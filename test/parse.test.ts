@@ -1,26 +1,20 @@
 import Decimal from 'decimal.js'
-import {
-  LosslessNumber,
-  parse,
-  parseNumberAndBigInt,
-  reviveDate,
-  stringify
-} from '../src'
+import { LosslessNumber, parse, parseNumberAndBigInt, reviveDate, stringify } from '../src'
 import { isLosslessNumber } from '../src/LosslessNumber'
 import { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
-function lln (value: string | number) {
+function lln(value: string | number) {
   return new LosslessNumber(value)
 }
 
 // deepEqual objects compared as plain JSON instead of JavaScript classes
-function expectDeepEqual (a: unknown, b: unknown) {
+function expectDeepEqual(a: unknown, b: unknown) {
   expect(jsonify(a)).toEqual(jsonify(b))
 }
 
 // turn a JavaScript object into plain JSON
-function jsonify (obj: unknown) : JSONValue {
+function jsonify(obj: unknown): JSONValue {
   return JSON.parse(JSON.stringify(obj))
 }
 
@@ -50,7 +44,15 @@ test('array', function () {
   expect(parse('[]')).toEqual([])
   expect(parse('[{}]')).toEqual([{}])
   expect(parse('{"a":[]}')).toEqual({ a: [] })
-  expect(parse('[1, "hi", true, false, null, {}, []]')).toEqual([lln(1), 'hi', true, false, null, {}, []])
+  expect(parse('[1, "hi", true, false, null, {}, []]')).toEqual([
+    lln(1),
+    'hi',
+    true,
+    false,
+    null,
+    {},
+    []
+  ])
 })
 
 test('number', function () {
@@ -106,7 +108,7 @@ test('reviver - replace values', function () {
     }
   }
 
-  function reviver (key: string, value: unknown) {
+  function reviver(key: string, value: unknown) {
     return {
       type: typeof value,
       value
@@ -179,24 +181,19 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   ]
 
   // convert LosslessNumbers to numbers for easy comparison with native JSON
-  function toRegularJSON (json: unknown) {
+  function toRegularJSON(json: unknown) {
     return JSON.parse(stringify(json))
   }
 
-  function reviver (key: string, value: unknown) {
-    return key === 'd'
-      ? undefined
-      : key === '1'
-        ? null
-        : value
+  function reviver(key: string, value: unknown) {
+    return key === 'd' ? undefined : key === '1' ? null : value
   }
 
   // validate expected outcome against reference implemenation JSON.parse
   const logsReference: Log[] = []
   JSON.parse(text, function (key, value) {
     logsReference.push({
-      context:
-        toRegularJSON(this),
+      context: toRegularJSON(this),
       key,
       value
     })
@@ -229,10 +226,8 @@ test('correctly handle strings equaling a JSON delimiter', function () {
 
 test('reviver - revive a lossless number correctly', function () {
   const text = '2.3e+500'
-  const expected = [
-    { key: '', value: lln('2.3e+500') }
-  ]
-  const logs: Array<{key: string, value: unknown}> = []
+  const expected = [{ key: '', value: lln('2.3e+500') }]
+  const logs: Array<{ key: string; value: unknown }> = []
 
   parse(text, function (key, value) {
     logs.push({ key, value })
@@ -243,18 +238,12 @@ test('reviver - revive a lossless number correctly', function () {
 
 test('parse with a custom number parser creating bigint', () => {
   const json = parse('[123456789123456789123456789, 2.3, 123]', null, parseNumberAndBigInt)
-  expect(json).toEqual([
-    123456789123456789123456789n,
-    2.3,
-    123n
-  ])
+  expect(json).toEqual([123456789123456789123456789n, 2.3, 123n])
 })
 
 test('parse with a reviver to parse Date', () => {
   const json = parse('["2022-08-25T09:39:19.288Z"]', reviveDate)
-  expect(json).toEqual([
-    new Date('2022-08-25T09:39:19.288Z')
-  ])
+  expect(json).toEqual([new Date('2022-08-25T09:39:19.288Z')])
 })
 
 test('parse with a custom number parser creating Decimal', () => {
@@ -270,28 +259,68 @@ test('parse with a custom number parser creating Decimal', () => {
 
 // FIXME: work out error handling
 test.skip('throw exceptions', function () {
-  expect(function () { parse('') }).toThrow(/Unexpected end of json string/)
+  expect(function () {
+    parse('')
+  }).toThrow(/Unexpected end of json string/)
 
-  expect(function () { parse('{') }).toThrow(/Object key expected/)
-  expect(function () { parse('{"a",') }).toThrow(/Colon expected/)
-  expect(function () { parse('{a:2}') }).toThrow(/Object key expected/)
-  expect(function () { parse('{"a":2,}') }).toThrow(/Object key expected/)
-  expect(function () { parse('{"a" "b"}') }).toThrow(/Colon expected/)
-  expect(function () { parse('{}{}') }).toThrow(/Unexpected characters/)
+  expect(function () {
+    parse('{')
+  }).toThrow(/Object key expected/)
+  expect(function () {
+    parse('{"a",')
+  }).toThrow(/Colon expected/)
+  expect(function () {
+    parse('{a:2}')
+  }).toThrow(/Object key expected/)
+  expect(function () {
+    parse('{"a":2,}')
+  }).toThrow(/Object key expected/)
+  expect(function () {
+    parse('{"a" "b"}')
+  }).toThrow(/Colon expected/)
+  expect(function () {
+    parse('{}{}')
+  }).toThrow(/Unexpected characters/)
 
-  expect(function () { parse('[') }).toThrow(/Unexpected end of json string/)
-  expect(function () { parse('[2,') }).toThrow(/Unexpected end of json string/)
-  expect(function () { parse('[2,]') }).toThrow(/Value expected/)
+  expect(function () {
+    parse('[')
+  }).toThrow(/Unexpected end of json string/)
+  expect(function () {
+    parse('[2,')
+  }).toThrow(/Unexpected end of json string/)
+  expect(function () {
+    parse('[2,]')
+  }).toThrow(/Value expected/)
 
-  expect(function () { parse('2.3.4') }).toThrow(/Syntax error in part ".4" \(char 3\)/)
-  expect(function () { parse('2..3') }).toThrow(/Invalid number, digit expected \(char 2\)/)
-  expect(function () { parse('2e3.4') }).toThrow(/Syntax error in part ".4" \(char 3\)/)
-  expect(function () { parse('2e') }).toThrow(/Invalid number, digit expected \(char 2\)/)
-  expect(function () { parse('-') }).toThrow(/Invalid number, digit expected \(char 1\)/)
+  expect(function () {
+    parse('2.3.4')
+  }).toThrow(/Syntax error in part ".4" \(char 3\)/)
+  expect(function () {
+    parse('2..3')
+  }).toThrow(/Invalid number, digit expected \(char 2\)/)
+  expect(function () {
+    parse('2e3.4')
+  }).toThrow(/Syntax error in part ".4" \(char 3\)/)
+  expect(function () {
+    parse('2e')
+  }).toThrow(/Invalid number, digit expected \(char 2\)/)
+  expect(function () {
+    parse('-')
+  }).toThrow(/Invalid number, digit expected \(char 1\)/)
 
-  expect(function () { parse('"a') }).toThrow(/End of string expected/)
-  expect(function () { parse('foo') }).toThrow(/Unknown symbol "foo"/)
-  expect(function () { parse('"\\a"') }).toThrow(/Invalid escape character "\\a" /)
-  expect(function () { parse('"\\u26"') }).toThrow(/Invalid unicode character/)
-  expect(function () { parse('"\\uZ000"') }).toThrow(/Invalid unicode character/)
+  expect(function () {
+    parse('"a')
+  }).toThrow(/End of string expected/)
+  expect(function () {
+    parse('foo')
+  }).toThrow(/Unknown symbol "foo"/)
+  expect(function () {
+    parse('"\\a"')
+  }).toThrow(/Invalid escape character "\\a" /)
+  expect(function () {
+    parse('"\\u26"')
+  }).toThrow(/Invalid unicode character/)
+  expect(function () {
+    parse('"\\uZ000"')
+  }).toThrow(/Invalid unicode character/)
 })

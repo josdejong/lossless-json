@@ -8,7 +8,7 @@ export class LosslessNumber {
   type: 'LosslessNumber'
   isLosslessNumber: true
 
-  constructor (value: unknown) {
+  constructor(value: unknown) {
     // value as string
     this.value = valueToString(value)
 
@@ -23,20 +23,23 @@ export class LosslessNumber {
    * of the number.
    * @return {Number}
    */
-  valueOf () {
+  valueOf() {
     const number = parseFloat(this.value)
     const digits = getDigits(this.value)
 
     // throw an error when the numeric value will lose information
     if (digits.length > 15) {
-      throw new Error('Cannot convert to number: ' +
-          'number would be truncated (value: ' + this.value + ')')
+      throw new Error(
+        'Cannot convert to number: ' + 'number would be truncated (value: ' + this.value + ')'
+      )
     }
     if (!isFinite(number)) {
       throw new Error('Cannot convert to number: number would overflow (value: ' + this.value + ')')
     }
     if (Math.abs(number) < Number.MIN_VALUE && !containsOnlyZeros(digits)) {
-      throw new Error('Cannot convert to number: number would underflow (value: ' + this.value + ')')
+      throw new Error(
+        'Cannot convert to number: number would underflow (value: ' + this.value + ')'
+      )
     }
 
     return number
@@ -46,12 +49,12 @@ export class LosslessNumber {
    * Get the value of the LosslessNumber as string.
    * @return {string}
    */
-  toString () {
+  toString() {
     return this.value
   }
 }
 
-export function isLosslessNumber (value: unknown) : value is LosslessNumber {
+export function isLosslessNumber(value: unknown): value is LosslessNumber {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return (value && typeof value === 'object' && value.isLosslessNumber === true) || false
@@ -61,7 +64,7 @@ export function isLosslessNumber (value: unknown) : value is LosslessNumber {
  * Convert input value to a string
  * If value is no number or string, the valueOf() of the object will be used.
  */
-export function valueToString (value: unknown) : string {
+export function valueToString(value: unknown): string {
   if (typeof value === 'string') {
     if (!isValidNumber(value)) {
       throw new Error('Invalid number (value: "' + value + '")')
@@ -93,7 +96,7 @@ export function valueToString (value: unknown) : string {
  * @returns Returns a number when the value fits in a regular number,
  *          else returns a LosslessNumber.
  */
-export function createNumber (value: string) : LosslessNumber | number {
+export function createNumber(value: string): LosslessNumber | number {
   const digits = getDigits(value)
 
   if (digits.length > 15) {
@@ -122,8 +125,8 @@ export function createNumber (value: string) : LosslessNumber | number {
  *   '0.0034' returns '34'
  *   '120.5e+30' returns '1205'
  **/
-export function getDigits (value : number | string) : string {
-  const _value = (typeof value !== 'string') ? (value + '') : value
+export function getDigits(value: number | string): string {
+  const _value = typeof value !== 'string' ? value + '' : value
 
   return _value
     .replace(/^-/, '') // remove sign
@@ -134,6 +137,6 @@ export function getDigits (value : number | string) : string {
 /**
  * Test whether a string contains only zeros or is empty
  */
-export function containsOnlyZeros (text: string) : boolean {
+export function containsOnlyZeros(text: string): boolean {
   return /^0*$/.test(text)
 }

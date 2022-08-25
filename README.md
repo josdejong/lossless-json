@@ -5,15 +5,15 @@ Parse JSON without risk of losing numeric information.
 ```js
 import { parse, stringify } from 'lossless-json'
 
-const text = '{"float":2.370,"long":9223372036854775827,"big":2.3e+500}';
+const text = '{"float":2.370,"long":9223372036854775827,"big":2.3e+500}'
 
 // JSON.parse will lose some digits and a whole number:
-console.log(JSON.stringify(JSON.parse(text)));
-// '{"float":2.37,"long":9223372036854776000,"big":null}'      
+console.log(JSON.stringify(JSON.parse(text)))
+// '{"float":2.37,"long":9223372036854776000,"big":null}'
 // WHOOPS!!!
 
 // LosslessJSON.parse will preserve all numbers and even the formatting:
-console.log(stringify(parse(text)));
+console.log(stringify(parse(text)))
 // '{"float":2.370,"long":9223372036854775827,"big":2.3e+500}'
 ```
 
@@ -30,9 +30,8 @@ Features:
 - Compatible with the native, built-in `JSON.parse` and `JSON.stringify`.
 - Helpful error messages when parsing invalid JSON.
 - Works in browsers and node.js.
-- Modular and composable ES module functions. 
+- Modular and composable ES module functions.
 - Less than 3kB when minified and gzipped in full.
-
 
 ## Install
 
@@ -41,7 +40,6 @@ Install via [npm](https://www.npmjs.com/package/lossless-json):
 ```
 npm install lossless-json
 ```
-
 
 ## Use
 
@@ -53,7 +51,7 @@ Parsing and stringification works as you're used to:
 import { parse, stringify } from 'lossless-json'
 
 const json = parse('{"foo":"bar"}') // {foo: 'bar'}
-const text = stringify(json);       // '{"foo":"bar"}'
+const text = stringify(json) // '{"foo":"bar"}'
 ```
 
 ### LosslessNumbers
@@ -67,13 +65,13 @@ const text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}'
 const json = parse(text)
 
 console.log(json.normal.isLosslessNumber) // true
-console.log(json.normal.valueOf())        // number, 2.3
-console.log(json.normal + 2)              // number, 4.3
+console.log(json.normal.valueOf()) // number, 2.3
+console.log(json.normal + 2) // number, 4.3
 
 // the following operations will throw an error
 // as they would result in information loss
 console.log(json.long + 1) // throws Error Cannot convert to number: number would be truncated
-console.log(json.big + 1)  // throws Error Cannot convert to number: number would overflow
+console.log(json.big + 1) // throws Error Cannot convert to number: number would overflow
 ```
 
 If you want parse a json string into an object with regular numbers, but want to validate that no numeric information is lost, you write your own number parser and use `isSafeNumber` to validate the numbers:
@@ -81,27 +79,25 @@ If you want parse a json string into an object with regular numbers, but want to
 ```js
 import { parse, isSafeNumber } from 'lossless-json'
 
-function parseAndValidateNumber (value) {
+function parseAndValidateNumber(value) {
   if (!isSafeNumber(value)) {
     throw new Error(`Cannot safely convert value '${value}' into a number`)
   }
-  
+
   return parseFloat(value)
 }
 
 // will parse with success if all values can be represented with a number
 let json = parse('[1,2,3]', undefined, parseAndValidateNumber)
-console.log(json)  // [1, 2, 3] (regular numbers)
+console.log(json) // [1, 2, 3] (regular numbers)
 
 // will throw an error when some of the values are too large to represent correctly as number
 try {
   let json = parse('[1,2e+500,3]', undefined, parseAndValidateNumber)
-}
-catch (err) {
+} catch (err) {
   console.log(err) // throws Error 'Cannot safely convert value '2e+500' into a number'
 }
 ```
-
 
 ### BigNumbers
 
@@ -111,17 +107,18 @@ To use the library in conjunction with your favorite BigNumber library, for exam
 import { parse, stringify } from 'lossless-json'
 import Decimal from 'decimal.js'
 
-const parseDecimal = value => new Decimal(value)
+const parseDecimal = (value) => new Decimal(value)
 
 const decimalStringifier = {
-  test: value => Decimal.isDecimal(value),
-  stringify: value => value.toString()
+  test: (value) => Decimal.isDecimal(value),
+  stringify: (value) => value.toString()
 }
 
 // parse JSON, operate on a Decimal value, then stringify again
-const text = '{"value":2.3e500}';
+const text = '{"value":2.3e500}'
 const json = parse(text, undefined, parseDecimal) // {value: new Decimal('2.3e500')}
-const output = {                                  // {result: new Decimal('4.6e500')}
+const output = {
+  // {result: new Decimal('4.6e500')}
   result: json.value.times(2)
 }
 const str = stringify(output, undefined, undefined, [decimalStringifier])
@@ -138,9 +135,9 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
   The string to parse as JSON. See the JSON object for a description of JSON syntax.
 - **@param** `{function(key: string, value: *)} [reviver]`
   If a function, prescribes how the value originally produced by parsing is
-   * transformed, before being returned.
+  - transformed, before being returned.
 - **@param** `{function(value: string) : any} [parseNumber]`
-     Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
+  Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
 - **@returns** `{*}`
   Returns the Object corresponding to the given JSON text.
 - **@throws** Throws a SyntaxError exception if the string to parse is not valid JSON.
@@ -188,7 +185,6 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 - `toString() : string`
   Get the string representation of the lossless number.
 
-
 #### Properties
 
 - `{boolean} isLosslessNumber : true`
@@ -198,11 +194,11 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 ### Utility functions
 
 - `reviveDate(key, value)`
-  Revive strings containing an ISO 8601 date string into a JavaScript `Date` object. This reviver is not turned on by default because there is a small risk of parsing a text field that _accidentally_ contains a date into a `Date`. Whether `reviveDate` is safe to use depends on the use case. Usage: 
+  Revive strings containing an ISO 8601 date string into a JavaScript `Date` object. This reviver is not turned on by default because there is a small risk of parsing a text field that _accidentally_ contains a date into a `Date`. Whether `reviveDate` is safe to use depends on the use case. Usage:
 
   ```js
   import { parse, reviveDate } from 'lossless-json'
-  
+
   const data = parse('["2022-08-25T09:39:19.288Z"]', reviveDate)
   // output:
   // [
@@ -211,7 +207,6 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
   ```
 
   An alternative solution is to stringify a `Date` in a specific recognizable object like `{'$date':'2022-08-25T09:39:19.288Z'}`, and use a reviver and replacer to turn this object into a `Date` and vice versa.
-
 
 ## Test
 
@@ -257,7 +252,6 @@ npm run benchmark
 
 (Spoiler: `lossless-json` is much slower than native: about 3 or 4 times as slow at the moment of writing)
 
-
 ## Build
 
 To build a bundled and minified library (ES5), first install the dependencies once:
@@ -274,7 +268,6 @@ npm run build
 
 This will generate an ES module output and an UMD bundle in the folder `./.lib` which can be executed in browsers and node.js and used in the browser.
 
-
 ## Deploy
 
 - Update version number in `package.json`
@@ -284,8 +277,6 @@ This will generate an ES module output and an UMD bundle in the folder `./.lib` 
 - create git tag and push it: `git tag v1.0.2 && git push --tags`
 - publish via `npm publish` (this will first build, test, and lint before actually publishing the library).
 
-
 ## License
 
 Released under the [MIT license](LICENSE.md).
-

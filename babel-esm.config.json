@@ -7,12 +7,6 @@
         "modules": false
       }
     ],
-    [
-      "@babel/preset-typescript"
-    ]
-  ],
-  "ignore": [
-    "**/*.test.js",
-    "**/*.test.ts"
+    ["@babel/preset-typescript"]
   ]
 }
