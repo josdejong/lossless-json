@@ -3,15 +3,15 @@
 Parse JSON without risk of losing numeric information.
 
 ```js
-let text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}';
+const text = '{"float":2.370,"long":9223372036854775827,"big":2.3e+500}';
 
 // JSON.parse will lose some digits and a whole number:
 console.log(JSON.stringify(JSON.parse(text)));
-    // '{"normal":2.3,"long":123456789012345680000,"big":null}'      WHOOPS!!!
+// '{"float":2.37,"long":9223372036854776000,"big":null}'      WHOOPS!!!
 
-// LosslessJSON.parse will preserve big numbers:
+// LosslessJSON.parse will preserve all numbers and even the formatting:
 console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
-    // '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}'
+// '{"float":2.370,"long":9223372036854775827,"big":2.3e+500}'
 ```
 
 **How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a lightweight class which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
@@ -20,12 +20,13 @@ console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
 
 Features:
 
-- No risk of losing numeric information when parsing JSON containing big numbers.
-- Compatible with the native, built-in `JSON.parse` and `JSON.stringify`.
+- No risk of losing numeric information when working with big numbers.
 - Built-in support for `bigint`
 - Customizable: parse numeric values into any data type, like `BigNumber`, `bigint`, or `number`, or a mix of them.
+- Compatible with the native, built-in `JSON.parse` and `JSON.stringify`.
 - Works in browsers and node.js.
-- Less than 3kB when minified and gzipped.
+- Modular and composable ES module functions. 
+- Less than 3kB when minified and gzipped in full.
 
 
 ## Install
