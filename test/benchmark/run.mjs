@@ -1,7 +1,7 @@
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { readFileSync } from 'fs';
-import { parseLosslessJSON, stringifyLosslessJSON, config } from '../../src/index.js';
+import { parse, stringify, config } from '../../src/index.js';
 import Benchmark from 'benchmark'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -15,9 +15,9 @@ config({ circularRefs: false })
 const suite = new Benchmark.Suite()
 suite
   .add('        JSON.parse    ', () => JSON.parse(text))
-  .add('LosslessJSON.parse    ', () => parseLosslessJSON(text))
+  .add('LosslessJSON.parse    ', () => parse(text))
   .add('        JSON.stringify', () => JSON.stringify(json))
-  .add('LosslessJSON.stringify', () => stringifyLosslessJSON(json))
+  .add('LosslessJSON.stringify', () => stringify(json))
   .on('cycle', function (event) {
     console.log(String(event.target))
   })

@@ -1,8 +1,6 @@
 'use strict'
 
-import { resolveCircularReferences } from './circular.js'
-import { config } from './config.js'
-import { LosslessNumber } from './LosslessNumber.js'
+import { parseLosslessNumber } from './numberParsers.js'
 import { revive } from './revive.js'
 
 /**
@@ -19,24 +17,20 @@ import { revive } from './revive.js'
  * If a function, prescribes how the value originally produced by parsing is
  * transformed, before being returned.
  *
+ * @param {function(value: string) : any} [parseNumber=parseLosslessNumber]
+ *
  * @returns Returns the Object corresponding to the given JSON text.
  *
  * @throws Throws a SyntaxError exception if the string to parse is not valid JSON.
  */
-export function parseLosslessJSON(text, reviver = undefined) {
+export function parse(text, reviver = undefined, parseNumber = parseLosslessNumber) {
   let i = 0
-
   let value = parseValue()
   expectEndOfInput()
 
-  // TODO: create a plugin system
-  if (reviver) {
-    value = revive(value, reviver)
-  }
-  if (config().circularRefs) {
-    value = resolveCircularReferences(value)
-  }
-  return value
+  return reviver
+    ? revive(value, reviver)
+    : value
 
   function parseObject() {
     if (text[i] === "{") {
@@ -98,7 +92,7 @@ export function parseLosslessJSON(text, reviver = undefined) {
 
     const value =
       parseString() ??
-      parseNumber() ??
+      parseNumeric() ??
       parseObject() ??
       parseArray() ??
       parseKeyword("true", true) ??
@@ -163,7 +157,7 @@ export function parseLosslessJSON(text, reviver = undefined) {
     }
   }
 
-  function parseNumber() {
+  function parseNumeric() {
     let start = i
     if (text[i] === "-") {
       i++
@@ -199,7 +193,7 @@ export function parseLosslessJSON(text, reviver = undefined) {
     }
 
     if (i > start) {
-      return new LosslessNumber(text.slice(start, i))
+      return parseNumber(text.slice(start, i))
     }
   }
 

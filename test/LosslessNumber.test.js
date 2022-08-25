@@ -56,6 +56,10 @@ test('get valueOf a LosslessNumber', function() {
     .toThrow(/Cannot convert to number: number would underflow/);
 });
 
+test('can do operations like add a number and a LosslessNumber', () => {
+  expect(new LosslessNumber('3') + 2).toBe(5)
+})
+
 test('LosslessNumber - toString', function() {
   expect(new LosslessNumber('23.4').toString()).toBe('23.4');
 });

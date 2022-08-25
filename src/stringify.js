@@ -1,14 +1,5 @@
 'use strict';
 
-import { config } from './config.js'
-import { stringifyJSONPointer as stringifyPointer } from './jsonPointer.js';
-
-// Keep track of the stack to handle circular references
-// https://github.com/manuelstofer/json-pointer/blob/master/index.js
-// stack of currently stringified objects
-let path = [];  // keys on the current stack
-let stack = []; // objects (Object or Array) on the current stack
-
 /**
  * The LosslessJSON.stringify() method converts a JavaScript value to a JSON string,
  * optionally replacing values if a replacer function is specified, or
@@ -35,11 +26,7 @@ let stack = []; // objects (Object or Array) on the current stack
  *
  * @returns {string | undefined} Returns the string representation of the JSON object.
  */
-export function stringifyLosslessJSON(value, replacer, space) {
-  // clear stack
-  stack = [];
-  path = [];
-
+export function stringify(value, replacer, space) {
   let _value = (typeof replacer === 'function')
       ? replacer.call({'': value}, '', value)
       : value;
@@ -84,12 +71,17 @@ function stringifyValue(value, replacer, space, indent) {
     return value.value;
   }
 
-  // array
+  // BigInt
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+
+  // Array
   if (Array.isArray(value)) {
     return stringifyArray(value, replacer, space, indent);
   }
 
-  // object (test lastly!)
+  // Object (test lastly!)
   if (value && typeof value === 'object') {
     return stringifyObject(value, replacer, space, indent);
   }
@@ -109,15 +101,6 @@ function stringifyArray(array, replacer, space, indent) {
   let childIndent = space ? (indent + space) : undefined;
   let str = space ? '[\n' : '[';
 
-  // check for circular reference
-  if (isCircular(array)) {
-    return stringifyCircular(array, replacer, space, indent);
-  }
-
-  // add this array to the stack
-  const stackIndex = stack.length;
-  stack[stackIndex] = array;
-
   for (let i = 0; i < array.length; i++) {
     let key = i + '';
     let item = (typeof replacer === 'function')
@@ -129,7 +112,6 @@ function stringifyArray(array, replacer, space, indent) {
     }
 
     if (typeof item !== 'undefined' && typeof item !== 'function') {
-      path[stackIndex] = key;
       str += stringifyValue(item, replacer, space, childIndent);
     }
     else {
@@ -140,10 +122,6 @@ function stringifyArray(array, replacer, space, indent) {
       str += space ? ',\n' : ',';
     }
   }
-
-  // remove current entry from the stack
-  stack.length = stackIndex;
-  path.length = stackIndex;
 
   str += space ? ('\n' + indent + ']') : ']';
   return str;
@@ -163,17 +141,8 @@ function stringifyObject(object, replacer, space, indent) {
   let str = space ? '{\n' : '{';
 
   if (typeof object.toJSON === 'function') {
-    return stringifyLosslessJSON(object.toJSON(), replacer, space);
+    return stringify(object.toJSON(), replacer, space);
   }
-
-  // check for circular reference
-  if (isCircular(object)) {
-    return stringifyCircular(object, replacer, space, indent);
-  }
-
-  // add this object to the stack
-  const stackIndex = stack.length;
-  stack[stackIndex] = object;
 
   for (let key in object) {
     if (object.hasOwnProperty(key)) {
@@ -195,49 +164,13 @@ function stringifyObject(object, replacer, space, indent) {
             ? (childIndent + keyStr + ': ')
             : keyStr + ':';
 
-        path[stackIndex] = key;
         str += stringifyValue(value, replacer, space, childIndent);
       }
     }
   }
 
-  // remove current entry from the stack
-  stack.length = stackIndex;
-  path.length = stackIndex;
-
   str += space ? ('\n' + indent + '}') : '}';
   return str;
-}
-
-/**
- * Test whether an object or array is a circular reference
- * @param {Object | Array} value
- * @return {boolean}
- */
-function isCircular(value) {
-  return stack.indexOf(value) !== -1;
-}
-
-/**
- * Stringify a circular reference
- * @param {Object | Array} value
- * @param {function | Array.<string | number>} [replacer]
- * @param {string} [space]
- * @param {string} [indent]
- * @return {string}
- */
-function stringifyCircular (value, replacer, space, indent) {
-  if (!config().circularRefs) {
-    throw new Error('Circular reference at "' + stringifyPointer(path) + '"');
-  }
-
-  let pathIndex = stack.indexOf(value);
-
-  let circular = {
-    $ref: stringifyPointer(path.slice(0, pathIndex))
-  };
-
-  return stringifyObject(circular, replacer, space, indent);
 }
 
 /**

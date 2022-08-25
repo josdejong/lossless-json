@@ -1,5 +1,5 @@
 import { LosslessNumber } from '../src/LosslessNumber';
-import { stringifyLosslessJSON } from '../src/stringifyLosslessJSON.js';
+import { stringify } from '../src/stringify.js';
 
 // helper function to create a lossless number
 function lln (value) {
@@ -7,51 +7,51 @@ function lln (value) {
 }
 
 test('stringify', function () {
-  expect(stringifyLosslessJSON(undefined)).toEqual(undefined);
+  expect(stringify(undefined)).toEqual(undefined);
 
-  expect(stringifyLosslessJSON(null)).toEqual('null');
+  expect(stringify(null)).toEqual('null');
 
-  expect(stringifyLosslessJSON(true)).toEqual('true');
-  expect(stringifyLosslessJSON(false)).toEqual('false');
-  expect(stringifyLosslessJSON(new Boolean(true))).toEqual('true');
-  expect(stringifyLosslessJSON(new Boolean(false))).toEqual('false');
+  expect(stringify(true)).toEqual('true');
+  expect(stringify(false)).toEqual('false');
+  expect(stringify(new Boolean(true))).toEqual('true');
+  expect(stringify(new Boolean(false))).toEqual('false');
 
-  expect(stringifyLosslessJSON(2.3)).toEqual('2.3');
-  expect(stringifyLosslessJSON(new Number(2.3))).toEqual('2.3');
-  expect(stringifyLosslessJSON(-2.3)).toEqual('-2.3');
-  expect(stringifyLosslessJSON(Infinity)).toEqual('null');
-  expect(stringifyLosslessJSON(NaN)).toEqual('null');
+  expect(stringify(2.3)).toEqual('2.3');
+  expect(stringify(new Number(2.3))).toEqual('2.3');
+  expect(stringify(-2.3)).toEqual('-2.3');
+  expect(stringify(Infinity)).toEqual('null');
+  expect(stringify(NaN)).toEqual('null');
 
-  expect(stringifyLosslessJSON('str')).toEqual('"str"');
-  expect(stringifyLosslessJSON(new String('str'))).toEqual('"str"');
-  expect(stringifyLosslessJSON('\"')).toEqual('"\\""');
-  expect(stringifyLosslessJSON('\\')).toEqual('"\\\\"');
-  expect(stringifyLosslessJSON('\b')).toEqual('"\\b"');
-  expect(stringifyLosslessJSON('\f')).toEqual('"\\f"');
-  expect(stringifyLosslessJSON('\n')).toEqual('"\\n"');
-  expect(stringifyLosslessJSON('\r')).toEqual('"\\r"');
-  expect(stringifyLosslessJSON('\t')).toEqual('"\\t"');
-  expect(stringifyLosslessJSON('\"\\/\b\f\n\r\t')).toEqual('"\\"\\\\/\\b\\f\\n\\r\\t"');
+  expect(stringify('str')).toEqual('"str"');
+  expect(stringify(new String('str'))).toEqual('"str"');
+  expect(stringify('\"')).toEqual('"\\""');
+  expect(stringify('\\')).toEqual('"\\\\"');
+  expect(stringify('\b')).toEqual('"\\b"');
+  expect(stringify('\f')).toEqual('"\\f"');
+  expect(stringify('\n')).toEqual('"\\n"');
+  expect(stringify('\r')).toEqual('"\\r"');
+  expect(stringify('\t')).toEqual('"\\t"');
+  expect(stringify('\"\\/\b\f\n\r\t')).toEqual('"\\"\\\\/\\b\\f\\n\\r\\t"');
 
   // validate expected outcome against native JSON.stringify
   expect(JSON.stringify('\"\\/\b\f\n\r\t')).toEqual('"\\"\\\\/\\b\\f\\n\\r\\t"');
 
-  expect(stringifyLosslessJSON(new Date('2016-02-08T14:00:00Z'))).toEqual('"2016-02-08T14:00:00.000Z"');
+  expect(stringify(new Date('2016-02-08T14:00:00Z'))).toEqual('"2016-02-08T14:00:00.000Z"');
 
-  expect(stringifyLosslessJSON([2,"str",null, undefined, true, function () {}]))
+  expect(stringify([2,"str",null, undefined, true, function () {}]))
     .toEqual('[2,"str",null,null,true,null]');
 
-  expect(stringifyLosslessJSON({a:2,b:"str",c:null,d: undefined, e:function() {}}))
+  expect(stringify({a:2,b:"str",c:null,d: undefined, e:function() {}}))
     .toEqual('{"a":2,"b":"str","c":null}');
 
-  expect(stringifyLosslessJSON({'\\\\d': 1}))
+  expect(stringify({'\\\\d': 1}))
     .toEqual('{\"\\\\\\\\d\":1}');
 
   // validate exepected outcome against native JSON.stringify
   expect(JSON.stringify({'\\\\d': 1}))
     .toEqual('{\"\\\\\\\\d\":1}');
 
-  expect(stringifyLosslessJSON({a:2,toJSON: function () {return 'foo'}}))
+  expect(stringify({a:2,toJSON: function () {return 'foo'}}))
     .toEqual('"foo"');
 
   // TODO: Symbol
@@ -62,11 +62,19 @@ test('stringify a full JSON object', function () {
   let expected = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
   let json = {a: lln(123), b:'str', c: null, d: false, e:[1, 2, 3]};
 
-  let stringified = stringifyLosslessJSON(json);
+  let stringified = stringify(json);
 
   expect(stringified).toEqual(expected);
 });
 
+test('stringify bigint', function () {
+  expect(stringify(123n)).toEqual('123')
+  expect(stringify({ bigint: 123n })).toEqual('{"bigint":123}')
+})
+
+test('stringify should keep formatting of a lossless number', function () {
+  expect(stringify([lln('4.0')])).toEqual('[4.0]')
+})
 
 test('stringify with replacer function', function () {
   let json = {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]};
@@ -119,7 +127,7 @@ test('stringify with replacer function', function () {
   ];
 
   let logs = [];
-  stringifyLosslessJSON(json, function (key, value) {
+  stringify(json, function (key, value) {
     logs.push({context: this, key, value});
     return value;
   });
@@ -154,7 +162,7 @@ test('stringify with replacer function (2)', function () {
     return value;
   }
 
-  expect(stringifyLosslessJSON(json, replacer)).toEqual(expected);
+  expect(stringify(json, replacer)).toEqual(expected);
 
   // validate expected outcome against native JSON.stringify
   expect(JSON.stringify(json, replacer)).toEqual(expected);
@@ -165,7 +173,7 @@ test('stringify with replacer Array', function () {
   let replacer = ['a', 'b', 'c', 42];
 
   let expected = '{"42":"universe","a":1,"c":{"a":1,"b":2,"c":3},"b":[1,2,3]}';
-  expect(stringifyLosslessJSON(json, replacer)).toEqual(expected);
+  expect(stringify(json, replacer)).toEqual(expected);
 
   // validate expected outcome against native JSON.stringify
   // note: stringified order differs. can happen.
@@ -191,7 +199,7 @@ test('stringify with numeric space', function () {
       '  "d": null\n' +
       '}';
 
-  expect(stringifyLosslessJSON(json, null, 2)).toEqual(expected);
+  expect(stringify(json, null, 2)).toEqual(expected);
 
   // validate expected outcome against native JSON.stringify
   expect(JSON.stringify(json, null, 2)).toEqual(expected);
@@ -215,36 +223,8 @@ test('stringify with string space', function () {
       '~"d": null\n' +
       '}';
 
-  expect(stringifyLosslessJSON(json, null, '~')).toEqual(expected);
+  expect(stringify(json, null, '~')).toEqual(expected);
 
   // validate expected outcome against native JSON.stringify
   expect(JSON.stringify(json, null, '~')).toEqual(expected);
-});
-
-test('stringify circular reference (1)', function () {
-  let json = {};
-  json.a = {b: json};
-  let expected = '{"a":{"b":{"$ref":"#/"}}}';
-  let text = stringifyLosslessJSON(json);
-
-  expect(text).toEqual(expected);
-});
-
-test('stringify circular reference (2)', function () {
-  let obj = {a: {b: {}}};
-  obj.a.b.b = obj.a.b;
-  let expected = '{"a":{"b":{"b":{"$ref":"#/a/b"}}}}';
-  let text = stringifyLosslessJSON(obj);
-
-  expect(text).toEqual(expected);
-});
-
-test('stringify circular reference (3)', function () {
-  let obj = {a: [{}, {b: {}}]};
-  obj.a[1].b.a = obj.a;
-
-  let expected = '{"a":[{},{"b":{"a":{"$ref":"#/a"}}}]}';
-  let text = stringifyLosslessJSON(obj);
-
-  expect(text).toEqual(expected);
 });
