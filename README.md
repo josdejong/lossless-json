@@ -14,17 +14,18 @@ console.log(LosslessJSON.stringify(LosslessJSON.parse(text)));
     // '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}'
 ```
 
-**How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a data type which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
+**How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a lightweight class which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
 
 **When to use?** Only in some special cases. For example when you have to create some sort of data processing middleware which has to process arbitrary JSON without risk of screwing up. JSON objects containing big numbers are rare in the wild. It can occur for example when interoperating with applications written in C++, Java, or C#, which support data types like `long`. Parsing a `long` into a JavaScript `number` can result in losing information because a `long` can hold more digits than a `number`. If possible, it's preferable to change these applications such that they serialize big numbers in a safer way, for example in a stringified form. If that's not feasible, `lossless-json` is here to help you out.
 
 Features:
 
 - No risk of losing numeric information when parsing JSON containing big numbers.
-- Supports circular references.
-- Compatible with the native `JSON.parse` and `JSON.stringify`.
+- Compatible with the native, built-in `JSON.parse` and `JSON.stringify`.
+- Built-in support for `bigint`
+- Customizable: parse numeric values into any data type, like `BigNumber`, `bigint`, or `number`, or a mix of them.
 - Works in browsers and node.js.
-- Less then 3kB when minified and gzipped.
+- Less than 3kB when minified and gzipped.
 
 
 ## Install
@@ -43,11 +44,10 @@ npm install lossless-json
 Parsing and stringification works as you're used to:
 
 ```js
-'use strict';
-const LosslessJSON = require('lossless-json');
+import { parse, stringify } from 'lossless-json'
 
-let json = LosslessJSON.parse('{"foo":"bar"}'); // {foo: 'bar'}
-let text = LosslessJSON.stringify(json);        // '{"foo":"bar"}'
+const json = parse('{"foo":"bar"}') // {foo: 'bar'}
+const text = stringify(json);       // '{"foo":"bar"}'
 ```
 
 ### LosslessNumbers
@@ -55,156 +55,76 @@ let text = LosslessJSON.stringify(json);        // '{"foo":"bar"}'
 Numbers are parsed into a `LosslessNumber`, which can be used like a regular number in numeric operations. Converting to a number will throw an error when this would result in losing information due to truncation, overflow, or underflow.
 
 ```js
-'use strict';
-const LosslessJSON = require('lossless-json');
+import { parse } from 'lossless-json'
 
-let text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}';
-let json = LosslessJSON.parse(text);
+const text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}'
+const json = parse(text)
 
-console.log(json.normal.isLosslessNumber); // true
-console.log(json.normal.valueOf());        // number, 2.3
-console.log(json.normal + 2);              // number, 4.3
+console.log(json.normal.isLosslessNumber) // true
+console.log(json.normal.valueOf())        // number, 2.3
+console.log(json.normal + 2)              // number, 4.3
 
 // the following operations will throw an error
 // as they would result in information loss
-console.log(json.long + 1); // throws Error Cannot convert to number: number would be truncated
-console.log(json.big + 1);  // throws Error Cannot convert to number: number would overflow
+console.log(json.long + 1) // throws Error Cannot convert to number: number would be truncated
+console.log(json.big + 1)  // throws Error Cannot convert to number: number would overflow
 ```
 
-If you want parse a json string into an object with regular numbers, but want to validate that no numeric information is lost, you can parse the json string using `lossless-json` and immediately convert LosslessNumbers into numbers using a reviver:
+If you want parse a json string into an object with regular numbers, but want to validate that no numeric information is lost, you write your own number parser and use `isSafeNumber` to validate the numbers:
 
 ```js
-'use strict';
-const LosslessJSON = require('lossless-json');
+import { parse, isSafeNumber } from 'lossless-json'
 
-// convert LosslessNumber to number
-// will throw an error if this results in information loss
-function convertLosslessNumber (key, value) {
-  if (value && value.isLosslessNumber) {
-    return value.valueOf();
+function parseAndValidateNumber (value) {
+  if (!isSafeNumber(value)) {
+    throw new Error(`Cannot safely convert value '${value}' into a number`)
   }
-  else {
-    return value;
-  }
+  
+  return parseFloat(value)
 }
 
 // will parse with success if all values can be represented with a number
-let json = LosslessJSON.parse('[1,2,3]', convertLosslessNumber);
-console.log(json);  // [1, 2, 3] (regular numbers)
+let json = parse('[1,2,3]', undefined, parseAndValidateNumber)
+console.log(json)  // [1, 2, 3] (regular numbers)
 
 // will throw an error when some of the values are too large to represent correctly as number
 try {
-  let json = LosslessJSON.parse('[1,2e+500,3]', convertLosslessNumber);
+  let json = parse('[1,2e+500,3]', undefined, parseAndValidateNumber)
 }
 catch (err) {
-  console.log(err); // throws Error Cannot convert to number: number would overflow
+  console.log(err) // throws Error 'Cannot safely convert value '2e+500' into a number'
 }
-
 ```
 
 
 ### BigNumbers
 
-To use the library in conjunction with your favorite BigNumber library, for example [decimal.js](https://github.com/MikeMcl/decimal.js/), you can use a replacer and reviver:
+To use the library in conjunction with your favorite BigNumber library, for example [decimal.js](https://github.com/MikeMcl/decimal.js/). You have to define a custom number parser and stringifier
 
 ```js
-'use strict';
-const LosslessJSON = require('lossless-json');
-const Decimal = require('decimal.js');
+import { parse, stringify } from 'lossless-json'
+import Decimal from 'decimal.js'
 
-// convert LosslessNumber to Decimal
-function reviver (key, value) {
-  if (value && value.isLosslessNumber) {
-    return new Decimal(value.toString());
-  }
-  else {
-    return value;
-  }
-}
+const parseDecimal = value => new Decimal(value)
 
-// convert Decimal to LosslessNumber
-function replacer (key, value) {
-  if (value instanceof Decimal) {
-    return new LosslessJSON.LosslessNumber(value.toString());
-  }
-  else {
-    return value;
-  }
+const decimalStringifier = {
+  test: value => Decimal.isDecimal(value),
+  stringify: value => value.toString()
 }
 
 // parse JSON, operate on a Decimal value, then stringify again
-let text = '{"value":2.3e500}';
-let json = LosslessJSON.parse(text, reviver);     // {value: new Decimal('2.3e500')}
-let result = {                                    // {result: new Decimal('4.6e500')}
+const text = '{"value":2.3e500}';
+const json = parse(text, undefined, parseDecimal) // {value: new Decimal('2.3e500')}
+const output = {                                  // {result: new Decimal('4.6e500')}
   result: json.value.times(2)
-};
-let str = LosslessJSON.stringify(json, replacer); // '{"result":4.6e500}'
-```
-
-### Circular references
-
-`lossless-json` automatically stringifies and restores circular references. Circular references are encoded as a [JSON Pointer URI fragment](https://tools.ietf.org/html/rfc6901#section-6).
-
-```js
-'use strict';
-const LosslessJSON = require('lossless-json');
-
-// create an object containing a circular reference to `foo` inside `bar`
-let json = {
-  foo: {
-    bar: {}
-  }
-};
-json.foo.bar.foo = json.foo;
-
-let text = LosslessJSON.stringify(json);
-// text = '"{"foo":{"bar":{"foo":{"$ref":"#/foo"}}}}"'
-```
-
-When resolving circular references is not desirable, resolving circular references can be turned off:
-
-```js
-'use strict';
-const LosslessJSON = require('lossless-json');
-
-// disable circular references
-LosslessJSON.config({circularRefs: false});
-
-// create an object containing a circular reference to `foo` inside `bar`
-let json = {
-  foo: {
-    bar: {}
-  }
-};
-json.foo.bar.foo = json.foo;
-
-try {
-  let text = LosslessJSON.stringify(json);
 }
-catch (err) {
-  console.log(err); // Error: Circular reference at "#/foo/bar/foo"
-}
+const str = stringify(output, undefined, undefined, [decimalStringifier])
+// '{"result":4.6e500}'
 ```
-
 
 ## API
 
-
-### config([options])
-
-Get and/or set configuration options for `lossless-json`.
-
-- **@param** `[{circularRefs: boolean}] [options]`
-  Optional new configuration to be applied.
-- **@returns** `{{circularRefs}}`
-  Returns an object with the current configuration.
-
-The following options are available:
-
-- `{boolean} circularRefs : true`
-  When `true` (default), `LosslessJSON.stringify` will resolve circular references. When `false`, the function will throw an error when a circular reference is encountered.
-
-### parse(text [, reviver])
+### parse(text [, reviver [, parseNumber]])
 
 The `LosslessJSON.parse()` function parses a string as JSON, optionally transforming the value produced by parsing.
 
@@ -213,11 +133,13 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
 - **@param** `{function(key: string, value: *)} [reviver]`
   If a function, prescribes how the value originally produced by parsing is
    * transformed, before being returned.
+- **@param** `{function(value: string) : any} [parseNumber]`
+     Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
 - **@returns** `{*}`
   Returns the Object corresponding to the given JSON text.
 - **@throws** Throws a SyntaxError exception if the string to parse is not valid JSON.
 
-### stringify(value [, replacer [, space]])
+### stringify(value [, replacer [, space [, valueStringifiers]]])
 
 The `LosslessJSON.stringify()`` function converts a JavaScript value to a JSON string,
 optionally replacing values if a replacer function is specified, or
@@ -239,6 +161,8 @@ optionally including only the specified properties if a replacer array is specif
   used. If this is a String, the string (or the first 10 characters of the string,
   if it's longer than that) is used as white space. If this parameter is not
   provided (or is null), no white space is used.
+- **@param** `{Array<{test: (value: any) => boolean, stringify: (value: any) => string}>} [valueStringifiers]`
+  An optional list with additional value stringifiers, for example to serialize a `BigNumber`. The output of the function must be valid stringified JSON. When undefined is returned, the property will be deleted from the object. The difference with using a replacer is that the output of a replacer must be JSON and will be stringified afterwards, whereas the output of the `valueStringifiers` is inserted in the JSON as is.
 - **@returns** `{string | undefined}`
   Returns the string representation of the JSON object.
 

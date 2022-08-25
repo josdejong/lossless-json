@@ -1,9 +1,8 @@
-import { config } from './index.js'
+import Decimal from 'decimal.js'
 import { LosslessNumber } from './LosslessNumber.js'
 import { parseNumberAndBigInt } from './numberParsers.js'
 import { parse } from './parse.js'
 import { stringify } from './stringify.js'
-import { isInteger } from './utils.js'
 
 // helper function to create a lossless number
 function lln (value) {
@@ -224,12 +223,23 @@ test('reviver - revive a lossless number correctly', function () {
   expectDeepEqual(logs, expected);
 });
 
-test('parse with a custom number parser', () => {
+test('parse with a custom number parser creating bigint', () => {
   const json = parse('[123456789123456789123456789, 2.3, 123]', null, parseNumberAndBigInt)
   expect(json).toEqual([
     123456789123456789123456789n,
     2.3,
     123n
+  ])
+})
+
+test('parse with a custom number parser creating Decimal', () => {
+  const parseDecimal = value => new Decimal(value)
+
+  const json = parse('[123456789123456789123456789,2.3,123]', null, parseDecimal)
+  expect(json).toEqual([
+    new Decimal('123456789123456789123456789'),
+    new Decimal('2.3'),
+    new Decimal('123')
   ])
 })
 

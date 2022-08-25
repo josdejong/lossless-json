@@ -24,16 +24,24 @@
  * if it's longer than that) is used as white space. If this parameter is not
  * provided (or is null), no white space is used.
  *
+ * @param {Array<{test: (value: any) => boolean, stringify: (value: any) => string}>} [valueStringifiers]
+ * An optional list with additional value stringifiers, for example to serialize
+ * a BigNumber. The output of the function must be valid stringified JSON.
+ * When undefined is returned, the property will be deleted from the object.
+ * The difference with using a replacer is that the output of a replacer must
+ * be JSON and will be stringified afterwards, whereas the output of
+ * the valueStringifiers is inserted in the JSON as is.
+ *
  * @returns {string | undefined} Returns the string representation of the JSON object.
  */
-export function stringify(value, replacer, space) {
+export function stringify(value, replacer, space, valueStringifiers) {
   const resolvedSpace = resolveSpace(space)
 
   const replacedValue = (typeof replacer === 'function')
     ? replacer.call({'': value}, '', value)
     : value;
 
-  return stringifyValue(replacedValue, '');
+  return _stringifyValue(replacedValue, '');
 
   /**
    * Stringify a value
@@ -41,7 +49,14 @@ export function stringify(value, replacer, space) {
    * @param {string} [indent]
    * @return {string | undefined}
    */
-  function stringifyValue(value, indent) {
+  function _stringifyValue(value, indent) {
+    if (Array.isArray(valueStringifiers)) {
+      const stringifier = valueStringifiers.find(item => item.test(value))
+      if (stringifier) {
+        return stringifier.stringify(value)
+      }
+    }
+
     // boolean, null, number, string, or date
     if (typeof value === 'boolean' ||
       typeof value === 'number' ||
@@ -57,7 +72,7 @@ export function stringify(value, replacer, space) {
 
     // lossless number, the secret ingredient :)
     if (value && value.isLosslessNumber) {
-      return value.value;
+      return value.toString();
     }
 
     // BigInt
@@ -98,7 +113,7 @@ export function stringify(value, replacer, space) {
       }
 
       if (typeof item !== 'undefined' && typeof item !== 'function') {
-        str += stringifyValue(item, childIndent);
+        str += _stringifyValue(item, childIndent);
       }
       else {
         str += 'null'
@@ -149,7 +164,7 @@ export function stringify(value, replacer, space) {
           ? (childIndent + keyStr + ': ')
           : keyStr + ':';
 
-        str += stringifyValue(value, childIndent);
+        str += _stringifyValue(value, childIndent);
       }
     })
 

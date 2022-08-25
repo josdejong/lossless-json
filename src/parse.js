@@ -18,6 +18,8 @@ import { revive } from './revive.js'
  * transformed, before being returned.
  *
  * @param {function(value: string) : any} [parseNumber=parseLosslessNumber]
+ * Pass a custom number parser. Input is a string, and the output can be any
+ * numeric value: number, bigint, LosslessNumber, or a custom BigNumber library.
  *
  * @returns Returns the Object corresponding to the given JSON text.
  *

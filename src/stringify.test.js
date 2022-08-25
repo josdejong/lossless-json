@@ -1,5 +1,6 @@
-import { LosslessNumber } from './LosslessNumber.js';
-import { stringify } from './stringify.js';
+import Decimal from 'decimal.js'
+import { LosslessNumber } from './LosslessNumber.js'
+import { stringify } from './stringify.js'
 
 // helper function to create a lossless number
 function lln (value) {
@@ -70,6 +71,28 @@ test('stringify a full JSON object', function () {
 test('stringify bigint', function () {
   expect(stringify(123n)).toEqual('123')
   expect(stringify({ bigint: 123n })).toEqual('{"bigint":123}')
+})
+
+test('stringify Decimal', function () {
+  const decimalStringifier = {
+    test: value => Decimal.isDecimal(value),
+    stringify: value => value.toString()
+  }
+  const valueStringifiers = [decimalStringifier]
+
+  const a = new Decimal('123456789123456789123456789')
+
+  expect(stringify(a, undefined, undefined, valueStringifiers))
+    .toEqual('1.23456789123456789123456789e+26')
+
+  const values = [
+    new Decimal('1.23456789123456789123456789e+26'),
+    new Decimal('2.3'),
+    new Decimal('123')
+  ]
+
+  expect(stringify(values, undefined, undefined, valueStringifiers))
+    .toEqual('[1.23456789123456789123456789e+26,2.3,123]')
 })
 
 test('stringify should keep formatting of a lossless number', function () {
