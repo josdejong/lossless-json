@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 import { LosslessNumber } from './LosslessNumber.js'
 import { parseNumberAndBigInt } from './numberParsers.js'
 import { parse } from './parse.js'
+import { reviveDate } from './reviveDate.js'
 import { stringify } from './stringify.js'
 
 // helper function to create a lossless number
@@ -229,6 +230,13 @@ test('parse with a custom number parser creating bigint', () => {
     123456789123456789123456789n,
     2.3,
     123n
+  ])
+})
+
+test('parse with a reviver to parse Date', () => {
+  const json = parse('["2022-08-25T09:39:19.288Z"]', reviveDate)
+  expect(json).toEqual([
+    new Date('2022-08-25T09:39:19.288Z')
   ])
 })
 

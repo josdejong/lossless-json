@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * The LosslessJSON.stringify() method converts a JavaScript value to a JSON string,
  * optionally replacing values if a replacer function is specified, or

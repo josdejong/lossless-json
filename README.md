@@ -22,6 +22,7 @@ Features:
 
 - No risk of losing numeric information when working with big numbers.
 - Built-in support for `bigint`
+- Built-in support for `Date` (turned off by default)
 - Customizable: parse numeric values into any data type, like `BigNumber`, `bigint`, or `number`, or a mix of them.
 - Compatible with the native, built-in `JSON.parse` and `JSON.stringify`.
 - Works in browsers and node.js.
@@ -189,6 +190,23 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 - `{boolean} isLosslessNumber : true`
   Lossless numbers contain a property `isLosslessNumber` which can be used to
   check whether some variable contains LosslessNumber.
+
+### Utility functions
+
+- `reviveDate(key, value)`
+  Revive strings containing an ISO 8601 date string into a JavaScript `Date` object. This reviver is not turned on by default because there is a small risk of parsing a text field that _accidentally_ contains a date into a `Date`. Whether `reviveDate` is safe to use depends on the use case. Usage: 
+
+  ```js
+  import { parse, reviveDate } from 'lossless-json'
+  
+  const data = parse('["2022-08-25T09:39:19.288Z"]', reviveDate)
+  // output:
+  // [
+  //   new Date('2022-08-25T09:39:19.288Z')
+  // ]
+  ```
+
+  An alternative solution is to stringify a `Date` in a specific recognizable object like `{'$date':'2022-08-25T09:39:19.288Z'}`, and use a reviver and replacer to turn this object into a `Date` and vice versa.
 
 
 ## Test

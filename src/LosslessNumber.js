@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * A lossless number. Stores it's value as string
  * @param {string | number} value

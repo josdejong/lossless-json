@@ -73,6 +73,11 @@ test('stringify bigint', function () {
   expect(stringify({ bigint: 123n })).toEqual('{"bigint":123}')
 })
 
+test('stringify Date', function () {
+  expect(stringify([new Date('2022-08-25T09:39:19.288Z')]))
+    .toEqual('["2022-08-25T09:39:19.288Z"]')
+})
+
 test('stringify Decimal', function () {
   const decimalStringifier = {
     test: value => Decimal.isDecimal(value),
