@@ -1,10 +1,16 @@
+interface ConfigOptional {
+  circularRefs?: boolean
+}
+
+interface Config extends ConfigOptional {
+  circularRefs: boolean
+}
+
 /**
  * Get and/or set configuration options
- * @param {{circularRefs?: boolean, parseNumber?: (text: string) => any}} [options]
- * @return {{circularRefs: boolean, parseNumber: (text: string) => any}}
  * @deprecated There is no config anymore
  */
-export function config (options) {
+export function config (options?: ConfigOptional) : Config {
   // Backward compatibility warning for v1.x
   throw new Error(
     'config is deprecated, support for circularRefs is removed from the library. ' +

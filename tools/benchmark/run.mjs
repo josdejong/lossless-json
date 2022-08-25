@@ -1,7 +1,7 @@
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { readFileSync } from 'fs';
-import { parse, stringify } from '../../src/index.js';
+import { parse, stringify } from '../../src/index.ts';
 import Benchmark from 'benchmark'
 
 const __filename = fileURLToPath(import.meta.url)

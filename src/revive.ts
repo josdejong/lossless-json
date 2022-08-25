@@ -1,27 +1,23 @@
+import type { GenericObject, JSONValue, Reviver } from './types'
+
 /**
  * Revive a json object.
  * Applies the reviver function recursively on all values in the JSON object.
- * @param {*} json   A JSON Object, Array, or value
- * @param {function (key: string, value: *)} reviver
+ * @param json   A JSON Object, Array, or value
+ * @param reviver
  *              A reviver function invoked with arguments `key` and `value`,
  *              which must return a replacement value. The function context
  *              (`this`) is the Object or Array that contains the currently
  *              handled value.
- * @return {*}
  */
-export function revive (json, reviver) {
-  return reviveValue({'': json}, '', json, reviver);
+export function revive (json: JSONValue, reviver: Reviver) : any {
+  return reviveValue({'': json}, '', json, reviver)
 }
 
 /**
  * Revive a value
- * @param {Object | Array} context
- * @param {string} key
- * @param {*} value
- * @param {function(key: string, value: *)} reviver
- * @return {*}
  */
-function reviveValue (context, key, value, reviver) {
+function reviveValue (context: Object | Array<any>, key: string, value: any, reviver: Reviver) : any {
   if (Array.isArray(value)) {
     return reviver.call(context, key, reviveArray(value, reviver));
   }
@@ -37,11 +33,8 @@ function reviveValue (context, key, value, reviver) {
 
 /**
  * Revive the properties of an object
- * @param {Object} object
- * @param {function} reviver
- * @return {Object}
  */
-function reviveObject (object, reviver) {
+function reviveObject (object: GenericObject<JSONValue>, reviver: Reviver) {
   Object.keys(object).forEach(key => {
     const value = reviveValue(object, key, object[key], reviver);
     if (value !== undefined) {
@@ -56,11 +49,8 @@ function reviveObject (object, reviver) {
 
 /**
  * Revive the properties of an Array
- * @param {Array} array
- * @param {function} reviver
- * @return {Array}
  */
-function reviveArray (array, reviver) {
+function reviveArray (array: Array<JSONValue>, reviver: Reviver) : Array<any> {
   for (let i = 0; i < array.length; i++) {
     array[i] = reviveValue(array, i + '', array[i], reviver)
   }

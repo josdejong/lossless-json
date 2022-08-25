@@ -1,18 +1,11 @@
-import babel from 'rollup-plugin-babel';
-// import { uglify } from 'rollup-plugin-uglify';
 
 export default {
-  input: 'src/index.js',
+  input: 'src/index.ts',
   output: {
     name: 'LosslessJSON',
-    file: 'dist/lossless-json.js',
+    file: 'lib/umd/lossless-json.js',
     format: 'umd',
-    sourcemap: true,
-  },
-  plugins: [
-    babel({
-      exclude: 'node_modules/**'
-    }),
-    // uglify()
-  ]
+    compact: true,
+    sourcemap: true
+  }
 };

@@ -1,4 +1,4 @@
-import { LosslessNumber } from './LosslessNumber.js';
+import { LosslessNumber } from '../src/LosslessNumber';
 
 test('create a LosslessNumber from string', function() {
   let n = new LosslessNumber('42');
@@ -57,6 +57,7 @@ test('get valueOf a LosslessNumber', function() {
 });
 
 test('can do operations like add a number and a LosslessNumber', () => {
+  // @ts-ignore
   expect(new LosslessNumber('3') + 2).toBe(5)
 })
 

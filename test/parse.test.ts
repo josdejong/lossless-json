@@ -1,29 +1,36 @@
 import Decimal from 'decimal.js'
-import { LosslessNumber } from './LosslessNumber.js'
-import { parseNumberAndBigInt } from './numberParsers.js'
-import { parse } from './parse.js'
-import { reviveDate } from './reviveDate.js'
-import { stringify } from './stringify.js'
+import { LosslessNumber } from '../src/LosslessNumber'
+import { parseNumberAndBigInt } from '../src/numberParsers'
+import { parse } from '../src/parse'
+import { reviveDate } from '../src/reviveDate'
+import { stringify } from '../src/stringify'
+import { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
-function lln (value) {
+function lln (value: string | number) {
   return new LosslessNumber(value);
 }
 
 // deepEqual objects compared as plain JSON instead of JavaScript classes
-function expectDeepEqual(a, b) {
+function expectDeepEqual(a: any, b: any) {
   expect(jsonify(a)).toEqual(jsonify(b));
 }
 
 // turn a JavaScript object into plain JSON
-function jsonify (obj) {
+function jsonify (obj: any) : JSONValue {
   return JSON.parse(JSON.stringify(obj));
 }
 
 test('full JSON object', function () {
-  let text = '{"a":2.3e100,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-  let expected = {a: lln('2.3e100'), b:'str', c: null, d: false, e:[lln(1), lln(2), lln(3)]};
-  let parsed = parse(text);
+  const text = '{"a":2.3e100,"b":"str","c":null,"d":false,"e":[1,2,3]}';
+  const expected: GenericObject<any> = {
+    a: lln('2.3e100'),
+    b:'str',
+    c: null,
+    d: false,
+    e:[lln(1), lln(2), lln(3)]
+  };
+  const parsed = parse(text);
 
   expect(jsonify(parsed)).toEqual(jsonify(expected));
 });
@@ -61,13 +68,13 @@ test('number', function () {
 });
 
 test('LosslessNumber', function () {
-  let str = '22222222222222222222';
+  const str = '22222222222222222222';
   expectDeepEqual(parse(str), lln(str));
 
-  let str2 = '2.3e+500';
+  const str2 = '2.3e+500';
   expectDeepEqual(parse(str2), lln(str2));
 
-  let str3 = '2.3e-500';
+  const str3 = '2.3e-500';
   expectDeepEqual(parse(str3), lln(str3));
 });
 
@@ -86,9 +93,9 @@ test('keywords', function () {
 });
 
 test('reviver - replace values', function () {
-  let text = '{"a":123,"b":"str"}';
+  const text = '{"a":123,"b":"str"}';
 
-  let expected = {
+  const expected = {
     type: 'object',
     value: {
       a: {type: 'object', value: lln(123)},
@@ -96,7 +103,7 @@ test('reviver - replace values', function () {
     }
   };
 
-  function reviver (key, value) {
+  function reviver (key: string, value: any) {
     return {
       type: typeof value,
       value
@@ -107,9 +114,15 @@ test('reviver - replace values', function () {
 });
 
 test('reviver - invoke callbacks with key/value and correct context', function () {
-  let text = '{"a":123,"b":"str","c":null,"22":22,"d":false,"e":[1,2,3]}';
+  const text = '{"a":123,"b":"str","c":null,"22":22,"d":false,"e":[1,2,3]}';
 
-  let expected = [
+  interface Log {
+    context: JSONValue
+    key: string
+    value: JSONValue
+  }
+
+  const expected: Log[] = [
     {
       context: { 22: 22, a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] },
       key: '22', // ordered first
@@ -163,11 +176,11 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   ];
 
   // convert LosslessNumbers to numbers for easy comparison with native JSON
-  function toRegularJSON(json) {
+  function toRegularJSON(json: any) {
     return JSON.parse(stringify(json))
   }
 
-  function reviver(key, value) {
+  function reviver(key: string, value: any) {
     return key === 'd'
       ? undefined
       : key === '1'
@@ -176,7 +189,7 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   }
 
   // validate expected outcome against reference implemenation JSON.parse
-  let logsReference = [];
+  const logsReference: Log[] = [];
   JSON.parse(text, function (key, value) {
     logsReference.push({context:
         toRegularJSON(this),
@@ -186,7 +199,7 @@ test('reviver - invoke callbacks with key/value and correct context', function (
     return reviver(key, value)
   });
 
-  let logsActual = [];
+  const logsActual: Log[] = [];
   parse(text, function (key, value) {
     logsActual.push({
       context: toRegularJSON(this),
@@ -211,11 +224,11 @@ test('correctly handle strings equaling a JSON delimiter', function () {
 });
 
 test('reviver - revive a lossless number correctly', function () {
-  let text = '2.3e+500';
-  let expected = [
+  const text = '2.3e+500';
+  const expected = [
     {key: '', value: lln('2.3e+500')}
   ];
-  let logs = [];
+  const logs: Array<{key: string, value: any}> = [];
 
   parse(text, function (key, value) {
     logs.push({key, value});
@@ -241,7 +254,7 @@ test('parse with a reviver to parse Date', () => {
 })
 
 test('parse with a custom number parser creating Decimal', () => {
-  const parseDecimal = value => new Decimal(value)
+  const parseDecimal = (value: string) => new Decimal(value)
 
   const json = parse('[123456789123456789123456789,2.3,123]', null, parseDecimal)
   expect(json).toEqual([

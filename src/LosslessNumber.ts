@@ -1,10 +1,14 @@
+import { isValidNumber } from './utils.js'
+
 /**
- * A lossless number. Stores it's value as string
- * @param {string | number} value
- * @constructor
+ * A lossless number. Stores its value as string
  */
 export class LosslessNumber {
-  constructor (value) {
+  value: string
+  type: 'LosslessNumber'
+  isLosslessNumber: true
+
+  constructor (value: any) {
     // value as string
     this.value = valueToString(value);
 
@@ -51,10 +55,8 @@ export class LosslessNumber {
 /**
  * Convert input value to a string
  * If value is no number or string, the valueOf() of the object will be used.
- * @param {number | string} value
- * @return {string}
  */
-export function valueToString (value) {
+export function valueToString (value: any) : string {
   if (typeof value === 'string') {
     if (!isValidNumber(value)) {
       throw new Error('Invalid number (value: "' + value +'")');
@@ -84,12 +86,11 @@ export function valueToString (value) {
 /**
  * Parse a string into a number. When the value can be represented in a number,
  * the function returns a number. Else, the function returns a LosslessNumber
- * @param {string} value
- * @returns {LosslessNumber | number} Returns a number when the value fits
- *                                    in a regular number, else returns a
- *                                    LosslessNumber.
+ * @param value
+ * @returns Returns a number when the value fits in a regular number,
+ *          else returns a LosslessNumber.
  */
-export function createNumber (value) {
+export function createNumber (value: string) : LosslessNumber | number {
   let digits = getDigits(value);
 
   if (digits.length > 15) {
@@ -112,18 +113,15 @@ export function createNumber (value) {
 }
 
 /**
- * Count the number of significant digits of a number.
+ * Get the significant digits of a number.
  *
  * For example:
  *   '2.34' returns '234'
  *   '-77' returns '77'
  *   '0.0034' returns '34'
  *   '120.5e+30' returns '1205'
- *
- * @param {number | string} value
- * @return {string} Returns the significant digits
- */
-export function getDigits (value) {
+ **/
+export function getDigits (value : number | string) : string {
   let _value = (typeof value !== 'string') ? (value + '') : value;
 
   return _value
@@ -134,19 +132,7 @@ export function getDigits (value) {
 
 /**
  * Test whether a string contains only zeros or is empty
- * @param {string} text
- * @return {boolean}
  */
-export function containsOnlyZeros (text) {
+export function containsOnlyZeros (text: string) : boolean {
   return /^0*$/.test(text);
-}
-
-/**
- * Test whether a string contains a valid number
- * http://stackoverflow.com/questions/13340717/json-numbers-regular-expression
- * @param {string} value
- * @return {boolean}
- */
-export function isValidNumber(value) {
-  return /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value);
 }

@@ -1,9 +1,10 @@
 import Decimal from 'decimal.js'
-import { LosslessNumber } from './LosslessNumber.js'
-import { stringify } from './stringify.js'
+import { LosslessNumber } from '../src/LosslessNumber'
+import { stringify } from '../src/stringify'
+import { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
-function lln (value) {
+function lln (value: string | number) {
   return new LosslessNumber(value);
 }
 
@@ -60,10 +61,10 @@ test('stringify', function () {
 });
 
 test('stringify a full JSON object', function () {
-  let expected = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-  let json = {a: lln(123), b:'str', c: null, d: false, e:[1, 2, 3]};
+  const expected = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
+  const json: GenericObject<any> = {a: lln(123), b:'str', c: null, d: false, e:[1, 2, 3]};
 
-  let stringified = stringify(json);
+  const stringified = stringify(json);
 
   expect(stringified).toEqual(expected);
 });
@@ -80,8 +81,8 @@ test('stringify Date', function () {
 
 test('stringify Decimal', function () {
   const decimalStringifier = {
-    test: value => Decimal.isDecimal(value),
-    stringify: value => value.toString()
+    test: (value: string) => Decimal.isDecimal(value),
+    stringify: (value: string) => value.toString()
   }
   const valueStringifiers = [decimalStringifier]
 
@@ -105,9 +106,15 @@ test('stringify should keep formatting of a lossless number', function () {
 })
 
 test('stringify with replacer function', function () {
-  let json = {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]};
+  const json: GenericObject<any> = {"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]};
 
-  let expected = [
+  interface Log {
+    context: JSONValue
+    key: string
+    value: JSONValue
+  }
+
+  const expected: Log[] = [
     {
       context: {'': { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }},
       key: '',
@@ -154,7 +161,7 @@ test('stringify with replacer function', function () {
     }
   ];
 
-  let logs = [];
+  const logs: Log[] = [];
   stringify(json, function (key, value) {
     logs.push({context: this, key, value});
     return value;
@@ -162,7 +169,7 @@ test('stringify with replacer function', function () {
   expect(logs).toEqual(expected);
 
   // validate expected outcome against native JSON.stringify
-  let logs2 = [];
+  const logs2: Log[] = [];
   JSON.stringify(json, function (key, value) {
     logs2.push({context: this, key, value});
     return value;
@@ -171,11 +178,11 @@ test('stringify with replacer function', function () {
 });
 
 test('stringify with replacer function (2)', function () {
-  let json = {"a":123,"b":"str","c":"ignoreMe"};
+  const json = {"a":123,"b":"str","c":"ignoreMe"};
 
-  let expected = '{"a":"number:a:123","b":"string:b:str"}';
+  const expected = '{"a":"number:a:123","b":"string:b:str"}';
 
-  function replacer (key, value) {
+  function replacer (key: string, value: any) {
     if (key === 'c') {
       return undefined;
     }
@@ -197,11 +204,11 @@ test('stringify with replacer function (2)', function () {
 });
 
 test('stringify with replacer Array', function () {
-  let json = {a:1,c:{a:1,b:2,c:3,d:4},b:[1,2,3],d:4, '42': 'universe'};
-  let replacer = ['a', 'b', 'c', 42];
+  const json = {a:1,c:{a:1,b:2,c:3,d:4},b:[1,2,3],d:4, '42': 'universe'};
+  const replacer = ['a', 'b', 'c', 42];
 
   // validate expected outcome against native JSON.stringify
-  let expected = '{"a":1,"b":[1,2,3],"c":{"a":1,"b":2,"c":3},"42":"universe"}';
+  const expected = '{"a":1,"b":[1,2,3],"c":{"a":1,"b":2,"c":3},"42":"universe"}';
   expect(JSON.stringify(json, replacer)).toEqual(expected);
 
   expect(stringify(json, replacer)).toEqual(expected);
@@ -209,9 +216,9 @@ test('stringify with replacer Array', function () {
 });
 
 test('stringify with numeric space', function () {
-  let json = {a: 1, b: [1,2,null,undefined,{c:3}], d: null};
+  const json: JSONValue = {a: 1, b: [1,2,null,undefined,{c:3}], d: null};
 
-  let expected =
+  const expected =
       '{\n' +
       '  "a": 1,\n' +
       '  "b": [\n' +
@@ -233,9 +240,9 @@ test('stringify with numeric space', function () {
 });
 
 test('stringify with string space', function () {
-  let json = {a: 1, b: [1,2,null,undefined,{c:3}], d: null};
+  const json: JSONValue = {a: 1, b: [1,2,null,undefined,{c:3}], d: null};
 
-  let expected =
+  const expected =
       '{\n' +
       '~"a": 1,\n' +
       '~"b": [\n' +
