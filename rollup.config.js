@@ -1,8 +1,8 @@
 import babel from 'rollup-plugin-babel';
-import { uglify } from 'rollup-plugin-uglify';
+// import { uglify } from 'rollup-plugin-uglify';
 
 export default {
-  input: 'lib/index.js',
+  input: 'src/index.js',
   output: {
     name: 'LosslessJSON',
     file: 'dist/lossless-json.js',
@@ -13,6 +13,6 @@ export default {
     babel({
       exclude: 'node_modules/**'
     }),
-    uglify()
+    // uglify()
   ]
 };

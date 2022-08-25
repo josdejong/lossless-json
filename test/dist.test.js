@@ -8,7 +8,5 @@ test('Test bundle in dist', function () {
   expect(LosslessJson.stringify({a:2}))
     .toEqual('{"a":2}');
 
-  expect(LosslessJson.config()).toEqual({circularRefs: true});
-
   expect(new LosslessJson.LosslessNumber(2).isLosslessNumber).toBe(true);
 });
