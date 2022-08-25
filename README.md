@@ -66,12 +66,14 @@ const json = parse(text)
 
 console.log(json.normal.isLosslessNumber) // true
 console.log(json.normal.valueOf()) // number, 2.3
+
+// LosslessNumbers can be used as regular numbers
 console.log(json.normal + 2) // number, 4.3
 
-// the following operations will throw an error
-// as they would result in information loss
-console.log(json.long + 1) // throws Error Cannot convert to number: number would be truncated
-console.log(json.big + 1) // throws Error Cannot convert to number: number would overflow
+// but the following operation will throw an error as it would result in information loss
+console.log(json.long + 1)
+// throws Error: Cannot safely convert LosslessNumber to number:
+//   "123456789012345678901" will be parsed as 123456789012345680000 and lose information
 ```
 
 If you want parse a json string into an object with regular numbers, but want to validate that no numeric information is lost, you write your own number parser and use `isSafeNumber` to validate the numbers:
@@ -179,15 +181,17 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 
 #### Methods
 
-- `valueOf() : number`
-  Convert the LosslessNumber to a regular number.
-  Throws an Error when this would result in loss of information: when the numbers digits would be truncated, or when the number would overflow or underflow.
-- `toString() : string`
+- `.valueOf() : number`
+  Convert the `LosslessNumber` to a regular `number`.
+  Throws an Error when this would result in loss of information: when the numbers digits would be truncated, or when the number would overflow or underflow. See also `.unsafeValueOf()`.
+- `.unsafeValueOf(): number`
+  Convert the `LosslessNumber` to a regular `number`. Unlike `.valueOf()`, this method will silently create a `number` also when this results in loss of information.
+- `.toString() : string`
   Get the string representation of the lossless number.
 
 #### Properties
 
-- `{boolean} isLosslessNumber : true`
+- `{boolean} .isLosslessNumber : true`
   Lossless numbers contain a property `isLosslessNumber` which can be used to
   check whether some variable contains LosslessNumber.
 

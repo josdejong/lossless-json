@@ -1,10 +1,9 @@
 import Decimal from 'decimal.js'
-import { LosslessNumber } from '../src/LosslessNumber'
-import { stringify } from '../src/stringify'
+import { LosslessNumber, stringify } from '../src'
 import { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
-function lln(value: string | number) {
+function lln(value: string) {
   return new LosslessNumber(value)
 }
 
@@ -89,7 +88,7 @@ test('stringify', function () {
 
 test('stringify a full JSON object', function () {
   const expected = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}'
-  const json: GenericObject<unknown> = { a: lln(123), b: 'str', c: null, d: false, e: [1, 2, 3] }
+  const json: GenericObject<unknown> = { a: lln('123'), b: 'str', c: null, d: false, e: [1, 2, 3] }
 
   const stringified = stringify(json)
 

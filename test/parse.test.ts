@@ -4,7 +4,7 @@ import { isLosslessNumber } from '../src/LosslessNumber'
 import { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
-function lln(value: string | number) {
+function lln(value: string) {
   return new LosslessNumber(value)
 }
 
@@ -25,7 +25,7 @@ test('full JSON object', function () {
     b: 'str',
     c: null,
     d: false,
-    e: [lln(1), lln(2), lln(3)]
+    e: [lln('1'), lln('2'), lln('3')]
   }
   const parsed = parse(text)
 
@@ -37,7 +37,7 @@ test('object', function () {
   expect(parse('  { \n } \t ')).toEqual({})
   expect(parse('{"a": {}}')).toEqual({ a: {} })
   expect(parse('{"a": "b"}')).toEqual({ a: 'b' })
-  expect(parse('{"a": 2}')).toEqual({ a: lln(2) })
+  expect(parse('{"a": 2}')).toEqual({ a: lln('2') })
 })
 
 test('array', function () {
@@ -45,7 +45,7 @@ test('array', function () {
   expect(parse('[{}]')).toEqual([{}])
   expect(parse('{"a":[]}')).toEqual({ a: [] })
   expect(parse('[1, "hi", true, false, null, {}, []]')).toEqual([
-    lln(1),
+    lln('1'),
     'hi',
     true,
     false,
@@ -64,7 +64,7 @@ test('number', function () {
   expect(parse('0e+2').valueOf()).toEqual(0)
   expect(parse('0.0')).toEqual(lln('0.0'))
   expect(parse('-0')).toEqual(lln('-0'))
-  expect(parse('2.3')).toEqual(lln(2.3))
+  expect(parse('2.3')).toEqual(lln('2.3'))
   expect(parse('2300e3')).toEqual(lln('2300e3'))
   expect(parse('2300e+3')).toEqual(lln('2300e+3'))
   expect(parse('-2')).toEqual(lln('-2'))
@@ -103,7 +103,7 @@ test('reviver - replace values', function () {
   const expected = {
     type: 'object',
     value: {
-      a: { type: 'object', value: lln(123) },
+      a: { type: 'object', value: lln('123') },
       b: { type: 'string', value: 'str' }
     }
   }

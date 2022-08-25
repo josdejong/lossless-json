@@ -1,16 +1,20 @@
-import { isValidNumber } from './utils.js'
+import { isSafeNumber, isValidNumber } from './utils.js'
 
 /**
- * A lossless number. Stores its value as string
+ * A lossless number. Stores its numeric value as string
  */
 export class LosslessNumber {
   value: string
   type: 'LosslessNumber'
   isLosslessNumber: true
 
-  constructor(value: unknown) {
-    // value as string
-    this.value = valueToString(value)
+  constructor(value: string) {
+    if (!isValidNumber(value)) {
+      throw new Error('Invalid number (value: "' + value + '")')
+    }
+
+    // numeric value as string
+    this.value = value
 
     // type information
     this.type = 'LosslessNumber'
@@ -21,24 +25,14 @@ export class LosslessNumber {
    * Get the value of the LosslessNumber as number.
    * Will throw an error when this conversion would result in a truncation
    * of the number.
-   * @return {Number}
    */
-  valueOf() {
+  valueOf(): number {
     const number = parseFloat(this.value)
-    const digits = getDigits(this.value)
 
-    // throw an error when the numeric value will lose information
-    if (digits.length > 15) {
+    if (!isSafeNumber(this.value)) {
       throw new Error(
-        'Cannot convert to number: ' + 'number would be truncated (value: ' + this.value + ')'
-      )
-    }
-    if (!isFinite(number)) {
-      throw new Error('Cannot convert to number: number would overflow (value: ' + this.value + ')')
-    }
-    if (Math.abs(number) < Number.MIN_VALUE && !containsOnlyZeros(digits)) {
-      throw new Error(
-        'Cannot convert to number: number would underflow (value: ' + this.value + ')'
+        'Cannot safely convert LosslessNumber to number: ' +
+          `"${this.value}" will be parsed as ${number} and lose information`
       )
     }
 
@@ -46,10 +40,18 @@ export class LosslessNumber {
   }
 
   /**
-   * Get the value of the LosslessNumber as string.
-   * @return {string}
+   * Get the value of the LosslessNumber as number.
+   * Will always return a number, also when this results in loss of digits.
+   * @return {Number}
    */
-  toString() {
+  unsafeValueOf(): number {
+    return parseFloat(this.value)
+  }
+
+  /**
+   * Get the value of the LosslessNumber as string.
+   */
+  toString(): string {
     return this.value
   }
 }
@@ -90,33 +92,6 @@ export function valueToString(value: unknown): string {
 }
 
 /**
- * Parse a string into a number. When the value can be represented in a number,
- * the function returns a number. Else, the function returns a LosslessNumber
- * @param value
- * @returns Returns a number when the value fits in a regular number,
- *          else returns a LosslessNumber.
- */
-export function createNumber(value: string): LosslessNumber | number {
-  const digits = getDigits(value)
-
-  if (digits.length > 15) {
-    // would truncate digits
-    return new LosslessNumber(value)
-  }
-
-  const number = parseFloat(value)
-  if (!isFinite(number)) {
-    // overflow, finite or NaN
-    return new LosslessNumber(value)
-  } else if (Math.abs(number) < Number.MIN_VALUE && !containsOnlyZeros(digits)) {
-    // underflow
-    return new LosslessNumber(value)
-  } else {
-    return number
-  }
-}
-
-/**
  * Get the significant digits of a number.
  *
  * For example:
@@ -132,11 +107,4 @@ export function getDigits(value: number | string): string {
     .replace(/^-/, '') // remove sign
     .replace(/e.*$/, '') // remove exponential notation
     .replace(/^0\.?0*|\./, '') // remove decimal point and leading zeros
-}
-
-/**
- * Test whether a string contains only zeros or is empty
- */
-export function containsOnlyZeros(text: string): boolean {
-  return /^0*$/.test(text)
 }
