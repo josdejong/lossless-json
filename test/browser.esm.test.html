@@ -7,8 +7,8 @@
   <script type="module">
     import { parse, stringify } from '../src/index.js'
 
-    let text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-    let json = parse(text);
+    const text = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
+    const json = parse(text);
 
     console.log('parsed:', json);
     console.log('json.a:', json.a);
