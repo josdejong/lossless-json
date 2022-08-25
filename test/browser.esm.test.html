@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LosslessJSON  browser test</title>
+  <title>LosslessJSON  browser test (ESM)</title>
   <script src="../dist/lossless-json.js"></script>
-  <script>
-    'use strict';
+  <script type="module">
+    import { parse, stringify } from '../src/index.js'
 
     let jsonStr = '{"a":123,"b":"str","c":null,"d":false,"e":[1,2,3]}';
-    let json = LosslessJSON.parse(jsonStr);
+    let json = parse(jsonStr);
 
     console.log('parsed:', json);
     console.log('json.a:', json.a);
-    console.log('stringified:', LosslessJSON.stringify(jsonStr));
+    console.log('stringified:', stringify(jsonStr));
   </script>
 </head>
 <body>
