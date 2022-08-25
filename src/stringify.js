@@ -27,179 +27,147 @@
  * @returns {string | undefined} Returns the string representation of the JSON object.
  */
 export function stringify(value, replacer, space) {
-  let _value = (typeof replacer === 'function')
-      ? replacer.call({'': value}, '', value)
-      : value;
+  const resolvedSpace = resolveSpace(space)
 
-  let _space; // undefined by default
-  if (typeof space === 'number') {
-    if (space > 10) {
-      _space = repeat(' ', 10);
-    }
-    else if (space >= 1) {
-      _space = repeat(' ', space);
-    }
-    // else ignore
-  }
-  else if (typeof space === 'string' && space !== '') {
-    _space = space;
-  }
+  const replacedValue = (typeof replacer === 'function')
+    ? replacer.call({'': value}, '', value)
+    : value;
 
-  return stringifyValue(_value, replacer, _space, '');
-}
+  return stringifyValue(replacedValue, '');
 
-/**
- * Stringify a value
- * @param {*} value
- * @param {function | Array.<string | number>} [replacer]
- * @param {string} [space]
- * @param {string} [indent]
- * @return {string | undefined}
- */
-function stringifyValue(value, replacer, space, indent) {
-  // boolean, null, number, string, or date
-  if (typeof value === 'boolean' || value instanceof Boolean ||
+  /**
+   * Stringify a value
+   * @param {*} value
+   * @param {string} [indent]
+   * @return {string | undefined}
+   */
+  function stringifyValue(value, indent) {
+    // boolean, null, number, string, or date
+    if (typeof value === 'boolean' ||
+      typeof value === 'number' ||
+      typeof value === 'string' ||
       value === null ||
-      typeof value === 'number' || value instanceof Number ||
-      typeof value === 'string' || value instanceof String ||
-      value instanceof Date) {
-    return JSON.stringify(value);
+      value instanceof Date ||
+      value instanceof Boolean ||
+      value instanceof Number ||
+      value instanceof String
+    ) {
+      return JSON.stringify(value);
+    }
+
+    // lossless number, the secret ingredient :)
+    if (value && value.isLosslessNumber) {
+      return value.value;
+    }
+
+    // BigInt
+    if (typeof value === 'bigint') {
+      return value.toString();
+    }
+
+    // Array
+    if (Array.isArray(value)) {
+      return stringifyArray(value, indent);
+    }
+
+    // Object (test lastly!)
+    if (value && typeof value === 'object') {
+      return stringifyObject(value, indent);
+    }
+
+    return undefined;
   }
 
-  // lossless number, the secret ingredient :)
-  if (value && value.isLosslessNumber) {
-    return value.value;
-  }
+  /**
+   * Stringify an array
+   * @param {Array} array
+   * @param {string} [indent]
+   * @return {string}
+   */
+  function stringifyArray(array, indent) {
+    let childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined;
+    let str = resolvedSpace ? '[\n' : '[';
 
-  // BigInt
-  if (typeof value === 'bigint') {
-    return value.toString();
-  }
-
-  // Array
-  if (Array.isArray(value)) {
-    return stringifyArray(value, replacer, space, indent);
-  }
-
-  // Object (test lastly!)
-  if (value && typeof value === 'object') {
-    return stringifyObject(value, replacer, space, indent);
-  }
-
-  return undefined;
-}
-
-/**
- * Stringify an array
- * @param {Array} array
- * @param {function | Array.<string | number>} [replacer]
- * @param {string} [space]
- * @param {string} [indent]
- * @return {string}
- */
-function stringifyArray(array, replacer, space, indent) {
-  let childIndent = space ? (indent + space) : undefined;
-  let str = space ? '[\n' : '[';
-
-  for (let i = 0; i < array.length; i++) {
-    let key = i + '';
-    let item = (typeof replacer === 'function')
-        ? replacer.call(array, key, array[i])
+    for (let i = 0; i < array.length; i++) {
+      const item = (typeof replacer === 'function')
+        ? replacer.call(array, String(i), array[i])
         : array[i];
 
-    if (space) {
-      str += childIndent;
+      if (resolvedSpace) {
+        str += childIndent;
+      }
+
+      if (typeof item !== 'undefined' && typeof item !== 'function') {
+        str += stringifyValue(item, childIndent);
+      }
+      else {
+        str += 'null'
+      }
+
+      if (i < array.length - 1) {
+        str += resolvedSpace ? ',\n' : ',';
+      }
     }
 
-    if (typeof item !== 'undefined' && typeof item !== 'function') {
-      str += stringifyValue(item, replacer, space, childIndent);
-    }
-    else {
-      str += 'null'
-    }
-
-    if (i < array.length - 1) {
-      str += space ? ',\n' : ',';
-    }
+    str += resolvedSpace ? ('\n' + indent + ']') : ']';
+    return str;
   }
 
-  str += space ? ('\n' + indent + ']') : ']';
-  return str;
-}
+  /**
+   * Stringify an object
+   * @param {Object} object
+   * @param {string} [indent]
+   * @return {string}
+   */
+  function stringifyObject(object, indent) {
+    const childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined;
+    let first = true;
+    let str = resolvedSpace ? '{\n' : '{';
 
-/**
- * Stringify an object
- * @param {Object} object
- * @param {function | Array.<string | number>} [replacer]
- * @param {string} [space]
- * @param {string} [indent]
- * @return {string}
- */
-function stringifyObject(object, replacer, space, indent) {
-  let childIndent = space ? (indent + space) : undefined;
-  let first = true;
-  let str = space ? '{\n' : '{';
+    if (typeof object.toJSON === 'function') {
+      return stringify(object.toJSON(), replacer, space);
+    }
 
-  if (typeof object.toJSON === 'function') {
-    return stringify(object.toJSON(), replacer, space);
-  }
+    const keys = Array.isArray(replacer) ? replacer : Object.keys(object)
 
-  for (let key in object) {
-    if (object.hasOwnProperty(key)) {
-      let value = (typeof replacer === 'function')
-          ? replacer.call(object, key, object[key])
-          : object[key];
+    keys.forEach(key => {
+      const value = (typeof replacer === 'function')
+        ? replacer.call(object, key, object[key])
+        : object[key];
 
-      if (includeProperty(key, value, replacer)) {
+      if (includeProperty(key, value)) {
         if (first) {
           first = false;
         }
         else {
-          str += space ? ',\n' : ',';
+          str += resolvedSpace ? ',\n' : ',';
         }
 
-        const keyStr = JSON.stringify(key);
+        const keyStr = JSON.stringify(String(key));
 
-        str += space
-            ? (childIndent + keyStr + ': ')
-            : keyStr + ':';
+        str += resolvedSpace
+          ? (childIndent + keyStr + ': ')
+          : keyStr + ':';
 
-        str += stringifyValue(value, replacer, space, childIndent);
+        str += stringifyValue(value, childIndent);
       }
-    }
+    })
+
+    str += resolvedSpace ? ('\n' + indent + '}') : '}';
+    return str;
   }
 
-  str += space ? ('\n' + indent + '}') : '}';
-  return str;
-}
-
-/**
- * Test whether to include a property in a stringified object or not.
- * @param {string} key
- * @param {*} value
- * @param {function(key: string, value: *) | Array<string | number>} [replacer]
- * @return {boolean}
- */
-function includeProperty (key, value, replacer) {
-  return typeof value !== 'undefined'
+  /**
+   * Test whether to include a property in a stringified object or not.
+   * @param {string} key
+   * @param {*} value
+   * @return {boolean}
+   */
+  function includeProperty (key, value) {
+    return typeof value !== 'undefined'
       && typeof value !== 'function'
-      && (!Array.isArray(replacer) || contains(replacer, key));
-}
-
-/**
- * Check whether an array contains some value.
- * Uses a non-strict comparison, so contains([1,2,3], '2') returns true
- * @param {Array} array
- * @param {*} value
- * @return {boolean}
- */
-function contains(array, value) {
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] == value) { // non-strict equality check!
-      return true;
-    }
+      && typeof value !== 'symbol'
   }
-  return false;
 }
 
 /**
@@ -215,4 +183,21 @@ function repeat (text, times) {
     res += text;
   }
   return res;
+}
+
+/**
+ * Resolve a JSON stringify
+ * @param {number | string | undefined} space
+ * @returns {string | undefined}
+ */
+function resolveSpace(space) {
+  if (typeof space === 'number') {
+    return repeat(' ', space);
+  }
+
+  if (typeof space === 'string' && space !== '') {
+    return space
+  }
+
+  return undefined
 }

@@ -172,13 +172,12 @@ test('stringify with replacer Array', function () {
   let json = {a:1,c:{a:1,b:2,c:3,d:4},b:[1,2,3],d:4, '42': 'universe'};
   let replacer = ['a', 'b', 'c', 42];
 
-  let expected = '{"42":"universe","a":1,"c":{"a":1,"b":2,"c":3},"b":[1,2,3]}';
+  // validate expected outcome against native JSON.stringify
+  let expected = '{"a":1,"b":[1,2,3],"c":{"a":1,"b":2,"c":3},"42":"universe"}';
+  expect(JSON.stringify(json, replacer)).toEqual(expected);
+
   expect(stringify(json, replacer)).toEqual(expected);
 
-  // validate expected outcome against native JSON.stringify
-  // note: stringified order differs. can happen.
-  let expected2 = '{"a":1,"b":[1,2,3],"c":{"a":1,"b":2,"c":3},"42":"universe"}';
-  expect(JSON.stringify(json, replacer)).toEqual(expected2);
 });
 
 test('stringify with numeric space', function () {
