@@ -35,8 +35,8 @@ import { repeat } from './utils.js'
  *
  * @returns Returns the string representation of the JSON object.
  */
-export function stringify(
-  value: any,
+export function stringify (
+  value: unknown,
   replacer?: Replacer,
   space?: number | string,
   valueStringifiers?: ValueStringifier[]
@@ -44,15 +44,15 @@ export function stringify(
   const resolvedSpace = resolveSpace(space)
 
   const replacedValue = (typeof replacer === 'function')
-    ? replacer.call({'': value}, '', value)
-    : value;
+    ? replacer.call({ '': value }, '', value)
+    : value
 
-  return _stringifyValue(replacedValue, '');
+  return _stringifyValue(replacedValue, '')
 
   /**
    * Stringify a value
    */
-  function _stringifyValue(value: any, indent: string) : string | undefined {
+  function _stringifyValue (value: unknown, indent: string) : string | undefined {
     if (Array.isArray(valueStringifiers)) {
       const stringifier = valueStringifiers.find(item => item.test(value))
       if (stringifier) {
@@ -70,74 +70,75 @@ export function stringify(
       value instanceof Number ||
       value instanceof String
     ) {
-      return JSON.stringify(value);
+      return JSON.stringify(value)
     }
 
     // lossless number, the secret ingredient :)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     if (value && value.isLosslessNumber) {
-      return value.toString();
+      return value.toString()
     }
 
     // BigInt
     if (typeof value === 'bigint') {
-      return value.toString();
+      return value.toString()
     }
 
     // Array
     if (Array.isArray(value)) {
-      return stringifyArray(value, indent);
+      return stringifyArray(value, indent)
     }
 
     // Object (test lastly!)
     if (value && typeof value === 'object') {
-      return stringifyObject(value, indent);
+      return stringifyObject(value as GenericObject<unknown>, indent)
     }
 
-    return undefined;
+    return undefined
   }
 
   /**
    * Stringify an array
    */
-  function stringifyArray(array: Array<any>, indent: string) : string {
-    let childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined;
-    let str = resolvedSpace ? '[\n' : '[';
+  function stringifyArray (array: Array<unknown>, indent: string) : string {
+    const childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined
+    let str = resolvedSpace ? '[\n' : '['
 
     for (let i = 0; i < array.length; i++) {
       const item = (typeof replacer === 'function')
         ? replacer.call(array, String(i), array[i])
-        : array[i];
+        : array[i]
 
       if (resolvedSpace) {
-        str += childIndent;
+        str += childIndent
       }
 
       if (typeof item !== 'undefined' && typeof item !== 'function') {
-        str += _stringifyValue(item, childIndent);
-      }
-      else {
+        str += _stringifyValue(item, childIndent)
+      } else {
         str += 'null'
       }
 
       if (i < array.length - 1) {
-        str += resolvedSpace ? ',\n' : ',';
+        str += resolvedSpace ? ',\n' : ','
       }
     }
 
-    str += resolvedSpace ? ('\n' + indent + ']') : ']';
-    return str;
+    str += resolvedSpace ? ('\n' + indent + ']') : ']'
+    return str
   }
 
   /**
    * Stringify an object
    */
-  function stringifyObject(object: GenericObject<any>, indent: string) : string {
-    const childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined;
-    let first = true;
-    let str = resolvedSpace ? '{\n' : '{';
+  function stringifyObject (object: GenericObject<unknown>, indent: string) : string {
+    const childIndent = resolvedSpace ? (indent + resolvedSpace) : undefined
+    let first = true
+    let str = resolvedSpace ? '{\n' : '{'
 
     if (typeof object.toJSON === 'function') {
-      return stringify(object.toJSON(), replacer, space, undefined);
+      return stringify(object.toJSON(), replacer, space, undefined)
     }
 
     const keys: string[] = Array.isArray(replacer) ? replacer.map(String) : Object.keys(object)
@@ -145,37 +146,36 @@ export function stringify(
     keys.forEach(key => {
       const value = (typeof replacer === 'function')
         ? replacer.call(object, key, object[key])
-        : object[key];
+        : object[key]
 
       if (includeProperty(key, value)) {
         if (first) {
-          first = false;
-        }
-        else {
-          str += resolvedSpace ? ',\n' : ',';
+          first = false
+        } else {
+          str += resolvedSpace ? ',\n' : ','
         }
 
-        const keyStr = JSON.stringify(key);
+        const keyStr = JSON.stringify(key)
 
         str += resolvedSpace
           ? (childIndent + keyStr + ': ')
-          : keyStr + ':';
+          : keyStr + ':'
 
-        str += _stringifyValue(value, childIndent);
+        str += _stringifyValue(value, childIndent)
       }
     })
 
-    str += resolvedSpace ? ('\n' + indent + '}') : '}';
-    return str;
+    str += resolvedSpace ? ('\n' + indent + '}') : '}'
+    return str
   }
 
   /**
    * Test whether to include a property in a stringified object or not.
    */
-  function includeProperty (key: string, value: any) : boolean {
-    return typeof value !== 'undefined'
-      && typeof value !== 'function'
-      && typeof value !== 'symbol'
+  function includeProperty (key: string, value: unknown) : boolean {
+    return typeof value !== 'undefined' &&
+      typeof value !== 'function' &&
+      typeof value !== 'symbol'
   }
 }
 
@@ -183,9 +183,9 @@ export function stringify(
  * Resolve a JSON stringify space:
  * replace a number with a string containing that number of spaces
  */
-function resolveSpace(space : number | string | undefined) : string | undefined {
+function resolveSpace (space : number | string | undefined) : string | undefined {
   if (typeof space === 'number') {
-    return repeat(' ', space);
+    return repeat(' ', space)
   }
 
   if (typeof space === 'string' && space !== '') {

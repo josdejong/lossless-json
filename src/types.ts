@@ -6,17 +6,17 @@ export type JSONValue =
 export type JSONObject = { [key: string]: JSONValue }
 export type JSONArray = JSONValue[]
 
-export type Reviver = (key: string, value: JSONValue) => any
+export type Reviver = (key: string, value: JSONValue) => unknown
 
-export type NumberParser = (value: string) => any
+export type NumberParser = (value: string) => unknown
 
 export type Replacer =
-  | ((key: string, value: any) => JSONValue | undefined)
+  | ((key: string, value: unknown) => JSONValue | undefined)
   | Array<string | number>
 
 export interface ValueStringifier {
-  test: (value: any) => boolean
-  stringify: (value: any) => string
+  test: (value: unknown) => boolean
+  stringify: (value: unknown) => string
 }
 
 export type GenericObject<T> = {

@@ -221,17 +221,33 @@ To test the library, first install dependencies once:
 npm install
 ```
 
-Then generate a bundle (some tests validate the created bundle):
-
-```
-npm run build
-```
-
-Then run the tests:
+To run the unit tests:
 
 ```
 npm test
 ```
+
+To build the library and run the unit tests and integration tests:
+
+```
+npm run build-and-test
+```
+
+## Lint
+
+Run linting:
+
+```
+npm run lint
+```
+
+Fix linting issues automatically:
+
+```
+npm run format
+```
+
+## Benchmark
 
 To run a benchmark to compare the performance with the native `JSON` parser:
 
@@ -239,8 +255,7 @@ To run a benchmark to compare the performance with the native `JSON` parser:
 npm run benchmark
 ```
 
-(Spoiler: `lossless-json` is much slower than native)
-
+(Spoiler: `lossless-json` is much slower than native: about 3 or 4 times as slow at the moment of writing)
 
 
 ## Build
@@ -257,7 +272,7 @@ Then bundle the code:
 npm run build
 ```
 
-This will generate an ES5 compatible bundle `./dist/lossless-json.js` which can be executed in browsers and node.js.
+This will generate an ES module output and an UMD bundle in the folder `./.lib` which can be executed in browsers and node.js and used in the browser.
 
 
 ## Deploy
@@ -267,7 +282,7 @@ This will generate an ES5 compatible bundle `./dist/lossless-json.js` which can 
 - run `npm test` to see whether everything works correctly.
 - merge changes from `develop` into `master`
 - create git tag and push it: `git tag v1.0.2 && git push --tags`
-- publish via `npm publish` (this will first run `npm test && npm run build` before actually publishing the library).
+- publish via `npm publish` (this will first build, test, and lint before actually publishing the library).
 
 
 ## License

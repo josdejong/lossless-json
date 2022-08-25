@@ -12,13 +12,16 @@
     "url": "https://github.com/josdejong/lossless-json.git"
   },
   "scripts": {
-    "test": "jest",
-    "build": "npm run clean && npm-run-all build:**",
-    "clean": "del-cli lib",
+    "test": "jest --rootDir=test",
+    "test:lib": "npm run build && jest --rootDir='test-lib'",
+    "build": "npm-run-all build:**",
+    "build:clean": "del-cli lib",
     "build:esm": "babel src --out-dir lib/esm --extensions \".ts\" --source-maps --config-file ./babel-esm.config.json",
     "build:umd": "rollup ./lib/esm/index.js --format umd --name 'LosslessJSON' --sourcemap --output.file lib/umd/lossless-json.js && cpy tools/cjs/package.json lib/umd --flat",
     "build:types": "tsc --project tsconfig-types.json",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts test/**/*.ts test-lib/**/*.mjs tools/**/*.mjs",
+    "format": "npm run lint -- --fix",
+    "build-and-test": "npm run build && jest && npm run lint",
     "prepublishOnly": "npm test && npm run build",
     "benchmark": "node tools/benchmark/run.mjs"
   },
@@ -40,6 +43,7 @@
     "@babel/plugin-transform-typescript": "7.18.12",
     "@babel/preset-env": "7.18.10",
     "@babel/preset-typescript": "7.18.6",
+    "@types/benchmark": "2.1.1",
     "@types/jest": "28.1.7",
     "@typescript-eslint/eslint-plugin": "5.35.1",
     "@typescript-eslint/parser": "5.35.1",

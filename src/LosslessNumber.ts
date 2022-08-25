@@ -8,13 +8,13 @@ export class LosslessNumber {
   type: 'LosslessNumber'
   isLosslessNumber: true
 
-  constructor (value: any) {
+  constructor (value: unknown) {
     // value as string
-    this.value = valueToString(value);
+    this.value = valueToString(value)
 
     // type information
-    this.type = 'LosslessNumber';
-    this.isLosslessNumber = true;
+    this.type = 'LosslessNumber'
+    this.isLosslessNumber = true
   }
 
   /**
@@ -24,62 +24,65 @@ export class LosslessNumber {
    * @return {Number}
    */
   valueOf () {
-    let number = parseFloat(this.value);
-    let digits = getDigits(this.value);
+    const number = parseFloat(this.value)
+    const digits = getDigits(this.value)
 
     // throw an error when the numeric value will lose information
     if (digits.length > 15) {
       throw new Error('Cannot convert to number: ' +
-          'number would be truncated (value: ' + this.value + ')');
+          'number would be truncated (value: ' + this.value + ')')
     }
     if (!isFinite(number)) {
-      throw new Error('Cannot convert to number: number would overflow (value: ' + this.value + ')');
+      throw new Error('Cannot convert to number: number would overflow (value: ' + this.value + ')')
     }
     if (Math.abs(number) < Number.MIN_VALUE && !containsOnlyZeros(digits)) {
-      throw new Error('Cannot convert to number: number would underflow (value: ' + this.value + ')');
+      throw new Error('Cannot convert to number: number would underflow (value: ' + this.value + ')')
     }
 
-    return number;
+    return number
   }
 
   /**
    * Get the value of the LosslessNumber as string.
    * @return {string}
    */
-  toString() {
-    return this.value;
+  toString () {
+    return this.value
   }
+}
 
+export function isLosslessNumber (value: unknown) : value is LosslessNumber {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return (value && typeof value === 'object' && value.isLosslessNumber === true) || false
 }
 
 /**
  * Convert input value to a string
  * If value is no number or string, the valueOf() of the object will be used.
  */
-export function valueToString (value: any) : string {
+export function valueToString (value: unknown) : string {
   if (typeof value === 'string') {
     if (!isValidNumber(value)) {
-      throw new Error('Invalid number (value: "' + value +'")');
+      throw new Error('Invalid number (value: "' + value + '")')
     }
 
-    return value;
-  }
-  else if (typeof value === 'number') {
+    return value
+  } else if (typeof value === 'number') {
     // validate number
     if (getDigits(value + '').length > 15) {
-      throw new Error('Invalid number: contains more than 15 digits (value: ' + value + ')');
+      throw new Error('Invalid number: contains more than 15 digits (value: ' + value + ')')
     }
     if (isNaN(value)) {
-      throw new Error('Invalid number: NaN');
+      throw new Error('Invalid number: NaN')
     }
     if (!isFinite(value)) {
-      throw new Error('Invalid number: Infinity');
+      throw new Error('Invalid number: Infinity')
     }
 
-    return value + '';
-  }
-  else {
-    return valueToString(value && value.valueOf());
+    return value + ''
+  } else {
+    return valueToString(value && value.valueOf())
   }
 }
 
@@ -91,24 +94,22 @@ export function valueToString (value: any) : string {
  *          else returns a LosslessNumber.
  */
 export function createNumber (value: string) : LosslessNumber | number {
-  let digits = getDigits(value);
+  const digits = getDigits(value)
 
   if (digits.length > 15) {
     // would truncate digits
-    return new LosslessNumber(value);
+    return new LosslessNumber(value)
   }
 
-  let number = parseFloat(value);
+  const number = parseFloat(value)
   if (!isFinite(number)) {
     // overflow, finite or NaN
-    return new LosslessNumber(value);
-  }
-  else if (Math.abs(number) < Number.MIN_VALUE && !containsOnlyZeros(digits)) {
+    return new LosslessNumber(value)
+  } else if (Math.abs(number) < Number.MIN_VALUE && !containsOnlyZeros(digits)) {
     // underflow
-    return new LosslessNumber(value);
-  }
-  else {
-    return number;
+    return new LosslessNumber(value)
+  } else {
+    return number
   }
 }
 
@@ -122,17 +123,17 @@ export function createNumber (value: string) : LosslessNumber | number {
  *   '120.5e+30' returns '1205'
  **/
 export function getDigits (value : number | string) : string {
-  let _value = (typeof value !== 'string') ? (value + '') : value;
+  const _value = (typeof value !== 'string') ? (value + '') : value
 
   return _value
-      .replace(/^-/, '')            // remove sign
-      .replace(/e.*$/, '')          // remove exponential notation
-      .replace( /^0\.?0*|\./, '');  // remove decimal point and leading zeros
+    .replace(/^-/, '') // remove sign
+    .replace(/e.*$/, '') // remove exponential notation
+    .replace(/^0\.?0*|\./, '') // remove decimal point and leading zeros
 }
 
 /**
  * Test whether a string contains only zeros or is empty
  */
 export function containsOnlyZeros (text: string) : boolean {
-  return /^0*$/.test(text);
+  return /^0*$/.test(text)
 }

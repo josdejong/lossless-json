@@ -1,7 +1,7 @@
 /**
  * Revive a string containing an ISO 8601 date string into a JavaScript `Date` object
  */
-export function reviveDate(key: string, value: any) : Date | any {
+export function reviveDate (key: string, value: unknown) : Date | unknown {
   return (typeof value === 'string' && isoDateRegex.test(value))
     ? new Date(value)
     : value
