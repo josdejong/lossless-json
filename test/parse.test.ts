@@ -1,6 +1,12 @@
 import Decimal from 'decimal.js'
-import { LosslessNumber, parse, parseNumberAndBigInt, reviveDate, stringify } from '../src'
-import { isLosslessNumber } from '../src/LosslessNumber'
+import {
+  isLosslessNumber,
+  LosslessNumber,
+  parse,
+  parseNumberAndBigInt,
+  reviveDate,
+  stringify
+} from '../src'
 import { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number

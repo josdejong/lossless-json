@@ -1,3 +1,31 @@
+import { LosslessNumber } from './LosslessNumber'
+
+export function isLosslessNumber(value: unknown): value is LosslessNumber {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return (value && typeof value === 'object' && value.isLosslessNumber === true) || false
+}
+
+/**
+ * Convert a number into a LosslessNumber if this is possible in a safe way
+ * If the value has too many digits, or is NaN or Infinity, an error will be thrown
+ */
+export function toLosslessNumber(value: number): LosslessNumber {
+  if (extractSignificantDigits(value + '').length > 15) {
+    throw new Error('Invalid number: contains more than 15 digits (value: ' + value + ')')
+  }
+
+  if (isNaN(value)) {
+    throw new Error('Invalid number: NaN')
+  }
+
+  if (!isFinite(value)) {
+    throw new Error('Invalid number: ' + value)
+  }
+
+  return new LosslessNumber(String(value))
+}
+
 /**
  * Test whether a string contains an integer number
  */
@@ -59,15 +87,3 @@ const EXPONENTIAL_PART_REGEX = /[eE][+-]?\d+$/
 const LEADING_MINUS_AND_ZEROS_REGEX = /^-?(0*)?/
 const DOT_REGEX = /\./
 const TRAILING_ZEROS_REGEX = /0+$/
-
-/**
- * Repeat a string a number of times.
- * Simple linear solution, we only need up to 10 iterations in practice
- */
-export function repeat(text: string, times: number): string {
-  let res = ''
-  while (times-- > 0) {
-    res += text
-  }
-  return res
-}

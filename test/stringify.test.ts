@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import { LosslessNumber, stringify } from '../src'
-import { GenericObject, JSONValue } from '../src/types'
+import type { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
 function lln(value: string) {

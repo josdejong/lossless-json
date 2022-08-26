@@ -1,4 +1,4 @@
-import { extractSignificantDigits, isInteger, isNumber, isSafeNumber, repeat } from '../src/utils'
+import { extractSignificantDigits, isInteger, isNumber, isSafeNumber } from '../src/utils'
 
 test('isInteger', () => {
   expect(isInteger('4250')).toEqual(true)
@@ -39,10 +39,4 @@ test('extractSignificantDigits', () => {
   expect(extractSignificantDigits('0120.50E-30')).toEqual('1205')
   expect(extractSignificantDigits('01200')).toEqual('12')
   expect(extractSignificantDigits('-01200')).toEqual('12')
-})
-
-test('repeat', () => {
-  expect(repeat('hi', 3)).toEqual('hihihi')
-  expect(repeat('hi', 0)).toEqual('')
-  expect(repeat('hi', -2)).toEqual('')
 })

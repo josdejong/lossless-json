@@ -1,5 +1,4 @@
 import { GenericObject, Replacer, ValueStringifier } from './types'
-import { repeat } from './utils.js'
 
 /**
  * The LosslessJSON.stringify() method converts a JavaScript value to a JSON string,
@@ -179,7 +178,7 @@ export function stringify(
  */
 function resolveSpace(space: number | string | undefined): string | undefined {
   if (typeof space === 'number') {
-    return repeat(' ', space)
+    return ' '.repeat(space)
   }
 
   if (typeof space === 'string' && space !== '') {

@@ -1,4 +1,4 @@
-import { isSafeNumber, isNumber, extractSignificantDigits } from './utils.js'
+import { isNumber, isSafeNumber } from './utils.js'
 
 /**
  * A lossless number. Stores its numeric value as string
@@ -27,7 +27,7 @@ export class LosslessNumber {
    * of the number.
    */
   valueOf(): number {
-    const number = parseFloat(this.value)
+    const number = this.unsafeValueOf()
 
     if (!isSafeNumber(this.value)) {
       throw new Error(
@@ -54,30 +54,4 @@ export class LosslessNumber {
   toString(): string {
     return this.value
   }
-}
-
-export function isLosslessNumber(value: unknown): value is LosslessNumber {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return (value && typeof value === 'object' && value.isLosslessNumber === true) || false
-}
-
-/**
- * Convert a number into a LosslessNumber if this is possible in a safe way
- * If the value has too many digits, or is NaN or Infinity, an error will be thrown
- */
-export function toLosslessNumber(value: number): LosslessNumber {
-  if (extractSignificantDigits(value + '').length > 15) {
-    throw new Error('Invalid number: contains more than 15 digits (value: ' + value + ')')
-  }
-
-  if (isNaN(value)) {
-    throw new Error('Invalid number: NaN')
-  }
-
-  if (!isFinite(value)) {
-    throw new Error('Invalid number: ' + value)
-  }
-
-  return new LosslessNumber(String(value))
 }
