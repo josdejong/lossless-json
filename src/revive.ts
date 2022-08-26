@@ -1,4 +1,4 @@
-import { isLosslessNumber } from './utils.js'
+import { isLosslessNumber } from './LosslessNumber.js'
 import type { GenericObject, Reviver } from './types'
 
 /**
