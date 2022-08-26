@@ -1,4 +1,4 @@
-import { isSafeNumber, isNumber } from './utils.js'
+import { isSafeNumber, isNumber, extractSignificantDigits } from './utils.js'
 
 /**
  * A lossless number. Stores its numeric value as string
@@ -63,48 +63,21 @@ export function isLosslessNumber(value: unknown): value is LosslessNumber {
 }
 
 /**
- * Convert input value to a string
- * If value is no number or string, the valueOf() of the object will be used.
+ * Convert a number into a LosslessNumber if this is possible in a safe way
+ * If the value has too many digits, or is NaN or Infinity, an error will be thrown
  */
-export function valueToString(value: unknown): string {
-  if (typeof value === 'string') {
-    if (!isNumber(value)) {
-      throw new Error('Invalid number (value: "' + value + '")')
-    }
-
-    return value
-  } else if (typeof value === 'number') {
-    // validate number
-    if (getDigits(value + '').length > 15) {
-      throw new Error('Invalid number: contains more than 15 digits (value: ' + value + ')')
-    }
-    if (isNaN(value)) {
-      throw new Error('Invalid number: NaN')
-    }
-    if (!isFinite(value)) {
-      throw new Error('Invalid number: Infinity')
-    }
-
-    return value + ''
-  } else {
-    return valueToString(value && value.valueOf())
+export function toLosslessNumber(value: number): LosslessNumber {
+  if (extractSignificantDigits(value + '').length > 15) {
+    throw new Error('Invalid number: contains more than 15 digits (value: ' + value + ')')
   }
-}
 
-/**
- * Get the significant digits of a number.
- *
- * For example:
- *   '2.34' returns '234'
- *   '-77' returns '77'
- *   '0.0034' returns '34'
- *   '120.5e+30' returns '1205'
- **/
-export function getDigits(value: number | string): string {
-  const _value = typeof value !== 'string' ? value + '' : value
+  if (isNaN(value)) {
+    throw new Error('Invalid number: NaN')
+  }
 
-  return _value
-    .replace(/^-/, '') // remove sign
-    .replace(/e.*$/, '') // remove exponential notation
-    .replace(/^0\.?0*|\./, '') // remove decimal point and leading zeros
+  if (!isFinite(value)) {
+    throw new Error('Invalid number: ' + value)
+  }
+
+  return new LosslessNumber(String(value))
 }

@@ -2,7 +2,7 @@
  * Test whether a string contains an integer number
  */
 export function isInteger(value: string): boolean {
-  return /^[0-9]+$/.test(value)
+  return /^-?[0-9]+$/.test(value)
 }
 
 /**
@@ -23,25 +23,42 @@ export function isSafeNumber(value: string): boolean {
 
   // TODO: create an option to allow round-off errors or not
 
-  function extractDigits(value: string): string {
-    return value
-      .replace(EXPONENTIAL_PART_REGEX, '')
-      .replace('.', '')
-      .replace(TRAILING_ZEROS_REGEX, '')
-      .replace(LEADING_MINUS_REGEX, '')
-      .replace(LEADING_ZEROS_REGEX, '')
-  }
-
-  const v = extractDigits(value)
-  const s = extractDigits(str)
+  const v = extractSignificantDigits(value)
+  const s = extractSignificantDigits(str)
 
   return v === s
 }
 
+/**
+ * Get the significant digits of a number.
+ *
+ * For example:
+ *   '2.34' returns '234'
+ *   '-77' returns '77'
+ *   '0.003400' returns '34'
+ *   '120.5e+30' returns '1205'
+ **/
+export function extractSignificantDigits(value: string): string {
+  return (
+    value
+      // from "-0.250e+30" to "-0.250"
+      .replace(EXPONENTIAL_PART_REGEX, '')
+
+      // from "-0.250" to "-0250"
+      .replace(DOT_REGEX, '')
+
+      // from "-0250" to "-025"
+      .replace(TRAILING_ZEROS_REGEX, '')
+
+      // from "-025" to "25"
+      .replace(LEADING_MINUS_AND_ZEROS_REGEX, '')
+  )
+}
+
 const EXPONENTIAL_PART_REGEX = /[eE][+-]?\d+$/
+const LEADING_MINUS_AND_ZEROS_REGEX = /^-?(0*)?/
+const DOT_REGEX = /\./
 const TRAILING_ZEROS_REGEX = /0+$/
-const LEADING_ZEROS_REGEX = /^0+/
-const LEADING_MINUS_REGEX = /^-/
 
 /**
  * Repeat a string a number of times.

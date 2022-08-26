@@ -1,5 +1,4 @@
-import { LosslessNumber } from '../src'
-import { isLosslessNumber } from '../src/LosslessNumber'
+import { isLosslessNumber, LosslessNumber, toLosslessNumber } from '../src'
 
 test('create a LosslessNumber from string', function () {
   const n = new LosslessNumber('42')
@@ -33,9 +32,13 @@ test('test whether something is a LosslessNumber', function () {
 })
 
 test('create a LosslessNumber from number', function () {
-  const n = new LosslessNumber('42')
-  expect(n.isLosslessNumber).toBe(true)
-  expect(n.value).toEqual('42')
+  expect(toLosslessNumber(42)).toEqual(new LosslessNumber('42'))
+  expect(toLosslessNumber(2.47)).toEqual(new LosslessNumber('2.47'))
+
+  expect(() => toLosslessNumber(2 / 3)).toThrow('Invalid number: contains more than 15 digits')
+  expect(() => toLosslessNumber(NaN)).toThrow('Invalid number: NaN')
+  expect(() => toLosslessNumber(Infinity)).toThrow('Invalid number: Infinity')
+  expect(() => toLosslessNumber(-Infinity)).toThrow('Invalid number: -Infinity')
 })
 
 test('use LosslessNumber.valueOf()', function () {
