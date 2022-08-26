@@ -23,7 +23,7 @@
     "format": "prettier --ignore-path .gitignore lib --write . && npm run lint -- --fix",
     "build-and-test": "npm run build && jest && npm run lint",
     "prepublishOnly": "npm test && npm run build",
-    "benchmark": "node tools/benchmark/run.mjs"
+    "benchmark": "npm run build:esm && node tools/benchmark/run.mjs"
   },
   "keywords": [
     "json",

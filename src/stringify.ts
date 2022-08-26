@@ -45,12 +45,12 @@ export function stringify(
   const replacedValue =
     typeof replacer === 'function' ? replacer.call({ '': value }, '', value) : value
 
-  return _stringifyValue(replacedValue, '')
+  return stringifyValue(replacedValue, '')
 
   /**
    * Stringify a value
    */
-  function _stringifyValue(value: unknown, indent: string): string | undefined {
+  function stringifyValue(value: unknown, indent: string): string | undefined {
     if (Array.isArray(valueStringifiers)) {
       const stringifier = valueStringifiers.find((item) => item.test(value))
       if (stringifier) {
@@ -113,7 +113,7 @@ export function stringify(
       }
 
       if (typeof item !== 'undefined' && typeof item !== 'function') {
-        str += _stringifyValue(item, childIndent)
+        str += stringifyValue(item, childIndent)
       } else {
         str += 'null'
       }
@@ -131,15 +131,14 @@ export function stringify(
    * Stringify an object
    */
   function stringifyObject(object: GenericObject<unknown>, indent: string): string {
-    const childIndent = resolvedSpace ? indent + resolvedSpace : undefined
-    let first = true
-    let str = resolvedSpace ? '{\n' : '{'
-
     if (typeof object.toJSON === 'function') {
       return stringify(object.toJSON(), replacer, space, undefined)
     }
 
     const keys: string[] = Array.isArray(replacer) ? replacer.map(String) : Object.keys(object)
+    const childIndent = resolvedSpace ? indent + resolvedSpace : undefined
+    let first = true
+    let str = resolvedSpace ? '{\n' : '{'
 
     keys.forEach((key) => {
       const value =
@@ -153,10 +152,9 @@ export function stringify(
         }
 
         const keyStr = JSON.stringify(key)
-
         str += resolvedSpace ? childIndent + keyStr + ': ' : keyStr + ':'
 
-        str += _stringifyValue(value, childIndent)
+        str += stringifyValue(value, childIndent)
       }
     })
 

@@ -1,4 +1,4 @@
-import { LosslessNumber } from './LosslessNumber'
+import { LosslessNumber } from './LosslessNumber.js'
 
 export function isLosslessNumber(value: unknown): value is LosslessNumber {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
