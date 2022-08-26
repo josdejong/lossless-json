@@ -31,7 +31,7 @@ Features:
 - Helpful error messages when parsing invalid JSON.
 - Works in browsers and node.js.
 - Modular and composable ES module functions.
-- Less than 3kB when minified and gzipped in full.
+- The full bundle is only 3kB in size when minified and gzipped.
 
 ## Install
 
