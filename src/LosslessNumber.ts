@@ -1,4 +1,4 @@
-import { extractSignificantDigits, isNumber, isSafeNumber } from './utils.js'
+import { extractSignificantDigits, isNumber, toSafeNumberOrThrow } from './utils.js'
 
 /**
  * A lossless number. Stores its numeric value as string
@@ -26,19 +26,11 @@ export class LosslessNumber {
    * Throws an Error when this would result in loss of information: when digits
    * of an integer or decimal would be truncated, or when the number would
    * overflow or underflow.
+   *
    * See also .approxValueOf() and .unsafeValueOf()
    */
   valueOf(): number {
-    const number = this.unsafeValueOf()
-
-    if (!isSafeNumber(this.value)) {
-      throw new Error(
-        'Cannot safely convert LosslessNumber to number: ' +
-          `"${this.value}" will be parsed as ${number} and lose information`
-      )
-    }
-
-    return number
+    return toSafeNumberOrThrow(this.value)
   }
 
   /**
@@ -47,24 +39,17 @@ export class LosslessNumber {
    * of an integer would be truncated, or when the number would overflow or
    * underflow. Unlike .valueOf(), this method will allow losing insignificant
    * digits of a decimal value.
+   *
    * See also .valueOf() and .unsafeValueOf()
    */
   approxValueOf(): number {
-    const number = this.unsafeValueOf()
-
-    if (!isSafeNumber(this.value, { approx: true })) {
-      throw new Error(
-        'Cannot safely convert LosslessNumber to number: ' +
-          `"${this.value}" will be parsed as ${number} and lose information`
-      )
-    }
-
-    return number
+    return toSafeNumberOrThrow(this.value, { approx: true })
   }
 
   /**
    * Get the value of the LosslessNumber as number.
    * Will always return a number, also when this results in loss of digits.
+   *
    * See also .valueOf() and .approxValueOf()
    */
   unsafeValueOf(): number {

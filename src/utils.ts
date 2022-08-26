@@ -56,6 +56,51 @@ export function isSafeNumber(
 }
 
 /**
+ * When the provided value is an unsafe number, describe what the reason is:
+ * overflow, underflow, truncate. Returns undefined when the value is safe.
+ */
+export function getUnsafeNumberReason(
+  value: string,
+  config?: {
+    approx: boolean
+  }
+): 'underflow' | 'overflow' | 'truncate' | undefined {
+  if (isSafeNumber(value, config)) {
+    return undefined
+  }
+
+  const num = parseFloat(value)
+  if (!isFinite(num)) {
+    return 'overflow'
+  }
+
+  if (num === 0) {
+    return 'underflow'
+  }
+
+  return 'truncate'
+}
+
+export function toSafeNumberOrThrow(
+  value: string,
+  config?: {
+    approx: boolean
+  }
+): number {
+  const number = parseFloat(value)
+
+  const unsafeReason = getUnsafeNumberReason(value, config)
+  if (unsafeReason) {
+    throw new Error(
+      'Cannot safely convert to number: ' +
+        `the value '${value}' would ${unsafeReason} and become ${number}`
+    )
+  }
+
+  return number
+}
+
+/**
  * Get the significant digits of a number.
  *
  * For example:
