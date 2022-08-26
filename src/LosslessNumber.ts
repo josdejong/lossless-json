@@ -1,4 +1,4 @@
-import { isSafeNumber, isValidNumber } from './utils.js'
+import { isSafeNumber, isNumber } from './utils.js'
 
 /**
  * A lossless number. Stores its numeric value as string
@@ -9,7 +9,7 @@ export class LosslessNumber {
   isLosslessNumber: true
 
   constructor(value: string) {
-    if (!isValidNumber(value)) {
+    if (!isNumber(value)) {
       throw new Error('Invalid number (value: "' + value + '")')
     }
 
@@ -68,7 +68,7 @@ export function isLosslessNumber(value: unknown): value is LosslessNumber {
  */
 export function valueToString(value: unknown): string {
   if (typeof value === 'string') {
-    if (!isValidNumber(value)) {
+    if (!isNumber(value)) {
       throw new Error('Invalid number (value: "' + value + '")')
     }
 

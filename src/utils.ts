@@ -6,10 +6,10 @@ export function isInteger(value: string): boolean {
 }
 
 /**
- * Test whether a string contains a valid number
+ * Test whether a string contains a number
  * http://stackoverflow.com/questions/13340717/json-numbers-regular-expression
  */
-export function isValidNumber(value: string): boolean {
+export function isNumber(value: string): boolean {
   return /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value)
 }
 
