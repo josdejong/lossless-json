@@ -23,8 +23,10 @@ export class LosslessNumber {
 
   /**
    * Get the value of the LosslessNumber as number.
-   * Will throw an error when this conversion would result in a truncation
-   * of the number.
+   * Throws an Error when this would result in loss of information: when digits
+   * of an integer or decimal would be truncated, or when the number would
+   * overflow or underflow.
+   * See also .approxValueOf() and .unsafeValueOf()
    */
   valueOf(): number {
     const number = this.unsafeValueOf()
@@ -41,8 +43,29 @@ export class LosslessNumber {
 
   /**
    * Get the value of the LosslessNumber as number.
+   * Throws an Error when this would result in loss of information: when digits
+   * of an integer would be truncated, or when the number would overflow or
+   * underflow. Unlike .valueOf(), this method will allow losing insignificant
+   * digits of a decimal value.
+   * See also .valueOf() and .unsafeValueOf()
+   */
+  approxValueOf(): number {
+    const number = this.unsafeValueOf()
+
+    if (!isSafeNumber(this.value, { approx: true })) {
+      throw new Error(
+        'Cannot safely convert LosslessNumber to number: ' +
+          `"${this.value}" will be parsed as ${number} and lose information`
+      )
+    }
+
+    return number
+  }
+
+  /**
+   * Get the value of the LosslessNumber as number.
    * Will always return a number, also when this results in loss of digits.
-   * @return {Number}
+   * See also .valueOf() and .approxValueOf()
    */
   unsafeValueOf(): number {
     return parseFloat(this.value)

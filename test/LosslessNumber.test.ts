@@ -45,6 +45,9 @@ test('use LosslessNumber.valueOf()', function () {
   expect(new LosslessNumber('23.4').valueOf()).toBe(23.4)
   expect(new LosslessNumber('23e4').valueOf()).toBe(230000)
 
+  expect(() => new LosslessNumber('0.66666666666666666666667').valueOf()).toThrow(
+    'Cannot safely convert LosslessNumber to number: "0.66666666666666666666667" will be parsed as 0.6666666666666666 and lose information'
+  )
   expect(() => new LosslessNumber('123456789012345678901234').valueOf()).toThrow(
     'Cannot safely convert LosslessNumber to number: "123456789012345678901234" will be parsed as 1.2345678901234569e+23 and lose information'
   )
@@ -56,9 +59,26 @@ test('use LosslessNumber.valueOf()', function () {
   )
 })
 
+test('use LosslessNumber.approxValueOf()', function () {
+  expect(new LosslessNumber('23.4').approxValueOf()).toBe(23.4)
+  expect(new LosslessNumber('23e4').approxValueOf()).toBe(230000)
+
+  expect(new LosslessNumber('0.66666666666666666666667').approxValueOf()).toBe(0.6666666666666666)
+  expect(() => new LosslessNumber('123456789012345678901234').approxValueOf()).toThrow(
+    'Cannot safely convert LosslessNumber to number: "123456789012345678901234" will be parsed as 1.2345678901234569e+23 and lose information'
+  )
+  expect(() => new LosslessNumber('2.3e+500').approxValueOf()).toThrow(
+    'Cannot safely convert LosslessNumber to number: "2.3e+500" will be parsed as Infinity and lose information'
+  )
+  expect(() => new LosslessNumber('2.3e-500').approxValueOf()).toThrow(
+    'Cannot safely convert LosslessNumber to number: "2.3e-500" will be parsed as 0 and lose information'
+  )
+})
+
 test('use LosslessNumber.unsafeValueOf()', function () {
   expect(new LosslessNumber('23.4').unsafeValueOf()).toBe(23.4)
   expect(new LosslessNumber('23e4').unsafeValueOf()).toBe(230000)
+  expect(new LosslessNumber('0.66666666666666666666667').unsafeValueOf()).toBe(0.6666666666666666)
   expect(new LosslessNumber('123456789012345678901234').unsafeValueOf()).toBe(1.2345678901234569e23)
   expect(new LosslessNumber('2.3e+500').unsafeValueOf()).toBe(Infinity)
   expect(new LosslessNumber('2.3e-500').unsafeValueOf()).toBe(0)

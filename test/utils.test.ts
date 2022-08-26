@@ -26,6 +26,27 @@ test('isSafeNumber', () => {
   expect(isSafeNumber('2e-500')).toEqual(false)
   expect(isSafeNumber('0.66666666666666666667')).toEqual(false)
   expect(isSafeNumber('12345678901234567890')).toEqual(false)
+  expect(isSafeNumber('1.2345678901234567890')).toEqual(false)
+})
+
+test('isSafeNumber({ approx: false })', () => {
+  expect(isSafeNumber('0.66666666666666666667', { approx: false })).toEqual(false)
+  expect(isSafeNumber('1.2345678901234567890', { approx: false })).toEqual(false)
+})
+
+test('isSafeNumber({ approx: true })', () => {
+  expect(isSafeNumber('2.3', { approx: true })).toEqual(true)
+  expect(isSafeNumber('2.3e4', { approx: true })).toEqual(true)
+  expect(isSafeNumber('1234567890', { approx: true })).toEqual(true)
+
+  expect(isSafeNumber('0.66666666666666666667', { approx: true })).toEqual(true)
+  expect(isSafeNumber('0.666666666666667', { approx: true })).toEqual(true)
+  expect(isSafeNumber('0.66666666666667', { approx: true })).toEqual(true)
+  expect(isSafeNumber('0.2345678901234567890', { approx: true })).toEqual(true)
+
+  expect(isSafeNumber('2e500', { approx: true })).toEqual(false)
+  expect(isSafeNumber('2e-500', { approx: true })).toEqual(false)
+  expect(isSafeNumber('12345678901234567890', { approx: true })).toEqual(false)
 })
 
 test('extractSignificantDigits', () => {

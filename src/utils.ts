@@ -15,18 +15,44 @@ export function isNumber(value: string): boolean {
 
 /**
  * Test whether a string can be safely represented with a number
- * without information
+ * without information.
+ *
+ * When approx is true, floating point numbers that lose a few digits but
+ * are still approximately equal in value are considered safe too.
+ * Integer numbers must still be exactly equal.
  */
-export function isSafeNumber(value: string): boolean {
+export function isSafeNumber(
+  value: string,
+  config?: {
+    approx: boolean
+  }
+): boolean {
   const num = parseFloat(value)
   const str = String(num)
-
-  // TODO: create an option to allow round-off errors or not
 
   const v = extractSignificantDigits(value)
   const s = extractSignificantDigits(str)
 
-  return v === s
+  if (v === s) {
+    return true
+  }
+
+  if (config?.approx === true) {
+    // A value is approximately equal when:
+    // 1. it is a floating point number, not an integer
+    // 2. it has at least 14 digits
+    // 3. the first 14 digits are equal
+    const requiredDigits = 14
+    if (
+      !isInteger(value) &&
+      s.length >= requiredDigits &&
+      v.startsWith(s.substring(0, requiredDigits))
+    ) {
+      return true
+    }
+  }
+
+  return false
 }
 
 /**

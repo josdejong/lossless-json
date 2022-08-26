@@ -5,16 +5,16 @@ Parse JSON without risk of losing numeric information.
 ```js
 import { parse, stringify } from 'lossless-json'
 
-const text = '{"float":2.370,"long":9223372036854775827,"big":2.3e+500}'
+const text = '{"decimal":2.370,"long":9223372036854775827,"big":2.3e+500}'
 
 // JSON.parse will lose some digits and a whole number:
 console.log(JSON.stringify(JSON.parse(text)))
-// '{"float":2.37,"long":9223372036854776000,"big":null}'
+// '{"decimal":2.37,"long":9223372036854776000,"big":null}'
 // WHOOPS!!!
 
 // LosslessJSON.parse will preserve all numbers and even the formatting:
 console.log(stringify(parse(text)))
-// '{"float":2.370,"long":9223372036854775827,"big":2.3e+500}'
+// '{"decimal":2.370,"long":9223372036854775827,"big":2.3e+500}'
 ```
 
 **How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a lightweight class which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
@@ -182,10 +182,24 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 #### Methods
 
 - `.valueOf() : number`
-  Convert the `LosslessNumber` to a regular `number`.
-  Throws an Error when this would result in loss of information: when the numbers digits would be truncated, or when the number would overflow or underflow. See also `.unsafeValueOf()`.
+  Convert the `LosslessNumber` to a regular `number`. Throws an Error when this would result in any loss of information: when digits would be truncated of an integer or decimal, or when the number would overflow or underflow. See also `.unsafeValueOf()` and `.approxValueOf()`.
+- `.approxValueOf()`
+  Convert the `LosslessNumber` to a regular `number`. Throws an Error when this would result in loss of information: when digits of an integer would be truncated, or when the number would overflow or underflow. Unlike the more strict `.valueOf()`, this method will allow losing insignificant digits of a decimal value. For example:
+
+  ```js
+  const long = new LosslessNumber('9223372036854775827')
+  console.log(long.valueOf()) // Error
+  console.log(long.approxValueOf()) // Error
+  console.log(long.unsafeValueOf()) // 9223372036854776000
+
+  const decimal = new LosslessNumber('0.66666666666666666667')
+  console.log(decimal.valueOf()) // Error
+  console.log(decimal.approxValueOf()) // 0.6666666666666666
+  console.log(decimal.unsafeValueOf()) // 0.6666666666666666
+  ```
+
 - `.unsafeValueOf(): number`
-  Convert the `LosslessNumber` to a regular `number`. Unlike `.valueOf()`, this method will silently create a `number` also when this results in loss of information.
+  Convert the `LosslessNumber` to a regular `number`. Unlike `.valueOf()` and `.unsafeValueOf()`, this method will silently create a `number` also when this results in loss of information.
 - `.toString() : string`
   Get the string representation of the lossless number.
 
@@ -203,8 +217,18 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 - `isNumber(value: string) : boolean`
   Test whether a string contains a numeric value, like `'2.4'` or `'1.4e+3'`.
 
-- `isSafeNumber(value: string): boolean`
-  Test whether a string contains a numeric value which can be safely represented by a JavaScript `number` without losing any information.
+- `isSafeNumber(value: string, config?: { approx: boolean }): boolean`
+  Test whether a string contains a numeric value which can be safely represented by a JavaScript `number` without losing any information. Returns false when digits would be truncated of an integer or decimal, or when the number would overflow or underflow. When passing `{ approx: true }` as config, the function will be less strict and allow losing insignificant digits of a decimal value. Examples:
+
+  ```js
+  isSafeNumber('1.55e3') // true
+  isSafeNumber('2e500') // false
+  isSafeNumber('2e-500') // false
+  isSafeNumber('9223372036854775827') // false
+  isSafeNumber('0.66666666666666666667') // false
+  isSafeNumber('9223372036854775827', { approx: true }) // false
+  isSafeNumber('0.66666666666666666667', { approx: true }) // true
+  ```
 
 - `isLosslessNumber(value: unknown) : boolean`
   Test whether a value is a `LosslessNumber`.
