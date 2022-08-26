@@ -210,7 +210,7 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
   Test whether a value is a `LosslessNumber`.
 
 - `toLosslessNumber(value: number) : LosslessNumber`
-  Convert a `number` into a `LosslessNumber`. The function will throw an exception when the `number` is exceeding the maximum safe limit of 15 digits (hence being imprecise itself) or is `NaN` or `Infinity`. 
+  Convert a `number` into a `LosslessNumber`. The function will throw an exception when the `number` is exceeding the maximum safe limit of 15 digits (hence being imprecise itself) or is `NaN` or `Infinity`.
 
 - `reviveDate(key, value)`
   Revive strings containing an ISO 8601 date string into a JavaScript `Date` object. This reviver is not turned on by default because there is a small risk of parsing a text field that _accidentally_ contains a date into a `Date`. Whether `reviveDate` is safe to use depends on the use case. Usage:
