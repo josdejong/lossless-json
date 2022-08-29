@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js'
-import { isLosslessNumber, LosslessNumber, stringify } from '../src'
+import { LosslessNumber, stringify } from '../src'
 import type { GenericObject, JSONValue } from '../src/types'
 
 // helper function to create a lossless number
@@ -126,6 +126,10 @@ test('stringify Decimal', function () {
   expect(stringify(values, undefined, undefined, numberStringifiers)).toEqual(
     '[1.23456789123456789123456789e+26,2.3,123]'
   )
+})
+
+test('should not have a .toJSON method implemented', function () {
+  expect('toJSON' in lln('123')).toBe(false)
 })
 
 test('should throw an error when the output of a number stringifier is not a number', function () {

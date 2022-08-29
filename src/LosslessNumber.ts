@@ -62,6 +62,10 @@ export class LosslessNumber {
   toString(): string {
     return this.value
   }
+
+  // Note: we do NOT implement a .toJSON() method, and you should not implement
+  // or use that, it cannot safely turn the numeric value in the string into
+  // stringified JSON since it has to be parsed into a number first.
 }
 
 /**
