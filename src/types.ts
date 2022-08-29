@@ -14,7 +14,7 @@ export type Replacer =
   | ((key: string, value: unknown) => JSONValue | undefined)
   | Array<string | number>
 
-export interface ValueStringifier {
+export interface NumberStringifier {
   test: (value: unknown) => boolean
   stringify: (value: unknown) => string
 }

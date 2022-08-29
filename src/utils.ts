@@ -2,16 +2,20 @@
  * Test whether a string contains an integer number
  */
 export function isInteger(value: string): boolean {
-  return /^-?[0-9]+$/.test(value)
+  return INTEGER_REGEX.test(value)
 }
+
+const INTEGER_REGEX = /^-?[0-9]+$/
 
 /**
  * Test whether a string contains a number
  * http://stackoverflow.com/questions/13340717/json-numbers-regular-expression
  */
 export function isNumber(value: string): boolean {
-  return /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/.test(value)
+  return NUMBER_REGEX.test(value)
 }
+
+const NUMBER_REGEX = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/
 
 /**
  * Test whether a string can be safely represented with a number

@@ -1,4 +1,5 @@
-import { GenericObject, Replacer, ValueStringifier } from './types'
+import type { GenericObject, Replacer, NumberStringifier } from './types'
+import { isNumber } from './utils.js'
 
 /**
  * The LosslessJSON.stringify() method converts a JavaScript value to a JSON string,
@@ -24,13 +25,13 @@ import { GenericObject, Replacer, ValueStringifier } from './types'
  * if it's longer than that) is used as white space. If this parameter is not
  * provided (or is null), no white space is used.
  *
- * @param [valueStringifiers]
+ * @param [numberStringifiers]
  * An optional list with additional value stringifiers, for example to serialize
  * a BigNumber. The output of the function must be valid stringified JSON.
  * When undefined is returned, the property will be deleted from the object.
  * The difference with using a replacer is that the output of a replacer must
  * be JSON and will be stringified afterwards, whereas the output of
- * the valueStringifiers is inserted in the JSON as is.
+ * the numberStringifiers is inserted in the JSON as is.
  *
  * @returns Returns the string representation of the JSON object.
  */
@@ -38,7 +39,7 @@ export function stringify(
   value: unknown,
   replacer?: Replacer,
   space?: number | string,
-  valueStringifiers?: ValueStringifier[]
+  numberStringifiers?: NumberStringifier[]
 ): string | undefined {
   const resolvedSpace = resolveSpace(space)
 
@@ -51,10 +52,18 @@ export function stringify(
    * Stringify a value
    */
   function stringifyValue(value: unknown, indent: string): string | undefined {
-    if (Array.isArray(valueStringifiers)) {
-      const stringifier = valueStringifiers.find((item) => item.test(value))
+    if (Array.isArray(numberStringifiers)) {
+      const stringifier = numberStringifiers.find((item) => item.test(value))
       if (stringifier) {
-        return stringifier.stringify(value)
+        const str = stringifier.stringify(value)
+        if (typeof str !== 'string' || !isNumber(str)) {
+          throw new Error(
+            'Invalid JSON number: ' +
+              'output of a number stringifier must be a string containing a JSON number ' +
+              `(output: ${str})`
+          )
+        }
+        return str
       }
     }
 

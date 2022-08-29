@@ -109,11 +109,11 @@ test('stringify Decimal', function () {
     test: (value: string) => Decimal.isDecimal(value),
     stringify: (value: string) => value.toString()
   }
-  const valueStringifiers = [decimalStringifier]
+  const numberStringifiers = [decimalStringifier]
 
   const a = new Decimal('123456789123456789123456789')
 
-  expect(stringify(a, undefined, undefined, valueStringifiers)).toEqual(
+  expect(stringify(a, undefined, undefined, numberStringifiers)).toEqual(
     '1.23456789123456789123456789e+26'
   )
 
@@ -123,8 +123,19 @@ test('stringify Decimal', function () {
     new Decimal('123')
   ]
 
-  expect(stringify(values, undefined, undefined, valueStringifiers)).toEqual(
+  expect(stringify(values, undefined, undefined, numberStringifiers)).toEqual(
     '[1.23456789123456789123456789e+26,2.3,123]'
+  )
+})
+
+test('should throw an error when the output of a number stringifier is not a number', function () {
+  const wrongStringifier = {
+    test: (value: string) => typeof value === 'number',
+    stringify: (value: string) => 'oopsie' + value // <-- does not return a valid number
+  }
+
+  expect(() => stringify([4], undefined, undefined, [wrongStringifier])).toThrow(
+    'Invalid JSON number: output of a number stringifier must be a string containing a JSON number (output: oopsie4)'
   )
 })
 
