@@ -76,6 +76,32 @@ console.log(json.long + 1)
 //   "123456789012345678901" will be parsed as 123456789012345680000 and lose information
 ```
 
+### BigInt
+
+JavaScript natively supports `bigint`: big integers that can hold a large number of digits, instead of the about 15 digits that a regular `number` can hold. It is a typical use case to want to parse integer numbers into a `bigint`, and all other values into a regular `number`. This can be achieved with a custom `numberParser`:
+
+```js
+import { parse, isInteger } from 'lossless-json'
+
+// parse integer values into a bigint, and use a regular number otherwise
+export function customNumberParser(value) {
+  return isInteger(value) ? BigInt(value) : parseFloat(value)
+}
+
+const text = '[123456789123456789123456789, 2.3, 123]'
+const json = parse(text, null, customNumberParser)
+// output:
+// [
+//   123456789123456789123456789n, // bigint
+//   2.3, // number
+//   123n // bigint
+// ]
+```
+
+You can adjust the logic to your liking, using utility functions like `isInteger`, `isNumber`, `isSafeNumber`. The number parser shown above is included in the library and is named `parseNumberAndBigInt`.
+
+### Validate safe numbers
+
 If you want parse a json string into an object with regular numbers, but want to validate that no numeric information is lost, you write your own number parser and use `isSafeNumber` to validate the numbers:
 
 ```js
@@ -103,7 +129,7 @@ try {
 
 ### BigNumbers
 
-To use the library in conjunction with your favorite BigNumber library, for example [decimal.js](https://github.com/MikeMcl/decimal.js/). You have to define a custom number parser and stringifier
+To use the library in conjunction with your favorite BigNumber library, for example [decimal.js](https://github.com/MikeMcl/decimal.js/). You have to define a custom number parser and stringifier:
 
 ```js
 import { parse, stringify } from 'lossless-json'
@@ -136,8 +162,7 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
 - **@param** `{string} text`
   The string to parse as JSON. See the JSON object for a description of JSON syntax.
 - **@param** `{function(key: string, value: *)} [reviver]`
-  If a function, prescribes how the value originally produced by parsing is
-  - transformed, before being returned.
+  If a function, prescribes how the value originally produced by parsing is transformed, before being returned.
 - **@param** `{function(value: string) : any} [parseNumber]`
   Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
 - **@returns** `{*}`
@@ -146,26 +171,14 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
 
 ### stringify(value [, replacer [, space [, numberStringifiers]]])
 
-The `LosslessJSON.stringify()`` function converts a JavaScript value to a JSON string,
-optionally replacing values if a replacer function is specified, or
-optionally including only the specified properties if a replacer array is specified.
+The `LosslessJSON.stringify()` function converts a JavaScript value to a JSON string, optionally replacing values if a replacer function is specified, or optionally including only the specified properties if a replacer array is specified.
 
 - **@param** `{*} value`
   The value to convert to a JSON string.
 - **@param** `{function(key: string, value: *) | Array.<string | number>} [replacer]`
-  A function that alters the behavior of the stringification process,
-  or an array of String and Number objects that serve as a whitelist for
-  selecting the properties of the value object to be included in the JSON string.
-  If this value is null or not provided, all properties of the object are
-  included in the resulting JSON string.
+  A function that alters the behavior of the stringification process, or an array with strings or numbers that serve as a whitelist for selecting the properties of the value object to be included in the JSON string. If this value is `null` or not provided, all properties of the object are included in the resulting JSON string.
 - **@param** `{number | string} [space]`
-  A String or Number object that's used to insert white space into the output
-  JSON string for readability purposes. If this is a Number, it indicates the
-  number of space characters to use as white space; this number is capped at 10
-  if it's larger than that. Values less than 1 indicate that no space should be
-  used. If this is a String, the string (or the first 10 characters of the string,
-  if it's longer than that) is used as white space. If this parameter is not
-  provided (or is null), no white space is used.
+  A `string` or `number` that is used to insert white space into the output JSON string for readability purposes. If this is a `number`, it indicates the number of space characters to use as white space. Values less than 1 indicate that no space should be used. If this is a `string`, the `string` is used as white space. If this parameter is not provided (or is `null`), no white space is used.
 - **@param** `{Array<{test: (value: any) => boolean, stringify: (value: any) => string}>} [numberStringifiers]`
   An optional list with additional number stringifiers, for example to serialize a `BigNumber`. The output of the function must be valid stringified JSON number. When `undefined` is returned, the property will be deleted from the object. The difference with using a `replacer` is that the output of a `replacer` must be JSON and will be stringified afterwards, whereas the output of the `numberStringifiers` is already stringified JSON.
 - **@returns** `{string | undefined}`
@@ -230,11 +243,23 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
   isSafeNumber('0.66666666666666666667', { approx: true }) // true
   ```
 
+- `toSafeNumberOrThrow(value: string, config?: { approx: boolean }) : number`
+  Convert a string into a number when it is safe to do so, otherwise throw an informative error.
+
+- `getUnsafeNumberReason(value, config?: { approx: boolean }): UnsafeNumberReason | undefined`
+  When the provided `value` is an unsafe number, describe what the reason is: `overflow`, `underflow`, `truncate`. Returns `undefined` when the value is safe.
+
 - `isLosslessNumber(value: unknown) : boolean`
   Test whether a value is a `LosslessNumber`.
 
 - `toLosslessNumber(value: number) : LosslessNumber`
-  Convert a `number` into a `LosslessNumber`. The function will throw an exception when the `number` is exceeding the maximum safe limit of 15 digits (hence being imprecise itself) or is `NaN` or `Infinity`.
+  Convert a `number` into a `LosslessNumber`. The function will throw an exception when the `number` is exceeding the maximum safe limit of 15 digits (hence being truncated itself) or is `NaN` or `Infinity`.
+
+- `parseLosslessNumber(value: string) : LosslessNumber`
+  The default `numberParser` used by `parse`. Creates a `LosslessNumber` from a string containing a numeric value.
+
+- `parseNumberAndBigInt(value: string) : number | bigint`
+  A custom `numberParser` that can be used by `parse`. The parser will convert integer values into `bigint`, and converts al other values into a regular `number`.
 
 - `reviveDate(key, value)`
   Revive strings containing an ISO 8601 date string into a JavaScript `Date` object. This reviver is not turned on by default because there is a small risk of parsing a text field that _accidentally_ contains a date into a `Date`. Whether `reviveDate` is safe to use depends on the use case. Usage:

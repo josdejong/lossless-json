@@ -83,7 +83,10 @@ export function isLosslessNumber(value: unknown): value is LosslessNumber {
  */
 export function toLosslessNumber(value: number): LosslessNumber {
   if (extractSignificantDigits(value + '').length > 15) {
-    throw new Error('Invalid number: contains more than 15 digits (value: ' + value + ')')
+    throw new Error(
+      'Invalid number: contains more than 15 digits and is most likely truncated and unsafe by itself ' +
+        `(value: ${value})`
+    )
   }
 
   if (isNaN(value)) {

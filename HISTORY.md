@@ -1,9 +1,28 @@
 # History
 
+## not yet published, version 2.0.0
+
+**IMPORTANT: BREAKING CHANGES**
+
+Breaking changes:
+
+- Dropped support for circular references. If you encounter circular references in your data structures, please rethink your datastructures: better prevent circular references in the first place.
+- The constructor of the `LosslessNumber` class now only supports a string as argument. Use `toLosslessNumber` to convert a number into a LosslessNumber in a safe way.
+- Dropped official support for Node.js 12.
+
+Non-breaking changes:
+
+- Serialization of numeric values is now fully customizable via new options `parseNumber` and `numberStringifiers`, making it easier to integrate with a BigNumber library, or to write your own logic to turn numeric values into `bigint` when needed.
+- Built in support for `bigint`.
+- Built-in support for `Date` (turned off by default), see `reviveDate`.
+- Export a set of utility functions: `isInteger`, `isNumber`, `isSafeNumber`, `toSafeNumberOrThrow`, `getUnsafeNumberReason`, `parseLosslessNumber`, `parseNumberAndBigInt`, `reviveDate`, `isLosslessNumber`, `toLosslessNumber`.
+- THe library is modular now: it exports ES modules and an UMD bundle. The ES modules allow to import only the functions that you need, instead of pulling in the full bundle.
+- The library now comes with TypeScript definitions, and the code has been rewritten in TypeScript,
+- Performance of both `parse` and `stringify` has been improved a lot.
+
 ## 2021-07-22, version 1.0.5
 
-- Fixed stringifing of object keys containing special characters like backslash,
-  see #239. Thanks @mengfanliao.
+- Fixed stringifing of object keys containing special characters like backslash, see #239. Thanks @mengfanliao.
 
 ## 2020-05-08, version 1.0.4
 
@@ -11,8 +30,7 @@
 
 ## 2018-07-31, version 1.0.3
 
-- Improved performance of `stringify` by using `JSON.stringify` where
-  possible. Thanks @SergeyFromHell for the suggestion (see #5).
+- Improved performance of `stringify` by using `JSON.stringify` where possible. Thanks @SergeyFromHell for the suggestion (see #5).
 
 ## 2018-02-11, version 1.0.2
 
@@ -35,8 +53,7 @@
 
 ## 2016-02-08, version 0.0.2
 
-- The `LosslessNumber` class now throws errors when you would lose information
-  when converting from and to a `LosslessNumber`.
+- The `LosslessNumber` class now throws errors when you would lose information when converting from and to a `LosslessNumber`.
 - Handle escape characters when stringifying a string.
 - Exposed `LosslessNumber` in public API.
 
