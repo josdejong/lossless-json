@@ -19,7 +19,7 @@ console.log(stringify(parse(text)))
 
 **How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a lightweight class which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
 
-**When to use?** Only in some special cases. For example when you have to create some sort of data processing middleware which has to process arbitrary JSON without risk of screwing up. JSON objects containing big numbers are rare in the wild. It can occur for example when interoperating with applications written in C++, Java, or C#, which support data types like `long`. Parsing a `long` into a JavaScript `number` can result in losing information because a `long` can hold more digits than a `number`. If possible, it's preferable to change these applications such that they serialize big numbers in a safer way, for example in a stringified form. If that's not feasible, `lossless-json` is here to help you out.
+**When to use?** If you have to deal with JSON data that contains `long` values for example, coming from an application like C++, Java, or C#. The trade-off is that `lossless-json` is slower than the native `JSON.parse` and `JSON.stringify` functions, so be careful when performance is a bottleneck for you.
 
 Features:
 
