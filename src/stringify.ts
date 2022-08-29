@@ -26,12 +26,12 @@ import { isNumber } from './utils.js'
  * provided (or is null), no white space is used.
  *
  * @param [numberStringifiers]
- * An optional list with additional value stringifiers, for example to serialize
+ * An optional list with additional number stringifiers, for example to serialize
  * a BigNumber. The output of the function must be valid stringified JSON.
- * When undefined is returned, the property will be deleted from the object.
- * The difference with using a replacer is that the output of a replacer must
- * be JSON and will be stringified afterwards, whereas the output of
- * the numberStringifiers is inserted in the JSON as is.
+ * When `undefined` is returned, the property will be deleted from the object.
+ * The difference with using a `replacer` is that the output of a `replacer`
+ * must be JSON and will be stringified afterwards, whereas the output of the
+ * `numberStringifiers` is already stringified JSON.
  *
  * @returns Returns the string representation of the JSON object.
  */

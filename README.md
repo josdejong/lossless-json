@@ -167,7 +167,7 @@ optionally including only the specified properties if a replacer array is specif
   if it's longer than that) is used as white space. If this parameter is not
   provided (or is null), no white space is used.
 - **@param** `{Array<{test: (value: any) => boolean, stringify: (value: any) => string}>} [numberStringifiers]`
-  An optional list with additional number stringifiers, for example to serialize a `BigNumber`. The output of the function must be valid stringified JSON number. When undefined is returned, the property will be deleted from the object. The difference with using a replacer is that the output of a replacer must be JSON and will be stringified afterwards, whereas the output of the `numberStringifiers` is inserted in the JSON as is.
+  An optional list with additional number stringifiers, for example to serialize a `BigNumber`. The output of the function must be valid stringified JSON number. When `undefined` is returned, the property will be deleted from the object. The difference with using a `replacer` is that the output of a `replacer` must be JSON and will be stringified afterwards, whereas the output of the `numberStringifiers` is already stringified JSON.
 - **@returns** `{string | undefined}`
   Returns the string representation of the JSON object.
 

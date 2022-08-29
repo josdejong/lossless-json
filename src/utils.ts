@@ -59,6 +59,12 @@ export function isSafeNumber(
   return false
 }
 
+export enum UnsafeNumberReason {
+  underflow = 'underflow',
+  overflow = 'overflow',
+  truncate = 'truncate'
+}
+
 /**
  * When the provided value is an unsafe number, describe what the reason is:
  * overflow, underflow, truncate. Returns undefined when the value is safe.
@@ -68,23 +74,27 @@ export function getUnsafeNumberReason(
   config?: {
     approx: boolean
   }
-): 'underflow' | 'overflow' | 'truncate' | undefined {
+): UnsafeNumberReason | undefined {
   if (isSafeNumber(value, config)) {
     return undefined
   }
 
   const num = parseFloat(value)
   if (!isFinite(num)) {
-    return 'overflow'
+    return UnsafeNumberReason.overflow
   }
 
   if (num === 0) {
-    return 'underflow'
+    return UnsafeNumberReason.underflow
   }
 
-  return 'truncate'
+  return UnsafeNumberReason.truncate
 }
 
+/**
+ * Convert a string into a number when it is safe to do so.
+ * Throws an error otherwise, explaining the reason.
+ */
 export function toSafeNumberOrThrow(
   value: string,
   config?: {
