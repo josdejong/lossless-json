@@ -1,6 +1,6 @@
 import { parseLosslessNumber } from './numberParsers.js'
 import { revive } from './revive.js'
-import { GenericObject } from './types'
+import { GenericObject, JavaScriptValue } from './types'
 import type { NumberParser, Reviver } from './types'
 
 /**
@@ -29,7 +29,7 @@ export function parse(
   text: string,
   reviver?: Reviver,
   parseNumber: NumberParser = parseLosslessNumber
-) {
+): JavaScriptValue {
   let i = 0
   const value = parseValue()
   expectValue(value)

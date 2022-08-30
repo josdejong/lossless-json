@@ -114,7 +114,7 @@ test('reviver - replace values', function () {
     }
   }
 
-  function reviver(key: string, value: unknown) {
+  function reviver(key: string, value: JSONValue) {
     return {
       type: typeof value,
       value
@@ -191,7 +191,7 @@ test('reviver - invoke callbacks with key/value and correct context', function (
     return JSON.parse(stringify(json))
   }
 
-  function reviver(key: string, value: unknown) {
+  function reviver(key: string, value: JSONValue) {
     return key === 'd' ? undefined : key === '1' ? null : value
   }
 
