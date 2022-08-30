@@ -374,7 +374,7 @@ To run a benchmark to compare the performance with the native `JSON` parser:
 npm run benchmark
 ```
 
-(Spoiler: `lossless-json` is much slower than native: about 3 or 4 times as slow at the moment of writing)
+(Spoiler: `lossless-json` is much slower than native)
 
 ## Build
 

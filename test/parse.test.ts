@@ -263,70 +263,59 @@ test('parse with a custom number parser creating Decimal', () => {
   ])
 })
 
-// FIXME: work out error handling
-test.skip('throw exceptions', function () {
-  expect(function () {
-    parse('')
-  }).toThrow(/Unexpected end of json string/)
+describe('throw meaningful exceptions', () => {
+  const cases = [
+    { input: '', expectedError: 'JSON value expected but reached end of input at position 1' },
+    { input: '  ', expectedError: 'JSON value expected but reached end of input at position 3' },
+    {
+      input: '{',
+      expectedError:
+        "Quoted object key or end of object '}' expected but reached end of input at position 2"
+    },
+    {
+      input: '{"a",',
+      expectedError: "Unexpected token: expecting ':' but got ',' at position 5"
+    },
+    { input: '{a:2}', expectedError: "Quoted object key expected but got 'a' at position 2" },
+    { input: '{"a":2,}', expectedError: "Quoted object key expected but got '}' at position 8" },
+    {
+      input: '{"a" "b"}',
+      expectedError: "Unexpected token: expecting ':' but got '\"' at position 6"
+    },
+    { input: '{}{}', expectedError: "Expected end of input but got '{' at position 3" },
+    {
+      input: '[',
+      expectedError:
+        "Array item or end of array ']' expected but reached end of input at position 2"
+    },
+    { input: '[2,]', expectedError: "Array item expected but got ']' at position 4" },
+    { input: '2.3.4', expectedError: "Expected end of input but got '.' at position 4" },
+    {
+      input: '2..3',
+      expectedError: "Invalid number '2.', expecting a digit but got '.' at position 3"
+    },
+    { input: '2e3.4', expectedError: "Expected end of input but got '.' at position 4" },
+    {
+      input: '2e',
+      expectedError: "Invalid number '2e', expecting a digit but reached end of input at position 3"
+    },
+    {
+      input: '-',
+      expectedError: "Invalid number '-', expecting a digit but reached end of input at position 2"
+    },
+    {
+      input: '"a',
+      expectedError: "End of string '\"' expected but reached end of input at position 3"
+    },
+    { input: 'foo', expectedError: "JSON value expected but got 'f' at position 1" },
+    { input: '"\\a"', expectedError: "Invalid escape character '\\a' at position 2" },
+    { input: '"\\u26"', expectedError: "Invalid unicode character '\\u26' at position 2" },
+    { input: '"\\uZ000"', expectedError: "Invalid unicode character '\\uZ000' at position 2" }
+  ]
 
-  expect(function () {
-    parse('{')
-  }).toThrow(/Object key expected/)
-  expect(function () {
-    parse('{"a",')
-  }).toThrow(/Colon expected/)
-  expect(function () {
-    parse('{a:2}')
-  }).toThrow(/Object key expected/)
-  expect(function () {
-    parse('{"a":2,}')
-  }).toThrow(/Object key expected/)
-  expect(function () {
-    parse('{"a" "b"}')
-  }).toThrow(/Colon expected/)
-  expect(function () {
-    parse('{}{}')
-  }).toThrow(/Unexpected characters/)
-
-  expect(function () {
-    parse('[')
-  }).toThrow(/Unexpected end of json string/)
-  expect(function () {
-    parse('[2,')
-  }).toThrow(/Unexpected end of json string/)
-  expect(function () {
-    parse('[2,]')
-  }).toThrow(/Value expected/)
-
-  expect(function () {
-    parse('2.3.4')
-  }).toThrow(/Syntax error in part ".4" \(char 3\)/)
-  expect(function () {
-    parse('2..3')
-  }).toThrow(/Invalid number, digit expected \(char 2\)/)
-  expect(function () {
-    parse('2e3.4')
-  }).toThrow(/Syntax error in part ".4" \(char 3\)/)
-  expect(function () {
-    parse('2e')
-  }).toThrow(/Invalid number, digit expected \(char 2\)/)
-  expect(function () {
-    parse('-')
-  }).toThrow(/Invalid number, digit expected \(char 1\)/)
-
-  expect(function () {
-    parse('"a')
-  }).toThrow(/End of string expected/)
-  expect(function () {
-    parse('foo')
-  }).toThrow(/Unknown symbol "foo"/)
-  expect(function () {
-    parse('"\\a"')
-  }).toThrow(/Invalid escape character "\\a" /)
-  expect(function () {
-    parse('"\\u26"')
-  }).toThrow(/Invalid unicode character/)
-  expect(function () {
-    parse('"\\uZ000"')
-  }).toThrow(/Invalid unicode character/)
+  cases.forEach(({ input, expectedError }) => {
+    test(`should throw when parsing '${input}'`, () => {
+      expect(() => parse(input)).toThrow(expectedError)
+    })
+  })
 })

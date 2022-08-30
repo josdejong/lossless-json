@@ -32,6 +32,7 @@ export function parse(
 ) {
   let i = 0
   const value = parseValue()
+  expectValue(value)
   expectEndOfInput()
 
   return reviver ? revive(value, reviver) : value
@@ -53,14 +54,16 @@ export function parse(
 
         const key = parseString()
         if (key === undefined) {
-          expectObjectKey()
+          throwObjectKeyExpected()
         }
         skipWhitespace()
         eatColon()
         object[key] = parseValue()
       }
-      expectNotEndOfInput('}')
-      // move to the next character of '}'
+
+      if (text[i] !== '}') {
+        throwObjectKeyOrEndExpected()
+      }
       i++
 
       return object
@@ -82,9 +85,13 @@ export function parse(
         }
 
         const value = parseValue()
+        expectArrayItem(value)
         array.push(value)
       }
-      expectNotEndOfInput(']')
+
+      if (text[i] !== ']') {
+        throwArrayItemOrEndExpected()
+      }
       i++
 
       return array
@@ -142,18 +149,17 @@ export function parse(
               result += String.fromCharCode(parseInt(text.slice(i + 2, i + 6), 16))
               i += 5
             } else {
-              i += 2
-              expectEscapeUnicode(result)
+              throwInvalidUnicodeCharacter(i)
             }
           } else {
-            expectEscapeCharacter(result)
+            throwInvalidEscapeCharacter(i)
           }
         } else {
           result += text[i]
         }
         i++
       }
-      expectNotEndOfInput('"')
+      expectEndOfString()
       i++
       return result
     }
@@ -209,78 +215,79 @@ export function parse(
     i++
   }
 
-  // error handling
-  function expectNotEndOfInput(expected: string) {
-    if (i === text.length) {
-      printCodeSnippet(`Expecting a \`${expected}\` here`)
-      throw new Error('JSON_ERROR_0001 Unexpected End of Input')
+  function expectValue(value: unknown) {
+    if (value === undefined) {
+      throw new SyntaxError(`JSON value expected ${gotAt()}`)
+    }
+  }
+
+  function expectArrayItem(value: unknown) {
+    if (value === undefined) {
+      throw new SyntaxError(`Array item expected ${gotAt()}`)
     }
   }
 
   function expectEndOfInput() {
     if (i < text.length) {
-      printCodeSnippet('Expecting to end here')
-      throw new Error('JSON_ERROR_0002 Expected End of Input')
+      throw new SyntaxError(`Expected end of input ${gotAt()}`)
     }
-  }
-
-  function expectObjectKey() {
-    printCodeSnippet(`Expecting object key here
-
-For example:
-{ "foo": "bar" }
-  ^^^^^`)
-    throw new Error('JSON_ERROR_0003 Expecting JSON Key')
   }
 
   function expectCharacter(expected: string) {
     if (text[i] !== expected) {
-      printCodeSnippet(`Expecting a \`${expected}\` here`)
-      throw new Error('JSON_ERROR_0004 Unexpected token')
+      throw new SyntaxError(`Unexpected token: expecting '${expected}' ${gotAt()}`)
     }
   }
 
   function expectDigit(start: number) {
-    const numSoFar = text.slice(start, i)
-    if (!(text[i] >= '0' && text[i] <= '9')) {
-      printCodeSnippet(`JSON_ERROR_0005 Expecting a digit here
-
-For example:
-${numSoFar}5
-${' '.repeat(numSoFar.length)}^`)
-      throw new Error('JSON_ERROR_0006 Expecting a digit')
+    if (!isDigit(text[i])) {
+      const numSoFar = text.slice(start, i)
+      throw new SyntaxError(`Invalid number '${numSoFar}', expecting a digit ${gotAt()}`)
     }
   }
 
-  function expectEscapeCharacter(strSoFar: string) {
-    printCodeSnippet(`JSON_ERROR_0007 Expecting escape character
-
-For example:
-"${strSoFar}\\n"
-${' '.repeat(strSoFar.length + 1)}^^
-List of escape characters are: \\", \\\\, \\/, \\b, \\f, \\n, \\r, \\t, \\u`)
-    throw new Error('JSON_ERROR_0008 Expecting an escape character')
+  function expectEndOfString() {
+    if (text[i] !== '"') {
+      throw new SyntaxError(`End of string '"' expected ${gotAt()}`)
+    }
   }
 
-  function expectEscapeUnicode(strSoFar: string) {
-    printCodeSnippet(`Expect escape unicode
-
-For example:
-"${strSoFar}\\u0123
-${' '.repeat(strSoFar.length + 1)}^^^^^^`)
-    throw new Error('JSON_ERROR_0009 Expecting an escape unicode')
+  function throwObjectKeyExpected() {
+    throw new SyntaxError(`Quoted object key expected ${gotAt()}`)
   }
 
-  function printCodeSnippet(message: string) {
-    const from = Math.max(0, i - 10)
-    const trimmed = from > 0
-    const padding = (trimmed ? 4 : 0) + (i - from)
-    const snippet = [
-      (trimmed ? '... ' : '') + text.slice(from, i + 1),
-      ' '.repeat(padding) + '^',
-      ' '.repeat(padding) + message
-    ].join('\n')
-    console.log(snippet)
+  function throwObjectKeyOrEndExpected() {
+    throw new SyntaxError(`Quoted object key or end of object '}' expected ${gotAt()}`)
+  }
+
+  function throwArrayItemOrEndExpected() {
+    throw new SyntaxError(`Array item or end of array ']' expected ${gotAt()}`)
+  }
+
+  function throwInvalidEscapeCharacter(start: number) {
+    const chars = text.slice(start, start + 2)
+    throw new SyntaxError(`Invalid escape character '${chars}' ${pos()}`)
+  }
+
+  function throwInvalidUnicodeCharacter(start: number) {
+    let end = start + 2
+    while (/\w/.test(text[end])) {
+      end++
+    }
+    const chars = text.slice(start, end)
+    throw new SyntaxError(`Invalid unicode character '${chars}' ${pos()}`)
+  }
+
+  function pos(): string {
+    return `at position ${i + 1}`
+  }
+
+  function got(): string {
+    return text[i] ? `but got '${text[i]}'` : 'but reached end of input'
+  }
+
+  function gotAt(): string {
+    return got() + ' ' + pos()
   }
 }
 
