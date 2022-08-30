@@ -330,6 +330,7 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 Similar libraries:
 
 - https://github.com/sidorares/json-bigint
+- https://github.com/nicolasparada/js-json-bigint
 
 ## Test
 
