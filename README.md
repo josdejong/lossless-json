@@ -276,6 +276,12 @@ new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
 
   An alternative solution is to stringify a `Date` in a specific recognizable object like `{'$date':'2022-08-25T09:39:19.288Z'}`, and use a reviver and replacer to turn this object into a `Date` and vice versa.
 
+## Alternatives
+
+Similar libraries:
+
+- https://github.com/sidorares/json-bigint
+
 ## Test
 
 To test the library, first install dependencies once:
