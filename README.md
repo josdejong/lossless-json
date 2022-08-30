@@ -153,6 +153,55 @@ const str = stringify(output, undefined, undefined, [decimalStringifier])
 // '{"result":4.6e500}'
 ```
 
+### Reviver and replacer
+
+The library is compatible with the native `JSON.parse` and `JSON.stringify`, and also comes with the optional `reviver` and `replacer` arguments that allow you to serialize for example data classes in a custom way. Here is an example demonstrating how you can stringify a `Date` as an object with a `$date` key instead of a string, so it is uniquely recognizable when parsing the structure:
+
+```js
+import { parse, stringify } from 'lossless-json'
+
+// stringify a Date as a unique object with a key '$date', so it is recognizable
+function dateReplacer(key, value) {
+  if (value instanceof Date) {
+    return {
+      $date: value.toISOString()
+    }
+  }
+
+  return value
+}
+
+function isJSONDateObject(value) {
+  return (value && typeof value === 'object' && typeof value.$date === 'string')
+}
+
+function dateReviver(key, value) {
+  if (isJSONDateObject(value)) {
+    return new Date(value.$date)
+  }
+
+  return value
+}
+
+const record = {
+  message: 'Hello World',
+  timestamp: new Date('2022-08-30T09:00:00Z')
+}
+
+const text = stringify(record, dateReplacer)
+console.log(text)
+// output:
+//   '{"message":"Hello World","timestamp":{"$date":"2022-08-30T09:00:00.000Z"}}'
+
+const parsed = parse(text, dateReviver)
+console.log(parsed)
+// output:
+//   {
+//     action: 'create',
+//     timestamp: new Date('2022-08-30T09:00:00.000Z')
+//   }
+```
+
 ## API
 
 ### parse(text [, reviver [, parseNumber]])
