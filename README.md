@@ -172,7 +172,7 @@ function dateReplacer(key, value) {
 }
 
 function isJSONDateObject(value) {
-  return (value && typeof value === 'object' && typeof value.$date === 'string')
+  return value && typeof value === 'object' && typeof value.$date === 'string'
 }
 
 function dateReviver(key, value) {
