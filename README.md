@@ -30,6 +30,7 @@ Features:
 - Compatible with the native, built-in `JSON.parse` and `JSON.stringify`.
 - Helpful error messages when parsing invalid JSON.
 - Works in browsers and node.js.
+- Comes with TypeScript typings included.
 - Modular and composable ES module functions.
 - The full bundle is only 3kB in size when minified and gzipped.
 
