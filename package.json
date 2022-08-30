@@ -29,12 +29,14 @@
   "keywords": [
     "json",
     "lossless",
-    "circular",
     "parse",
     "stringify",
-    "number",
     "long",
-    "bignumber"
+    "bigint",
+    "bignumber",
+    "number",
+    "date",
+    "safe"
   ],
   "author": "Jos de Jong",
   "license": "MIT",
