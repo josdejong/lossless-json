@@ -263,6 +263,12 @@ test('parse with a custom number parser creating Decimal', () => {
   ])
 })
 
+test('throws an error when a duplicate key is encountered', () => {
+  const text = '{"name": "Joe", "name": "Sarah"}'
+
+  expect(() => parse(text)).toThrow("Duplicate key 'name' encountered at position 17")
+})
+
 describe('throw meaningful exceptions', () => {
   const cases = [
     { input: '', expectedError: 'JSON value expected but reached end of input at position 1' },

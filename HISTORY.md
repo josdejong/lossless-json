@@ -6,6 +6,7 @@
 
 Breaking changes:
 
+- Function `parse` now throws an error when a duplicate key is encountered.
 - Dropped support for circular references. If you encounter circular references in your data structures, please rethink your datastructures: better prevent circular references in the first place.
 - The constructor of the `LosslessNumber` class now only supports a string as argument. Use `toLosslessNumber` to convert a number into a LosslessNumber in a safe way.
 - Dropped official support for Node.js 12.

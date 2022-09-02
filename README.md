@@ -24,15 +24,16 @@ console.log(stringify(parse(text)))
 Features:
 
 - No risk of losing numeric information when working with big numbers.
-- Built-in support for `bigint`
-- Built-in support for `Date` (turned off by default)
+- Parse error on duplicate keys.
+- Built-in support for `bigint`.
+- Built-in support for `Date` (turned off by default).
 - Customizable: parse numeric values into any data type, like `BigNumber`, `bigint`, `number`, or a mix of them.
 - Compatible with the native, built-in `JSON.parse` and `JSON.stringify`.
 - Helpful error messages when parsing invalid JSON.
 - Works in browsers and node.js.
 - Comes with TypeScript typings included.
-- Modular and composable ES module functions.
-- The full bundle is only 3kB in size when minified and gzipped.
+- Modular: ES module functions, only load and bundle what you use.
+- The full bundle is less than 4kB in size when minified and gzipped.
 
 ## Install
 

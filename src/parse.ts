@@ -56,6 +56,11 @@ export function parse(
         if (key === undefined) {
           throwObjectKeyExpected()
         }
+        if (typeof object[key] !== 'undefined') {
+          // Note that we could also test `if(key in object) {...}`
+          // or `if (object[key] !== 'undefined') {...}`, but that is slower.
+          throwDuplicateKey(key)
+        }
         skipWhitespace()
         eatColon()
         object[key] = parseValue()
@@ -254,6 +259,10 @@ export function parse(
 
   function throwObjectKeyExpected() {
     throw new SyntaxError(`Quoted object key expected ${gotAt()}`)
+  }
+
+  function throwDuplicateKey(key: string) {
+    throw new SyntaxError(`Duplicate key '${key}' encountered at position ${i - key.length - 1}`)
   }
 
   function throwObjectKeyOrEndExpected() {
