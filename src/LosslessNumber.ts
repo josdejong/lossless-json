@@ -1,4 +1,4 @@
-import { extractSignificantDigits, isNumber, toSafeNumberOrThrow } from './utils.js'
+import { extractSignificantDigits, getUnsafeNumberReason, isInteger, isNumber } from './utils.js'
 
 /**
  * A lossless number. Stores its numeric value as string
@@ -22,38 +22,31 @@ export class LosslessNumber {
   }
 
   /**
-   * Get the value of the LosslessNumber as number.
-   * Throws an Error when this would result in loss of information: when digits
-   * of an integer or decimal would be truncated, or when the number would
-   * overflow or underflow.
+   * Get the value of the LosslessNumber as number or bigint.
    *
-   * See also .approxValueOf() and .unsafeValueOf()
+   * - a number is returned for safe numbers and decimal values that only lose some insignificant digits
+   * - a bigint is returned for big integer numbers
+   * - an Error is thrown for values that will overflow or underflow
+   *
+   * Note that you can implement your own strategy for conversion by just getting the value as string
+   * via .toString(), and using util functions like isInteger, isSafeNumber, getUnsafeNumberReason,
+   * and toSafeNumberOrThrow to convert it to a numeric value.
    */
-  valueOf(): number {
-    return toSafeNumberOrThrow(this.value)
-  }
+  valueOf(): number | bigint {
+    const unsafeReason = getUnsafeNumberReason(this.value, { approx: true })
 
-  /**
-   * Get the value of the LosslessNumber as number.
-   * Throws an Error when this would result in loss of information: when digits
-   * of an integer would be truncated, or when the number would overflow or
-   * underflow. Unlike .valueOf(), this method will allow losing insignificant
-   * digits of a decimal value.
-   *
-   * See also .valueOf() and .unsafeValueOf()
-   */
-  approxValueOf(): number {
-    return toSafeNumberOrThrow(this.value, { approx: true })
-  }
+    if (unsafeReason === undefined) {
+      return parseFloat(this.value)
+    }
 
-  /**
-   * Get the value of the LosslessNumber as number.
-   * Will always return a number, also when this results in loss of digits.
-   *
-   * See also .valueOf() and .approxValueOf()
-   */
-  unsafeValueOf(): number {
-    return parseFloat(this.value)
+    if (isInteger(this.value)) {
+      return BigInt(this.value)
+    }
+
+    throw new Error(
+      'Cannot safely convert to number: ' +
+        `the value '${this.value}' would ${unsafeReason} and become ${parseFloat(this.value)}`
+    )
   }
 
   /**

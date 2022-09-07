@@ -42,46 +42,27 @@ test('create a LosslessNumber from number', function () {
 })
 
 test('use LosslessNumber.valueOf()', function () {
+  // safe number
   expect(new LosslessNumber('23.4').valueOf()).toBe(23.4)
   expect(new LosslessNumber('23e4').valueOf()).toBe(230000)
 
-  expect(() => new LosslessNumber('0.66666666666666666666667').valueOf()).toThrow(
-    "Cannot safely convert to number: the value '0.66666666666666666666667' would truncate and become 0.6666666666666666"
+  // a decimal losing insignificant digits
+  expect(new LosslessNumber('0.66666666666666666666667').valueOf()).toEqual(0.6666666666666666)
+
+  // a big integer
+  expect(new LosslessNumber('123456789012345678901234').valueOf()).toEqual(
+    123456789012345678901234n
   )
-  expect(() => new LosslessNumber('123456789012345678901234').valueOf()).toThrow(
-    "Cannot safely convert to number: the value '123456789012345678901234' would truncate and become 1.2345678901234569e+23"
-  )
+
+  // overflow
   expect(() => new LosslessNumber('2.3e+500').valueOf()).toThrow(
     "Cannot safely convert to number: the value '2.3e+500' would overflow and become Infinity"
   )
+
+  // underflow
   expect(() => new LosslessNumber('2.3e-500').valueOf()).toThrow(
     "Cannot safely convert to number: the value '2.3e-500' would underflow and become 0"
   )
-})
-
-test('use LosslessNumber.approxValueOf()', function () {
-  expect(new LosslessNumber('23.4').approxValueOf()).toBe(23.4)
-  expect(new LosslessNumber('23e4').approxValueOf()).toBe(230000)
-
-  expect(new LosslessNumber('0.66666666666666666666667').approxValueOf()).toBe(0.6666666666666666)
-  expect(() => new LosslessNumber('123456789012345678901234').approxValueOf()).toThrow(
-    "Cannot safely convert to number: the value '123456789012345678901234' would truncate and become 1.2345678901234569e+23"
-  )
-  expect(() => new LosslessNumber('2.3e+500').approxValueOf()).toThrow(
-    "Cannot safely convert to number: the value '2.3e+500' would overflow and become Infinity"
-  )
-  expect(() => new LosslessNumber('2.3e-500').approxValueOf()).toThrow(
-    "Cannot safely convert to number: the value '2.3e-500' would underflow and become 0"
-  )
-})
-
-test('use LosslessNumber.unsafeValueOf()', function () {
-  expect(new LosslessNumber('23.4').unsafeValueOf()).toBe(23.4)
-  expect(new LosslessNumber('23e4').unsafeValueOf()).toBe(230000)
-  expect(new LosslessNumber('0.66666666666666666666667').unsafeValueOf()).toBe(0.6666666666666666)
-  expect(new LosslessNumber('123456789012345678901234').unsafeValueOf()).toBe(1.2345678901234569e23)
-  expect(new LosslessNumber('2.3e+500').unsafeValueOf()).toBe(Infinity)
-  expect(new LosslessNumber('2.3e-500').unsafeValueOf()).toBe(0)
 })
 
 test('can do operations like add a number and a LosslessNumber', () => {

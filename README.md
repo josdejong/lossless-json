@@ -241,30 +241,38 @@ The `LosslessJSON.stringify()` function converts a JavaScript value to a JSON st
 #### Construction
 
 ```
-new LosslessJSON.LosslessNumber(value: number | string) : LosslessNumber
+new LosslessNumber(value: number | string) : LosslessNumber
 ```
 
 #### Methods
 
-- `.valueOf() : number`
-  Convert the `LosslessNumber` to a regular `number`. Throws an Error when this would result in any loss of information: when digits would be truncated of an integer or decimal, or when the number would overflow or underflow. See also `.unsafeValueOf()` and `.approxValueOf()`.
-- `.approxValueOf()`
-  Convert the `LosslessNumber` to a regular `number`. Throws an Error when this would result in loss of information: when digits of an integer would be truncated, or when the number would overflow or underflow. Unlike the more strict `.valueOf()`, this method will allow losing insignificant digits of a decimal value. For example:
+- `.valueOf(): number | bigint`
+  Convert the `LosslessNumber` into a regular `number` or `bigint`. A `number` is returned for safe numbers and decimal values that only lose some insignificant digits. A `bigint` is returned for large integer numbers. An `Error` is thrown for values that will overflow or underflow. Examples:
 
   ```js
-  const long = new LosslessNumber('9223372036854775827')
-  console.log(long.valueOf()) // Error
-  console.log(long.approxValueOf()) // Error
-  console.log(long.unsafeValueOf()) // 9223372036854776000
+  // a safe number
+  console.log(new LosslessNumber('23.4').valueOf()) 
+  // number 23.4
 
-  const decimal = new LosslessNumber('0.66666666666666666667')
-  console.log(decimal.valueOf()) // Error
-  console.log(decimal.approxValueOf()) // 0.6666666666666666
-  console.log(decimal.unsafeValueOf()) // 0.6666666666666666
+  // a decimal losing insignificant digits
+  console.log(new LosslessNumber('0.66666666666666666666667').valueOf()) 
+  // number 0.6666666666666666
+  
+  // a large integer
+  console.log(new LosslessNumber('9223372036854775827').valueOf()) 
+  // bigint 9223372036854775827
+  
+  // a value that will overflow
+  console.log(new LosslessNumber('2.3e+500').valueOf())
+  // Error: Cannot safely convert to number: the value '2.3e+500' would overflow and become Infinity
+  
+  // a value that will underflow
+  console.log(new LosslessNumber('2.3e-500').valueOf())
+  // Error: Cannot safely convert to number: the value '2.3e-500' would underflow and become 0
   ```
 
-- `.unsafeValueOf(): number`
-  Convert the `LosslessNumber` to a regular `number`. Unlike `.valueOf()` and `.unsafeValueOf()`, this method will silently create a `number` also when this results in loss of information.
+  Note that you can implement your own strategy for conversion by just getting the value as string via `.toString()`, and using util functions like `isInteger`, `isSafeNumber`, `getUnsafeNumberReason`, and `toSafeNumberOrThrow` to convert it to a numeric value.
+
 - `.toString() : string`
   Get the string representation of the lossless number.
 
