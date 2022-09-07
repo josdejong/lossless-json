@@ -4,21 +4,18 @@ import { extractSignificantDigits, getUnsafeNumberReason, isInteger, isNumber } 
  * A lossless number. Stores its numeric value as string
  */
 export class LosslessNumber {
+  // numeric value as string
   value: string
-  type: 'LosslessNumber'
-  isLosslessNumber: true
+
+  // type information
+  isLosslessNumber = true
 
   constructor(value: string) {
     if (!isNumber(value)) {
       throw new Error('Invalid number (value: "' + value + '")')
     }
 
-    // numeric value as string
     this.value = value
-
-    // type information
-    this.type = 'LosslessNumber'
-    this.isLosslessNumber = true
   }
 
   /**

@@ -14,6 +14,8 @@ test('throw an error when when creating a LosslessNumber from invalid string', f
   expect(() => new LosslessNumber('2e3.4')).toThrow(/Invalid number/)
   expect(() => new LosslessNumber('2.3.4')).toThrow(/Invalid number/)
   expect(() => new LosslessNumber('+24')).toThrow(/Invalid number/)
+  expect(() => new LosslessNumber('   123')).toThrow(/Invalid number/)
+  expect(() => new LosslessNumber('123   ')).toThrow(/Invalid number/)
 
   // valid
   expect(new LosslessNumber('42e+4').toString()).toEqual('42e+4')
