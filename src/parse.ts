@@ -211,12 +211,16 @@ export function parse(
   }
 
   function eatComma() {
-    expectCharacter(',')
+    if (text[i] !== ',') {
+      throw new SyntaxError(`Comma ',' expected after value ${gotAt()}`)
+    }
     i++
   }
 
   function eatColon() {
-    expectCharacter(':')
+    if (text[i] !== ':') {
+      throw new SyntaxError(`Colon ':' expected after property name ${gotAt()}`)
+    }
     i++
   }
 
@@ -235,12 +239,6 @@ export function parse(
   function expectEndOfInput() {
     if (i < text.length) {
       throw new SyntaxError(`Expected end of input ${gotAt()}`)
-    }
-  }
-
-  function expectCharacter(expected: string) {
-    if (text[i] !== expected) {
-      throw new SyntaxError(`Unexpected token: expecting '${expected}' ${gotAt()}`)
     }
   }
 
@@ -287,8 +285,9 @@ export function parse(
     throw new SyntaxError(`Invalid unicode character '${chars}' ${pos()}`)
   }
 
+  // zero based character position
   function pos(): string {
-    return `at position ${i + 1}`
+    return `at position ${i}`
   }
 
   function got(): string {

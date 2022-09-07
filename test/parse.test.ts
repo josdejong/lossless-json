@@ -271,52 +271,57 @@ test('throws an error when a duplicate key is encountered', () => {
 
 describe('throw meaningful exceptions', () => {
   const cases = [
-    { input: '', expectedError: 'JSON value expected but reached end of input at position 1' },
-    { input: '  ', expectedError: 'JSON value expected but reached end of input at position 3' },
+    { input: '', expectedError: 'JSON value expected but reached end of input at position 0' },
+    { input: '  ', expectedError: 'JSON value expected but reached end of input at position 2' },
     {
       input: '{',
       expectedError:
-        "Quoted object key or end of object '}' expected but reached end of input at position 2"
+        "Quoted object key or end of object '}' expected but reached end of input at position 1"
     },
     {
       input: '{"a",',
-      expectedError: "Unexpected token: expecting ':' but got ',' at position 5"
+      expectedError: "Colon ':' expected after property name but got ',' at position 4"
     },
-    { input: '{a:2}', expectedError: "Quoted object key expected but got 'a' at position 2" },
-    { input: '{"a":2,}', expectedError: "Quoted object key expected but got '}' at position 8" },
+    { input: '{a:2}', expectedError: "Quoted object key expected but got 'a' at position 1" },
+    { input: '{"a":2,}', expectedError: "Quoted object key expected but got '}' at position 7" },
     {
       input: '{"a" "b"}',
-      expectedError: "Unexpected token: expecting ':' but got '\"' at position 6"
+      expectedError: "Colon ':' expected after property name but got '\"' at position 5"
     },
-    { input: '{}{}', expectedError: "Expected end of input but got '{' at position 3" },
+    {
+      input: '{"a":2 "b":3}',
+      expectedError: "Comma ',' expected after value but got '\"' at position 7"
+    },
+    { input: '{}{}', expectedError: "Expected end of input but got '{' at position 2" },
     {
       input: '[',
       expectedError:
-        "Array item or end of array ']' expected but reached end of input at position 2"
+        "Array item or end of array ']' expected but reached end of input at position 1"
     },
-    { input: '[2,]', expectedError: "Array item expected but got ']' at position 4" },
-    { input: '2.3.4', expectedError: "Expected end of input but got '.' at position 4" },
+    { input: '[2,]', expectedError: "Array item expected but got ']' at position 3" },
+    { input: '[2 3]', expectedError: "Comma ',' expected after value but got '3' at position 3" },
+    { input: '2.3.4', expectedError: "Expected end of input but got '.' at position 3" },
     {
       input: '2..3',
-      expectedError: "Invalid number '2.', expecting a digit but got '.' at position 3"
+      expectedError: "Invalid number '2.', expecting a digit but got '.' at position 2"
     },
-    { input: '2e3.4', expectedError: "Expected end of input but got '.' at position 4" },
+    { input: '2e3.4', expectedError: "Expected end of input but got '.' at position 3" },
     {
       input: '2e',
-      expectedError: "Invalid number '2e', expecting a digit but reached end of input at position 3"
+      expectedError: "Invalid number '2e', expecting a digit but reached end of input at position 2"
     },
     {
       input: '-',
-      expectedError: "Invalid number '-', expecting a digit but reached end of input at position 2"
+      expectedError: "Invalid number '-', expecting a digit but reached end of input at position 1"
     },
     {
       input: '"a',
-      expectedError: "End of string '\"' expected but reached end of input at position 3"
+      expectedError: "End of string '\"' expected but reached end of input at position 2"
     },
-    { input: 'foo', expectedError: "JSON value expected but got 'f' at position 1" },
-    { input: '"\\a"', expectedError: "Invalid escape character '\\a' at position 2" },
-    { input: '"\\u26"', expectedError: "Invalid unicode character '\\u26' at position 2" },
-    { input: '"\\uZ000"', expectedError: "Invalid unicode character '\\uZ000' at position 2" }
+    { input: 'foo', expectedError: "JSON value expected but got 'f' at position 0" },
+    { input: '"\\a"', expectedError: "Invalid escape character '\\a' at position 1" },
+    { input: '"\\u26"', expectedError: "Invalid unicode character '\\u26' at position 1" },
+    { input: '"\\uZ000"', expectedError: "Invalid unicode character '\\uZ000' at position 1" }
   ]
 
   cases.forEach(({ input, expectedError }) => {
