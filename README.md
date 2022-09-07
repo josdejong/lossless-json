@@ -334,6 +334,7 @@ Similar libraries:
 
 - https://github.com/sidorares/json-bigint
 - https://github.com/nicolasparada/js-json-bigint
+- https://github.com/epoberezkin/json-source-map
 
 ## Test
 
