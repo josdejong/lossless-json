@@ -251,21 +251,21 @@ new LosslessNumber(value: number | string) : LosslessNumber
 
   ```js
   // a safe number
-  console.log(new LosslessNumber('23.4').valueOf()) 
+  console.log(new LosslessNumber('23.4').valueOf())
   // number 23.4
 
   // a decimal losing insignificant digits
-  console.log(new LosslessNumber('0.66666666666666666666667').valueOf()) 
+  console.log(new LosslessNumber('0.66666666666666666666667').valueOf())
   // number 0.6666666666666666
-  
+
   // a large integer
-  console.log(new LosslessNumber('9223372036854775827').valueOf()) 
+  console.log(new LosslessNumber('9223372036854775827').valueOf())
   // bigint 9223372036854775827
-  
+
   // a value that will overflow
   console.log(new LosslessNumber('2.3e+500').valueOf())
   // Error: Cannot safely convert to number: the value '2.3e+500' would overflow and become Infinity
-  
+
   // a value that will underflow
   console.log(new LosslessNumber('2.3e-500').valueOf())
   // Error: Cannot safely convert to number: the value '2.3e-500' would underflow and become 0
