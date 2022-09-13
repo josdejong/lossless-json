@@ -3,7 +3,7 @@
   "version": "1.0.5",
   "description": "Parse JSON without risk of losing numeric information",
   "type": "module",
-  "main": "lib/umd/lossless-json.js",
+  "main": "lib/esm/index.js",
   "module": "lib/esm/index.js",
   "browser": "lib/umd/lossless-json.js",
   "types": "lib/types/index.d.ts",
