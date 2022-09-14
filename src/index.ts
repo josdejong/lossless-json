@@ -5,9 +5,11 @@ export { LosslessNumber, isLosslessNumber, toLosslessNumber } from './LosslessNu
 export { reviveDate } from './reviveDate.js'
 export { parseLosslessNumber, parseNumberAndBigInt } from './numberParsers.js'
 export {
+  UnsafeNumberReason,
   isInteger,
   isNumber,
   isSafeNumber,
   toSafeNumberOrThrow,
   getUnsafeNumberReason
 } from './utils.js'
+export * from './types.js'
