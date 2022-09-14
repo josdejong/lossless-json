@@ -62,21 +62,22 @@ export function isSafeNumber(
 export enum UnsafeNumberReason {
   underflow = 'underflow',
   overflow = 'overflow',
-  truncate = 'truncate'
+  truncate_integer = 'truncate_integer',
+  truncate_float = 'truncate_float'
 }
 
 /**
  * When the provided value is an unsafe number, describe what the reason is:
- * overflow, underflow, truncate. Returns undefined when the value is safe.
+ * overflow, underflow, truncate_integer, or truncate_float.
+ * Returns undefined when the value is safe.
  */
-export function getUnsafeNumberReason(
-  value: string,
-  config?: {
-    approx: boolean
-  }
-): UnsafeNumberReason | undefined {
-  if (isSafeNumber(value, config)) {
+export function getUnsafeNumberReason(value: string): UnsafeNumberReason | undefined {
+  if (isSafeNumber(value, { approx: false })) {
     return undefined
+  }
+
+  if (isInteger(value)) {
+    return UnsafeNumberReason.truncate_integer
   }
 
   const num = parseFloat(value)
@@ -88,7 +89,7 @@ export function getUnsafeNumberReason(
     return UnsafeNumberReason.underflow
   }
 
-  return UnsafeNumberReason.truncate
+  return UnsafeNumberReason.truncate_float
 }
 
 /**
@@ -103,8 +104,11 @@ export function toSafeNumberOrThrow(
 ): number {
   const number = parseFloat(value)
 
-  const unsafeReason = getUnsafeNumberReason(value, config)
-  if (unsafeReason) {
+  const unsafeReason = getUnsafeNumberReason(value)
+  if (
+    unsafeReason &&
+    (unsafeReason !== UnsafeNumberReason.truncate_float || config?.approx === true)
+  ) {
     throw new Error(
       'Cannot safely convert to number: ' +
         `the value '${value}' would ${unsafeReason} and become ${number}`

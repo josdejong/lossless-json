@@ -1,4 +1,10 @@
-import { extractSignificantDigits, getUnsafeNumberReason, isInteger, isNumber } from './utils.js'
+import {
+  extractSignificantDigits,
+  getUnsafeNumberReason,
+  isInteger,
+  isNumber,
+  UnsafeNumberReason
+} from './utils.js'
 
 /**
  * A lossless number. Stores its numeric value as string
@@ -30,16 +36,19 @@ export class LosslessNumber {
    * and toSafeNumberOrThrow to convert it to a numeric value.
    */
   valueOf(): number | bigint {
-    const unsafeReason = getUnsafeNumberReason(this.value, { approx: true })
+    const unsafeReason = getUnsafeNumberReason(this.value)
 
-    if (unsafeReason === undefined) {
+    // safe or truncate_float
+    if (unsafeReason === undefined || unsafeReason === UnsafeNumberReason.truncate_float) {
       return parseFloat(this.value)
     }
 
+    // truncate_integer
     if (isInteger(this.value)) {
       return BigInt(this.value)
     }
 
+    // overflow or underflow
     throw new Error(
       'Cannot safely convert to number: ' +
         `the value '${this.value}' would ${unsafeReason} and become ${parseFloat(this.value)}`

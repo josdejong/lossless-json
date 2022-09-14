@@ -306,8 +306,8 @@ new LosslessNumber(value: number | string) : LosslessNumber
 - `toSafeNumberOrThrow(value: string, config?: { approx: boolean }) : number`
   Convert a string into a number when it is safe to do so, otherwise throw an informative error.
 
-- `getUnsafeNumberReason(value, config?: { approx: boolean }): UnsafeNumberReason | undefined`
-  When the provided `value` is an unsafe number, describe what the reason is: `overflow`, `underflow`, `truncate`. Returns `undefined` when the value is safe.
+- `getUnsafeNumberReason(value): UnsafeNumberReason | undefined`
+  When the provided `value` is an unsafe number, describe what the reason is: `overflow`, `underflow`, `truncate_integer`, `truncate_float`. Returns `undefined` when the value is safe.
 
 - `isLosslessNumber(value: unknown) : boolean`
   Test whether a value is a `LosslessNumber`.
