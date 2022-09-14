@@ -1,4 +1,12 @@
-import { extractSignificantDigits, isInteger, isNumber, isSafeNumber } from '../src/utils'
+import {
+  extractSignificantDigits,
+  getUnsafeNumberReason,
+  isInteger,
+  isNumber,
+  isSafeNumber,
+  toSafeNumberOrThrow,
+  UnsafeNumberReason
+} from '../src/utils'
 
 test('isInteger', () => {
   expect(isInteger('4250')).toEqual(true)
@@ -47,6 +55,49 @@ test('isSafeNumber({ approx: true })', () => {
   expect(isSafeNumber('2e500', { approx: true })).toEqual(false)
   expect(isSafeNumber('2e-500', { approx: true })).toEqual(false)
   expect(isSafeNumber('12345678901234567890', { approx: true })).toEqual(false)
+})
+
+test('getUnsafeNumberReason', () => {
+  expect(getUnsafeNumberReason('123')).toBe(undefined)
+  expect(getUnsafeNumberReason('0.666666667')).toBe(undefined)
+  expect(getUnsafeNumberReason('1e500')).toBe(UnsafeNumberReason.overflow)
+  expect(getUnsafeNumberReason('1e-500')).toBe(UnsafeNumberReason.underflow)
+  expect(getUnsafeNumberReason('12345678901234567890')).toBe(UnsafeNumberReason.truncate_integer)
+  expect(getUnsafeNumberReason('0.66666666666666666667')).toBe(UnsafeNumberReason.truncate_float)
+})
+
+test('toSafeNumberOrThrow', () => {
+  expect(toSafeNumberOrThrow('123')).toBe(123)
+  expect(toSafeNumberOrThrow('0.666666667')).toBe(0.666666667)
+
+  expect(() => toSafeNumberOrThrow('1e500')).toThrow(
+    "Cannot safely convert to number: the value '1e500' would overflow and become Infinity"
+  )
+  expect(() => toSafeNumberOrThrow('1e-500')).toThrow(
+    "Cannot safely convert to number: the value '1e-500' would underflow and become 0"
+  )
+  expect(() => toSafeNumberOrThrow('12345678901234567890')).toThrow(
+    "Cannot safely convert to number: the value '12345678901234567890' would truncate and become 12345678901234567000"
+  )
+  expect(() => toSafeNumberOrThrow('0.66666666666666666667')).toThrow(
+    "Cannot safely convert to number: the value '0.66666666666666666667' would truncate and become 0.6666666666666666"
+  )
+})
+
+test('toSafeNumberOrThrow({ approx: true })', () => {
+  expect(toSafeNumberOrThrow('123', { approx: true })).toBe(123)
+  expect(toSafeNumberOrThrow('0.666666667', { approx: true })).toBe(0.666666667)
+
+  expect(() => toSafeNumberOrThrow('1e500', { approx: true })).toThrow(
+    "Cannot safely convert to number: the value '1e500' would overflow and become Infinity"
+  )
+  expect(() => toSafeNumberOrThrow('1e-500', { approx: true })).toThrow(
+    "Cannot safely convert to number: the value '1e-500' would underflow and become 0"
+  )
+  expect(() => toSafeNumberOrThrow('12345678901234567890', { approx: true })).toThrow(
+    "Cannot safely convert to number: the value '12345678901234567890' would truncate and become 12345678901234567000"
+  )
+  expect(toSafeNumberOrThrow('0.66666666666666666667', { approx: true })).toBe(0.6666666666666666)
 })
 
 test('extractSignificantDigits', () => {
