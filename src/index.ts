@@ -12,4 +12,3 @@ export {
   toSafeNumberOrThrow,
   getUnsafeNumberReason
 } from './utils.js'
-export * from './types.js'
