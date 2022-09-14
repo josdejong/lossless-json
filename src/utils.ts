@@ -106,8 +106,9 @@ export function toSafeNumberOrThrow(
 
   const unsafeReason = getUnsafeNumberReason(value)
   if (
-    unsafeReason &&
-    (config?.approx === true ? unsafeReason !== UnsafeNumberReason.truncate_float : true)
+    config?.approx === true
+      ? unsafeReason && unsafeReason !== UnsafeNumberReason.truncate_float
+      : unsafeReason
   ) {
     const unsafeReasonText = unsafeReason.replace(/_\w+$/, '')
     throw new Error(
