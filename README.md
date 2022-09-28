@@ -406,9 +406,9 @@ This will generate an ES module output and an UMD bundle in the folder `./.lib` 
 
 ## Deploy
 
-- Update version number in `package.json`
+- Update version number in `package.json`, and run `npm install` to update the version number in `package-lock.json` too.
 - Describe changes is `HISTORY.md`
-- run `npm test` to see whether everything works correctly.
+- run `build-and-test` to see whether everything works correctly.
 - merge changes from `develop` into `master`
 - create git tag and push it: `git tag v1.0.2 && git push --tags`
 - publish via `npm publish` (this will first build, test, and lint before actually publishing the library).

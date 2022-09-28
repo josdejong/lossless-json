@@ -1,6 +1,6 @@
 # History
 
-## not yet published, version 2.0.0
+## 2022-09-28, version 2.0.0
 
 **IMPORTANT: BREAKING CHANGES**
 
