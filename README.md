@@ -5,16 +5,16 @@ Parse JSON without risk of losing numeric information.
 ```js
 import { parse, stringify } from 'lossless-json'
 
-const text = '{"decimal":2.370,"long":9223372036854775827,"big":2.3e+500}'
+const text = '{"decimal":2.370,"long":9123372036854000123,"big":2.3e+500}'
 
 // JSON.parse will lose some digits and a whole number:
 console.log(JSON.stringify(JSON.parse(text)))
-// '{"decimal":2.37,"long":9223372036854776000,"big":null}'
+// '{"decimal":2.37,"long":9123372036854000000,"big":null}'
 // WHOOPS!!!
 
 // LosslessJSON.parse will preserve all numbers and even the formatting:
 console.log(stringify(parse(text)))
-// '{"decimal":2.370,"long":9223372036854775827,"big":2.3e+500}'
+// '{"decimal":2.370,"long":9123372036854000123,"big":2.3e+500}'
 ```
 
 **How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a lightweight class which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
@@ -259,8 +259,8 @@ new LosslessNumber(value: number | string) : LosslessNumber
   // number 0.6666666666666666
 
   // a large integer
-  console.log(new LosslessNumber('9223372036854775827').valueOf())
-  // bigint 9223372036854775827
+  console.log(new LosslessNumber('9123372036854000123').valueOf())
+  // bigint 9123372036854000123
 
   // a value that will overflow
   console.log(new LosslessNumber('2.3e+500').valueOf())
@@ -297,9 +297,9 @@ new LosslessNumber(value: number | string) : LosslessNumber
   isSafeNumber('1.55e3') // true
   isSafeNumber('2e500') // false
   isSafeNumber('2e-500') // false
-  isSafeNumber('9223372036854775827') // false
+  isSafeNumber('9123372036854000123') // false
   isSafeNumber('0.66666666666666666667') // false
-  isSafeNumber('9223372036854775827', { approx: true }) // false
+  isSafeNumber('9123372036854000123', { approx: true }) // false
   isSafeNumber('0.66666666666666666667', { approx: true }) // true
   ```
 
