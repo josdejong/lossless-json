@@ -17,6 +17,8 @@ console.log(stringify(parse(text)))
 // '{"decimal":2.370,"long":9123372036854000123,"big":2.3e+500}'
 ```
 
+The following in-depth article explains what happens there: [Why does JSON.parse corrupt large numbers and how to solve this?](https://jsoneditoronline.org/indepth/parse/why-does-json-parse-corrupt-large-numbers/)
+
 **How does it work?** The library works exactly the same as the native `JSON.parse` and `JSON.stringify`. The difference is that `lossless-json` preserves information of big numbers. `lossless-json` parses numeric values not as a regular number but as a `LosslessNumber`, a lightweight class which stores the numeric value as a string. One can perform regular operations with a `LosslessNumber`, and it will throw an error when this would result in losing information.
 
 **When to use?** If you have to deal with JSON data that contains `long` values for example, coming from an application like C++, Java, or C#. The trade-off is that `lossless-json` is slower than the native `JSON.parse` and `JSON.stringify` functions, so be careful when performance is a bottleneck for you.
