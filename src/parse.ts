@@ -325,7 +325,7 @@ const escapeCharacters: GenericObject<string> = {
   n: '\n',
   r: '\r',
   t: '\t'
-  // \u is handled by getToken()
+  // note that \u is handled separately in parseString()
 }
 
 // map with all whitespace characters
