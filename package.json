@@ -8,6 +8,13 @@
   "browser": "lib/umd/lossless-json.js",
   "types": "lib/types/index.d.ts",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./lib/esm/index.js",
+      "require": "./lib/umd/lossless-json.js",
+      "types": "./lib/types/index.d.ts"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/josdejong/lossless-json.git"
