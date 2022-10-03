@@ -1,5 +1,10 @@
 # History
 
+## 2022-10-03, version 2.0.1
+
+- Fix: configure `exports` in `package.json` to fix problems with Jest (#243).
+  Thanks @akphi.
+
 ## 2022-09-28, version 2.0.0
 
 **IMPORTANT: BREAKING CHANGES**
