@@ -56,7 +56,7 @@ export function parse(
         if (key === undefined) {
           throwObjectKeyExpected()
         }
-        if (typeof object[key] !== 'undefined') {
+        if (Object.prototype.hasOwnProperty.call(object, key)) {
           // Note that we could also test `if(key in object) {...}`
           // or `if (object[key] !== 'undefined') {...}`, but that is slower.
           throwDuplicateKey(key)

@@ -269,6 +269,18 @@ test('throws an error when a duplicate key is encountered', () => {
   expect(() => parse(text)).toThrow("Duplicate key 'name' encountered at position 17")
 })
 
+test('does not throw a duplicate key error for build in methods like toString', () => {
+  const text = '{"toString": "test"}'
+
+  expect(parse(text)).toEqual({ toString: 'test' })
+})
+
+test('throw a duplicate key error when using a build in method name twice', () => {
+  const text = '{"toString": 1, "toString": 2}'
+
+  expect(() => parse(text)).toThrow("Duplicate key 'toString' encountered at position 17")
+})
+
 describe('throw meaningful exceptions', () => {
   const cases = [
     { input: '', expectedError: 'JSON value expected but reached end of input at position 0' },
