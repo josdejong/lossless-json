@@ -26,6 +26,7 @@ The following in-depth article explains what happens there: [Why does JSON.parse
 Features:
 
 - No risk of losing numeric information when working with big numbers.
+- Maintain the formatting of numbers.
 - Parse error on duplicate keys.
 - Built-in support for `bigint`.
 - Built-in support for `Date` (turned off by default).
