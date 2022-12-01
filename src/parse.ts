@@ -160,7 +160,12 @@ export function parse(
             throwInvalidEscapeCharacter(i)
           }
         } else {
-          result += text[i]
+          const char = text[i]
+          if (isValidStringCharacter(char)) {
+            result += char
+          } else {
+            throwInvalidCharacter(char)
+          }
         }
         i++
       }
@@ -271,6 +276,10 @@ export function parse(
     throw new SyntaxError(`Array item or end of array ']' expected ${gotAt()}`)
   }
 
+  function throwInvalidCharacter(char: string) {
+    throw new SyntaxError(`Invalid character '${char}' ${pos()}`)
+  }
+
   function throwInvalidEscapeCharacter(start: number) {
     const chars = text.slice(start, start + 2)
     throw new SyntaxError(`Invalid escape character '${chars}' ${pos()}`)
@@ -313,6 +322,10 @@ function isDigit(char: string): boolean {
 
 function isNonZeroDigit(char: string): boolean {
   return /[1-9]/.test(char)
+}
+
+function isValidStringCharacter(char: string): boolean {
+  return /^[\u0020-\u{10FFFF}]$/u.test(char)
 }
 
 // map with all escape characters

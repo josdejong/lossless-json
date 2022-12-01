@@ -1,5 +1,9 @@
 # History
 
+## 2022-12-01, version 2.0.3
+
+- Fix: `parse` not throwing an exception on illegal characters inside a string, like an unescaped new line.
+
 ## 2022-11-17, version 2.0.2
 
 - Fix: `parse` throwing a duplicate key error when using built-in property name like `toString` as key.

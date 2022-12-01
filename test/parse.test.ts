@@ -263,6 +263,30 @@ test('parse with a custom number parser creating Decimal', () => {
   ])
 })
 
+test('supports unicode characters in a string', () => {
+  expect(parse('"★"')).toBe('★')
+  expect(parse('"\u2605"')).toBe('\u2605')
+  expect(parse('"😀"')).toBe('😀')
+  expect(parse('"\ud83d\ude00"')).toBe('😀')
+})
+
+test('supports unicode characters in a key', () => {
+  expect(parse('{"★":true}')).toStrictEqual({ '★': true })
+  expect(parse('{"\u2605":true}')).toStrictEqual({ '\u2605': true })
+  expect(parse('{"😀":true}')).toStrictEqual({ '😀': true })
+  expect(parse('{"\ud83d\ude00":true}')).toStrictEqual({ '\ud83d\ude00': true })
+})
+
+test('throws an error when an invalid character is encountered in a string', () => {
+  expect(() => parse('"\n"')).toThrow("Invalid character '\n' at position 1")
+  expect(() => parse('"\t"')).toThrow("Invalid character '\t' at position 1")
+})
+
+test('throws an error when an invalid character is encountered in a key', () => {
+  expect(() => parse('{"\n":true}')).toThrow("Invalid character '\n' at position 2")
+  expect(() => parse('{"\t":true}')).toThrow("Invalid character '\t' at position 2")
+})
+
 test('throws an error when a duplicate key is encountered', () => {
   const text = '{"name": "Joe", "name": "Sarah"}'
 
