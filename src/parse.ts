@@ -38,13 +38,13 @@ export function parse(
   return reviver ? revive(value, reviver) : value
 
   function parseObject(): GenericObject<unknown> | undefined {
-    if (text[i] === '{') {
+    if (text.charCodeAt(i) === codeOpeningBrace) {
       i++
       skipWhitespace()
 
       const object: GenericObject<unknown> = {}
       let initial = true
-      while (i < text.length && text[i] !== '}') {
+      while (i < text.length && text.charCodeAt(i) !== codeClosingBrace) {
         if (!initial) {
           eatComma()
           skipWhitespace()
@@ -66,7 +66,7 @@ export function parse(
         object[key] = parseValue()
       }
 
-      if (text[i] !== '}') {
+      if (text.charCodeAt(i) !== codeClosingBrace) {
         throwObjectKeyOrEndExpected()
       }
       i++
@@ -76,13 +76,13 @@ export function parse(
   }
 
   function parseArray(): Array<unknown> | unknown {
-    if (text[i] === '[') {
+    if (text.charCodeAt(i) === codeOpeningBracket) {
       i++
       skipWhitespace()
 
       const array = []
       let initial = true
-      while (i < text.length && text[i] !== ']') {
+      while (i < text.length && text.charCodeAt(i) !== codeClosingBracket) {
         if (!initial) {
           eatComma()
         } else {
@@ -94,7 +94,7 @@ export function parse(
         array.push(value)
       }
 
-      if (text[i] !== ']') {
+      if (text.charCodeAt(i) !== codeClosingBracket) {
         throwArrayItemOrEndExpected()
       }
       i++
@@ -128,17 +128,17 @@ export function parse(
   }
 
   function skipWhitespace() {
-    while (isWhitespace(text[i])) {
+    while (isWhitespace(text.charCodeAt(i))) {
       i++
     }
   }
 
   function parseString() {
-    if (text[i] === '"') {
+    if (text.charCodeAt(i) === codeDoubleQuote) {
       i++
       let result = ''
-      while (i < text.length && text[i] !== '"') {
-        if (text[i] === '\\') {
+      while (i < text.length && text.charCodeAt(i) !== codeDoubleQuote) {
+        if (text.charCodeAt(i) === codeBackslash) {
           const char = text[i + 1]
           const escapeChar = escapeCharacters[char]
           if (escapeChar !== undefined) {
@@ -146,10 +146,10 @@ export function parse(
             i++
           } else if (char === 'u') {
             if (
-              isHex(text[i + 2]) &&
-              isHex(text[i + 3]) &&
-              isHex(text[i + 4]) &&
-              isHex(text[i + 5])
+              isHex(text.charCodeAt(i + 2)) &&
+              isHex(text.charCodeAt(i + 3)) &&
+              isHex(text.charCodeAt(i + 4)) &&
+              isHex(text.charCodeAt(i + 5))
             ) {
               result += String.fromCharCode(parseInt(text.slice(i + 2, i + 6), 16))
               i += 5
@@ -160,11 +160,10 @@ export function parse(
             throwInvalidEscapeCharacter(i)
           }
         } else {
-          const char = text[i]
-          if (isValidStringCharacter(char)) {
-            result += char
+          if (isValidStringCharacter(text.charCodeAt(i))) {
+            result += text[i]
           } else {
-            throwInvalidCharacter(char)
+            throwInvalidCharacter(text[i])
           }
         }
         i++
@@ -177,35 +176,35 @@ export function parse(
 
   function parseNumeric() {
     const start = i
-    if (text[i] === '-') {
+    if (text.charCodeAt(i) === codeMinus) {
       i++
       expectDigit(start)
     }
 
-    if (text[i] === '0') {
+    if (text.charCodeAt(i) === codeZero) {
       i++
-    } else if (isNonZeroDigit(text[i])) {
+    } else if (isNonZeroDigit(text.charCodeAt(i))) {
       i++
-      while (isDigit(text[i])) {
+      while (isDigit(text.charCodeAt(i))) {
         i++
       }
     }
 
-    if (text[i] === '.') {
+    if (text.charCodeAt(i) === codeDot) {
       i++
       expectDigit(start)
-      while (isDigit(text[i])) {
+      while (isDigit(text.charCodeAt(i))) {
         i++
       }
     }
 
-    if (text[i] === 'e' || text[i] === 'E') {
+    if (text.charCodeAt(i) === codeLowercaseE || text.charCodeAt(i) === codeUppercaseE) {
       i++
-      if (text[i] === '-' || text[i] === '+') {
+      if (text.charCodeAt(i) === codeMinus || text.charCodeAt(i) === codePlus) {
         i++
       }
       expectDigit(start)
-      while (isDigit(text[i])) {
+      while (isDigit(text.charCodeAt(i))) {
         i++
       }
     }
@@ -216,14 +215,14 @@ export function parse(
   }
 
   function eatComma() {
-    if (text[i] !== ',') {
+    if (text.charCodeAt(i) !== codeComma) {
       throw new SyntaxError(`Comma ',' expected after value ${gotAt()}`)
     }
     i++
   }
 
   function eatColon() {
-    if (text[i] !== ':') {
+    if (text.charCodeAt(i) !== codeColon) {
       throw new SyntaxError(`Colon ':' expected after property name ${gotAt()}`)
     }
     i++
@@ -248,14 +247,14 @@ export function parse(
   }
 
   function expectDigit(start: number) {
-    if (!isDigit(text[i])) {
+    if (!isDigit(text.charCodeAt(i))) {
       const numSoFar = text.slice(start, i)
       throw new SyntaxError(`Invalid number '${numSoFar}', expecting a digit ${gotAt()}`)
     }
   }
 
   function expectEndOfString() {
-    if (text[i] !== '"') {
+    if (text.charCodeAt(i) !== codeDoubleQuote) {
       throw new SyntaxError(`End of string '"' expected ${gotAt()}`)
     }
   }
@@ -300,7 +299,7 @@ export function parse(
   }
 
   function got(): string {
-    return text[i] ? `but got '${text[i]}'` : 'but reached end of input'
+    return i < text.length ? `but got '${text[i]}'` : 'but reached end of input'
   }
 
   function gotAt(): string {
@@ -308,24 +307,28 @@ export function parse(
   }
 }
 
-function isWhitespace(char: string): boolean {
-  return whitespaceCharacters[char] === true
+function isWhitespace(code: number): boolean {
+  return code === codeSpace || code === codeNewline || code === codeTab || code === codeReturn
 }
 
-function isHex(char: string): boolean {
-  return /^[0-9a-fA-F]/.test(char)
+function isHex(code: number): boolean {
+  return (
+    (code >= codeZero && code < codeNine) ||
+    (code >= codeUppercaseA && code <= codeUppercaseF) ||
+    (code >= codeLowercaseA && code <= codeLowercaseF)
+  )
 }
 
-function isDigit(char: string): boolean {
-  return /[0-9]/.test(char)
+function isDigit(code: number): boolean {
+  return code >= codeZero && code <= codeNine
 }
 
-function isNonZeroDigit(char: string): boolean {
-  return /[1-9]/.test(char)
+function isNonZeroDigit(code: number): boolean {
+  return code >= codeOne && code <= codeNine
 }
 
-function isValidStringCharacter(char: string): boolean {
-  return /^[\u0020-\u{10FFFF}]$/u.test(char)
+export function isValidStringCharacter(code: number): boolean {
+  return code >= 0x20 && code <= 0x10ffff
 }
 
 // map with all escape characters
@@ -341,10 +344,27 @@ const escapeCharacters: GenericObject<string> = {
   // note that \u is handled separately in parseString()
 }
 
-// map with all whitespace characters
-const whitespaceCharacters: GenericObject<boolean> = {
-  ' ': true,
-  '\n': true,
-  '\t': true,
-  '\r': true
-}
+const codeBackslash = 0x5c // "\"
+const codeOpeningBrace = 0x7b // "{"
+const codeClosingBrace = 0x7d // "}"
+const codeOpeningBracket = 0x5b // "["
+const codeClosingBracket = 0x5d // "]"
+const codeSpace = 0x20 // " "
+const codeNewline = 0xa // "\n"
+const codeTab = 0x9 // "\t"
+const codeReturn = 0xd // "\r"
+const codeDoubleQuote = 0x0022 // "
+const codePlus = 0x2b // "+"
+const codeMinus = 0x2d // "-"
+const codeZero = 0x30
+const codeOne = 0x31
+const codeNine = 0x39
+const codeComma = 0x2c // ","
+const codeDot = 0x2e // "." (dot, period)
+const codeColon = 0x3a // ":"
+export const codeUppercaseA = 0x41 // "A"
+export const codeLowercaseA = 0x61 // "a"
+export const codeUppercaseE = 0x45 // "E"
+export const codeLowercaseE = 0x65 // "e"
+export const codeUppercaseF = 0x46 // "F"
+export const codeLowercaseF = 0x66 // "f"
