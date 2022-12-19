@@ -407,7 +407,7 @@ npm run build
 
 This will generate an ES module output and an UMD bundle in the folder `./.lib` which can be executed in browsers and node.js and used in the browser.
 
-## Deploy
+## Publish
 
 - Update version number in `package.json`, and run `npm install` to update the version number in `package-lock.json` too.
 - Describe changes is `HISTORY.md`

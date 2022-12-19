@@ -1,5 +1,9 @@
 # History
 
+## 2022-12-19, version 2.0.4
+
+- Improved performance.
+
 ## 2022-12-01, version 2.0.3
 
 - Fix: `parse` not throwing an exception on illegal characters inside a string, like an unescaped new line.
