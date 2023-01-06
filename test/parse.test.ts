@@ -265,9 +265,17 @@ test('parse with a custom number parser creating Decimal', () => {
 
 test('supports unicode characters in a string', () => {
   expect(parse('"★"')).toBe('★')
-  expect(parse('"\u2605"')).toBe('\u2605')
   expect(parse('"😀"')).toBe('😀')
-  expect(parse('"\ud83d\ude00"')).toBe('😀')
+  expect(parse('"\ud83d\ude00"')).toBe('\ud83d\ude00')
+  expect(parse('"йнформация"')).toBe('йнформация')
+})
+
+test('supports escaped unicode characters in a string', () => {
+  expect(parse('"\\u2605"')).toBe('\u2605')
+  expect(parse('"\\ud83d\\ude00"')).toBe('\ud83d\ude00')
+  expect(parse('"\\u0439\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u044f"')).toBe(
+    '\u0439\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f'
+  )
 })
 
 test('supports unicode characters in a key', () => {

@@ -313,7 +313,7 @@ function isWhitespace(code: number): boolean {
 
 function isHex(code: number): boolean {
   return (
-    (code >= codeZero && code < codeNine) ||
+    (code >= codeZero && code <= codeNine) ||
     (code >= codeUppercaseA && code <= codeUppercaseF) ||
     (code >= codeLowercaseA && code <= codeLowercaseF)
   )
