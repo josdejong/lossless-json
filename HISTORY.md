@@ -1,5 +1,9 @@
 # History
 
+## 2023-01-06, version 2.0.5
+
+- Fix: error handling unicode characters containing a `9`.
+
 ## 2022-12-19, version 2.0.4
 
 - Improved performance.
