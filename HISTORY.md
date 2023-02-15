@@ -1,5 +1,9 @@
 # History
 
+## 2023-02-15, version 2.0.6
+
+- Fix: empty objects and arrays being formatted with indentation inside.
+
 ## 2023-01-06, version 2.0.5
 
 - Fix: error handling unicode characters containing a `9`.
