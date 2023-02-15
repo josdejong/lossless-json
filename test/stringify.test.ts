@@ -304,3 +304,13 @@ test('stringify with string space', function () {
   // validate expected outcome against native JSON.stringify
   expect(JSON.stringify(json, null, '~')).toEqual(expected)
 })
+
+test('stringify an empty array', function () {
+  expect(stringify([], null, 2)).toEqual('[]')
+  expect(stringify([], null, '    ')).toEqual('[]')
+})
+
+test('stringify an empty object', function () {
+  expect(stringify({}, null, 2)).toEqual('{}')
+  expect(stringify({}, null, '    ')).toEqual('{}')
+})

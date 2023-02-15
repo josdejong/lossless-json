@@ -110,6 +110,10 @@ export function stringify(
    * Stringify an array
    */
   function stringifyArray(array: Array<unknown>, indent: string): string {
+    if (array.length === 0) {
+      return '[]'
+    }
+
     const childIndent = resolvedSpace ? indent + resolvedSpace : undefined
     let str = resolvedSpace ? '[\n' : '['
 
@@ -145,6 +149,11 @@ export function stringify(
     }
 
     const keys: string[] = Array.isArray(replacer) ? replacer.map(String) : Object.keys(object)
+
+    if (keys.length === 0) {
+      return '{}'
+    }
+
     const childIndent = resolvedSpace ? indent + resolvedSpace : undefined
     let first = true
     let str = resolvedSpace ? '{\n' : '{'
