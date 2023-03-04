@@ -160,13 +160,15 @@ const str = stringify(output, undefined, undefined, [decimalStringifier])
 
 ### Reviver and replacer
 
-The library is compatible with the native `JSON.parse` and `JSON.stringify`, and also comes with the optional `reviver` and `replacer` arguments that allow you to serialize for example data classes in a custom way. Here is an example demonstrating how you can stringify a `Date` as an object with a `$date` key instead of a string, so it is uniquely recognizable when parsing the structure:
+The library is compatible with the native `JSON.parse` and `JSON.stringify`, and also comes with the optional `reviver` and `replacer` arguments that allow you to serialize for example data classes in a custom way. Here is an example demonstrating how you can stringify a `Date` in a different way than the built-in `reviveDate` utility function. 
+
+The following example stringifies a `Date` as an object with a `$date` key instead of a string, so it is uniquely recognizable when parsing the structure:
 
 ```js
 import { parse, stringify } from 'lossless-json'
 
 // stringify a Date as a unique object with a key '$date', so it is recognizable
-function dateReplacer(key, value) {
+function customDateReplacer(key, value) {
   if (value instanceof Date) {
     return {
       $date: value.toISOString()
@@ -180,7 +182,7 @@ function isJSONDateObject(value) {
   return value && typeof value === 'object' && typeof value.$date === 'string'
 }
 
-function dateReviver(key, value) {
+function customDateReviver(key, value) {
   if (isJSONDateObject(value)) {
     return new Date(value.$date)
   }
@@ -193,12 +195,12 @@ const record = {
   timestamp: new Date('2022-08-30T09:00:00Z')
 }
 
-const text = stringify(record, dateReplacer)
+const text = stringify(record, customDateReplacer)
 console.log(text)
 // output:
 //   '{"message":"Hello World","timestamp":{"$date":"2022-08-30T09:00:00.000Z"}}'
 
-const parsed = parse(text, dateReviver)
+const parsed = parse(text, customDateReviver)
 console.log(parsed)
 // output:
 //   {
