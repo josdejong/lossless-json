@@ -8,6 +8,7 @@ import {
   stringify
 } from '../src'
 import { GenericObject, JSONValue } from '../src/types'
+import { isDeepEqual } from '../src/parse'
 
 // helper function to create a lossless number
 function lln(value: string) {
@@ -296,21 +297,38 @@ test('throws an error when an invalid character is encountered in a key', () => 
 })
 
 test('throws an error when a duplicate key is encountered', () => {
-  const text = '{"name": "Joe", "name": "Sarah"}'
-
-  expect(() => parse(text)).toThrow("Duplicate key 'name' encountered at position 17")
+  expect(() => parse('{"name": "Joe", "name": "Sarah"}')).toThrow(
+    "Duplicate key 'name' encountered at position 17"
+  )
 })
 
 test('does not throw a duplicate key error for build in methods like toString', () => {
-  const text = '{"toString": "test"}'
+  expect(parse('{"toString": "test"}')).toEqual({ toString: 'test' })
+})
 
-  expect(parse(text)).toEqual({ toString: 'test' })
+test('does not throw a duplicate key error when the values are equal', () => {
+  expect(parse('{"name": "Joe", "name": "Joe"}')).toStrictEqual({ name: 'Joe' })
+  expect(parse('{"name": "Joe", "name": "Joe", "name": "Joe"}')).toStrictEqual({ name: 'Joe' })
+
+  expect(parse('{"age": 41, "age": 41}')).toStrictEqual({ age: new LosslessNumber('41') })
+
+  expect(
+    parse('{"address": {"city": "Rotterdam"}, "address": {"city": "Rotterdam"}}')
+  ).toStrictEqual({ address: { city: 'Rotterdam' } })
+
+  expect(parse('{"scores": [2.3, 7.1], "scores": [2.3, 7.1]}')).toStrictEqual({
+    scores: [new LosslessNumber('2.3'), new LosslessNumber('7.1')]
+  })
+
+  expect(parse('{"scores": [2.3, 7.1], "scores": [2.3, 7.1]}', null, parseFloat)).toStrictEqual({
+    scores: [2.3, 7.1]
+  })
 })
 
 test('throw a duplicate key error when using a build in method name twice', () => {
-  const text = '{"toString": 1, "toString": 2}'
-
-  expect(() => parse(text)).toThrow("Duplicate key 'toString' encountered at position 17")
+  expect(() => parse('{"toString": 1, "toString": 2}')).toThrow(
+    "Duplicate key 'toString' encountered at position 17"
+  )
 })
 
 describe('throw meaningful exceptions', () => {
@@ -372,5 +390,47 @@ describe('throw meaningful exceptions', () => {
     test(`should throw when parsing '${input}'`, () => {
       expect(() => parse(input)).toThrow(expectedError)
     })
+  })
+})
+
+describe('isDeepEqual', () => {
+  test('should test equality of primitive values', () => {
+    expect(isDeepEqual(2, 3)).toEqual(false)
+    expect(isDeepEqual(2, 2)).toEqual(true)
+    expect(isDeepEqual(2.4, 2.4)).toEqual(true)
+    expect(isDeepEqual(true, true)).toEqual(true)
+    expect(isDeepEqual(false, false)).toEqual(true)
+    expect(isDeepEqual(true, false)).toEqual(false)
+    expect(isDeepEqual(null, null)).toEqual(true)
+    expect(isDeepEqual(undefined, undefined)).toEqual(true)
+    expect(isDeepEqual(undefined, null)).toEqual(false)
+    expect(isDeepEqual(0, null)).toEqual(false)
+    expect(isDeepEqual('hello', 'hello')).toEqual(true)
+    expect(isDeepEqual('hello', 'there')).toEqual(false)
+    expect(isDeepEqual(new LosslessNumber('2'), new LosslessNumber('2'))).toEqual(true)
+  })
+
+  test('should test equality of arrays', () => {
+    expect(isDeepEqual([1, 2], [1, 2])).toEqual(true)
+    expect(isDeepEqual([1, 2], [1, 3])).toEqual(false)
+    expect(isDeepEqual([1, 2], [3, 2])).toEqual(false)
+    expect(isDeepEqual([1, 2], [1, 2, 3])).toEqual(false)
+    expect(isDeepEqual([1, 2, 3], [1, 2])).toEqual(false)
+  })
+
+  test('should test equality of objects', () => {
+    expect(isDeepEqual({ a: 2, b: 3 }, { a: 2, b: 3 })).toEqual(true)
+    expect(isDeepEqual({ a: 2, b: 3 }, { a: 2, b: 4 })).toEqual(false)
+    expect(isDeepEqual({ a: 2, b: 3 }, { a: 4, b: 3 })).toEqual(false)
+    expect(isDeepEqual({ a: 2 }, { a: 2, b: 3 })).toEqual(false)
+    expect(isDeepEqual({ a: 2, b: 3 }, { a: 2 })).toEqual(false)
+  })
+
+  test('should test equality of nested objects / arrays', () => {
+    expect(isDeepEqual({ values: [1, 2] }, { values: [1, 2] })).toEqual(true)
+    expect(isDeepEqual({ values: [1, 2] }, { values: [1, 2], b: 3 })).toEqual(false)
+    expect(isDeepEqual({ values: [1, 3] }, { values: [1, 2] })).toEqual(false)
+    expect(isDeepEqual([{ id: 2 }], [{ id: 2 }])).toEqual(true)
+    expect(isDeepEqual([{ id: 2 }], [{ id: 3 }])).toEqual(false)
   })
 })

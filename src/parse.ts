@@ -1,7 +1,7 @@
 import { parseLosslessNumber } from './numberParsers.js'
 import { revive } from './revive.js'
-import { GenericObject, JavaScriptValue } from './types'
 import type { NumberParser, Reviver } from './types'
+import { GenericObject, JavaScriptValue } from './types'
 
 /**
  * The LosslessJSON.parse() method parses a string as JSON, optionally transforming
@@ -52,18 +52,25 @@ export function parse(
           initial = false
         }
 
+        const start = i
+
         const key = parseString()
         if (key === undefined) {
           throwObjectKeyExpected()
         }
-        if (Object.prototype.hasOwnProperty.call(object, key)) {
-          // Note that we could also test `if(key in object) {...}`
-          // or `if (object[key] !== 'undefined') {...}`, but that is slower.
-          throwDuplicateKey(key)
-        }
+
         skipWhitespace()
         eatColon()
-        object[key] = parseValue()
+        const value = parseValue()
+
+        // TODO: test deep equal instead of strict equal
+        if (Object.prototype.hasOwnProperty.call(object, key) && !isDeepEqual(value, object[key])) {
+          // Note that we could also test `if(key in object) {...}`
+          // or `if (object[key] !== 'undefined') {...}`, but that is slower.
+          throwDuplicateKey(key, start + 1)
+        }
+
+        object[key] = value
       }
 
       if (text.charCodeAt(i) !== codeClosingBrace) {
@@ -263,8 +270,8 @@ export function parse(
     throw new SyntaxError(`Quoted object key expected ${gotAt()}`)
   }
 
-  function throwDuplicateKey(key: string) {
-    throw new SyntaxError(`Duplicate key '${key}' encountered at position ${i - key.length - 1}`)
+  function throwDuplicateKey(key: string, pos: number) {
+    throw new SyntaxError(`Duplicate key '${key}' encountered at position ${pos}`)
   }
 
   function throwObjectKeyOrEndExpected() {
@@ -329,6 +336,27 @@ function isNonZeroDigit(code: number): boolean {
 
 export function isValidStringCharacter(code: number): boolean {
   return code >= 0x20 && code <= 0x10ffff
+}
+
+export function isDeepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) {
+    return true
+  }
+
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((item, index) => isDeepEqual(item, b[index]))
+  }
+
+  if (isObject(a) && isObject(b)) {
+    const keys = [...new Set([...Object.keys(a), ...Object.keys(b)])]
+    return keys.every((key) => isDeepEqual(a[key], b[key]))
+  }
+
+  return false
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 // map with all escape characters
