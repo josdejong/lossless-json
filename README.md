@@ -160,7 +160,7 @@ const str = stringify(output, undefined, undefined, [decimalStringifier])
 
 ### Reviver and replacer
 
-The library is compatible with the native `JSON.parse` and `JSON.stringify`, and also comes with the optional `reviver` and `replacer` arguments that allow you to serialize for example data classes in a custom way. Here is an example demonstrating how you can stringify a `Date` in a different way than the built-in `reviveDate` utility function. 
+The library is compatible with the native `JSON.parse` and `JSON.stringify`, and also comes with the optional `reviver` and `replacer` arguments that allow you to serialize for example data classes in a custom way. Here is an example demonstrating how you can stringify a `Date` in a different way than the built-in `reviveDate` utility function.
 
 The following example stringifies a `Date` as an object with a `$date` key instead of a string, so it is uniquely recognizable when parsing the structure:
 
@@ -409,15 +409,28 @@ npm run build
 
 This will generate an ES module output and an UMD bundle in the folder `./.lib` which can be executed in browsers and node.js and used in the browser.
 
-## Publish
+### Release
 
-- Update version number in `package.json`, and run `npm install` to update the version number in `package-lock.json` too.
-- Describe changes is `HISTORY.md`
-- run `build-and-test` to see whether everything works correctly.
-- Commit changes.
-- merge changes from `develop` into `master`
-- create git tag and push it: `git tag v1.0.2 && git push --tags`
-- publish via `npm publish` (this will first build, test, and lint before actually publishing the library).
+To release a new version:
+
+```
+$ npm run release
+```
+
+This will:
+
+- lint
+- test
+- build
+- increment the version number
+- push the changes to git, add a git version tag
+- publish the npm package
+
+To try the build and see the change list without actually publishing:
+
+```
+$ npm run release-dry-run
+```
 
 ## License
 
