@@ -21,8 +21,8 @@
   },
   "scripts": {
     "test": "jest --rootDir=test --runInBand",
-    "lint": "prettier --ignore-path .gitignore lib --check . && eslint src/**/*.ts test/**/*.ts test-lib/**/*.mjs tools/**/*.mjs",
-    "format": "prettier --ignore-path .gitignore lib --write . && npm run lint -- --fix",
+    "lint": "prettier --check . && eslint src/**/*.ts test/**/*.ts test-lib/**/*.mjs tools/**/*.mjs",
+    "format": "prettier --write . && npm run lint -- --fix",
     "build": "npm-run-all build:**",
     "build:clean": "del-cli lib",
     "build:esm": "babel src --out-dir lib/esm --extensions \".ts\" --source-maps --config-file ./babel.config.json",
