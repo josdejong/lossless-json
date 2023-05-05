@@ -63,6 +63,10 @@ export function parse(
         eatColon()
         const value = parseValue()
 
+        if (value === undefined) {
+          throwObjectValueExpected()
+        }
+
         // TODO: test deep equal instead of strict equal
         if (Object.prototype.hasOwnProperty.call(object, key) && !isDeepEqual(value, object[key])) {
           // Note that we could also test `if(key in object) {...}`
@@ -289,6 +293,10 @@ export function parse(
   function throwInvalidEscapeCharacter(start: number) {
     const chars = text.slice(start, start + 2)
     throw new SyntaxError(`Invalid escape character '${chars}' ${pos()}`)
+  }
+
+  function throwObjectValueExpected() {
+    throw new SyntaxError(`Object value expected after ':' ${pos()}`)
   }
 
   function throwInvalidUnicodeCharacter(start: number) {

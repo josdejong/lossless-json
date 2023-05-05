@@ -344,6 +344,10 @@ describe('throw meaningful exceptions', () => {
       input: '{"a",',
       expectedError: "Colon ':' expected after property name but got ',' at position 4"
     },
+    {
+      input: '{"a":}',
+      expectedError: "Object value expected after ':' at position 5"
+    },
     { input: '{a:2}', expectedError: "Quoted object key expected but got 'a' at position 1" },
     { input: '{"a":2,}', expectedError: "Quoted object key expected but got '}' at position 7" },
     {
@@ -361,6 +365,7 @@ describe('throw meaningful exceptions', () => {
         "Array item or end of array ']' expected but reached end of input at position 1"
     },
     { input: '[2,]', expectedError: "Array item expected but got ']' at position 3" },
+    { input: '[2,,3]', expectedError: "Array item expected but got ',' at position 3" },
     { input: '[2 3]', expectedError: "Comma ',' expected after value but got '3' at position 3" },
     { input: '2.3.4', expectedError: "Expected end of input but got '.' at position 3" },
     {
