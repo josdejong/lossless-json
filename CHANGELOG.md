@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.9](https://github.com/josdejong/lossless-json/compare/v2.0.8...v2.0.9) (2023-05-05)
+
+
+### Bug Fixes
+
+* [#247](https://github.com/josdejong/lossless-json/issues/247) throw an error in case of a missing object value ([c260715](https://github.com/josdejong/lossless-json/commit/c260715fe6c38cf999663bd83ffdce308ba623ee))
+
 ### [2.0.8](https://github.com/josdejong/lossless-json/compare/v2.0.7...v2.0.8) (2023-03-06)
 
 ### [2.0.7](https://github.com/josdejong/lossless-json/compare/v2.0.6...v2.0.7) (2023-03-06)
