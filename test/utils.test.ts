@@ -35,6 +35,9 @@ test('isSafeNumber', () => {
   expect(isSafeNumber('0.66666666666666666667')).toEqual(false)
   expect(isSafeNumber('12345678901234567890')).toEqual(false)
   expect(isSafeNumber('1.2345678901234567890')).toEqual(false)
+
+  // the following number loses formatting, but the value stays the same and hence is safe
+  expect(isSafeNumber('2.300')).toEqual(true)
 })
 
 test('isSafeNumber({ approx: false })', () => {

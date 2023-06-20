@@ -19,7 +19,7 @@ const NUMBER_REGEX = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/
 
 /**
  * Test whether a string can be safely represented with a number
- * without information.
+ * without information loss.
  *
  * When approx is true, floating point numbers that lose a few digits but
  * are still approximately equal in value are considered safe too.
