@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.10](https://github.com/josdejong/lossless-json/compare/v2.0.9...v2.0.10) (2023-07-07)
+
+
+### Bug Fixes
+
+* let the `main` field in `package.json` point to the CommonJS output instead of ESM ([0d6c48f](https://github.com/josdejong/lossless-json/commit/0d6c48f75925e292ae4829301db8a6f9f1beca39))
+
 ### [2.0.9](https://github.com/josdejong/lossless-json/compare/v2.0.8...v2.0.9) (2023-05-05)
 
 
