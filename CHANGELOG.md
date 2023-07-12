@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.11](https://github.com/josdejong/lossless-json/compare/v2.0.10...v2.0.11) (2023-07-12)
+
+
+### Bug Fixes
+
+* adjust published module types ([311995d](https://github.com/josdejong/lossless-json/commit/311995d9323c086a058a766486191197189004f4))
+
 ### [2.0.10](https://github.com/josdejong/lossless-json/compare/v2.0.9...v2.0.10) (2023-07-07)
 
 
