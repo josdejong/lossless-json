@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import { LosslessNumber, stringify } from '../src'
-import type { GenericObject, JSONValue } from '../src/types'
+import type { GenericObject } from '../src/types'
 
 // helper function to create a lossless number
 function lln(value: string) {
@@ -151,9 +151,9 @@ test('stringify with replacer function', function () {
   const json: GenericObject<unknown> = { a: 123, b: 'str', c: null, d: false, e: [1, 2, 3] }
 
   interface Log {
-    context: JSONValue
+    context: unknown
     key: string
-    value: JSONValue
+    value: unknown
   }
 
   const expected: Log[] = [
@@ -206,8 +206,8 @@ test('stringify with replacer function', function () {
 
   const logs: Log[] = []
   stringify(json, function (key, value) {
-    logs.push({ context: this, key, value: value as JSONValue })
-    return value as JSONValue
+    logs.push({ context: this, key, value })
+    return value
   })
   expect(logs).toEqual(expected)
 
@@ -225,7 +225,7 @@ test('stringify with replacer function (2)', function () {
 
   const expected = '{"a":"number:a:123","b":"string:b:str"}'
 
-  function replacer(key: string, value: unknown): JSONValue {
+  function replacer(key: string, value: unknown): unknown {
     if (key === 'c') {
       return undefined
     }
@@ -237,7 +237,7 @@ test('stringify with replacer function (2)', function () {
       return 'string:' + key + ':' + value
     }
 
-    return value as JSONValue
+    return value
   }
 
   expect(stringify(json, replacer)).toEqual(expected)
@@ -258,7 +258,7 @@ test('stringify with replacer Array', function () {
 })
 
 test('stringify with numeric space', function () {
-  const json: JSONValue = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
+  const json: unknown = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
 
   const expected =
     '{\n' +
@@ -282,7 +282,7 @@ test('stringify with numeric space', function () {
 })
 
 test('stringify with string space', function () {
-  const json: JSONValue = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
+  const json: unknown = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
 
   const expected =
     '{\n' +

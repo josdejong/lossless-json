@@ -1,4 +1,4 @@
-import type { GenericObject, Replacer, NumberStringifier, JavaScriptValue } from './types'
+import type { GenericObject, NumberStringifier, Replacer } from './types'
 import { isNumber } from './utils.js'
 
 /**
@@ -36,7 +36,7 @@ import { isNumber } from './utils.js'
  * @returns Returns the string representation of the JSON object.
  */
 export function stringify(
-  value: JavaScriptValue,
+  value: unknown,
   replacer?: Replacer,
   space?: number | string,
   numberStringifiers?: NumberStringifier[]
