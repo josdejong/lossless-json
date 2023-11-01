@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/josdejong/lossless-json/compare/v2.0.11...v3.0.0) (2023-11-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* The usages of types `JavaScriptValue`, `JavaScriptObject`, `JavaScriptArray` and `JavaScriptPrimitive` must be replaced with `unknown`.
+
+### Bug Fixes
+
+* [#250](https://github.com/josdejong/lossless-json/issues/250) replace the `JavaScriptValue` type definition with `unknown`, which is more accurate ([6033fec](https://github.com/josdejong/lossless-json/commit/6033fec2cf5b8064e5eff1ee3dfa8e3c951f98f8))
+* drop official support for node.js 16 ([ee88c4a](https://github.com/josdejong/lossless-json/commit/ee88c4ab36ca5034436d1b11c4aac2be1461478e))
+* for backward compatibility, keep the JavaScriptValue types there and mark them deprecated ([bb92e3f](https://github.com/josdejong/lossless-json/commit/bb92e3f1ec1d304a0d024b35893966bf507307bd))
+* replace `JavaScriptValue` with `unknown`, which is more accurate (see [#250](https://github.com/josdejong/lossless-json/issues/250)) ([94d2503](https://github.com/josdejong/lossless-json/commit/94d250311b6035de2b8700e7eaf7c9ba0b4639fc))
+
 ### [2.0.11](https://github.com/josdejong/lossless-json/compare/v2.0.10...v2.0.11) (2023-07-12)
 
 
