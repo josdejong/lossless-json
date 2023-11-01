@@ -6,6 +6,26 @@ export type JSONValue =
 export type JSONObject = { [key: string]: JSONValue }
 export type JSONArray = JSONValue[]
 
+/**
+ * @deprecated use `unknown` instead
+ */
+export type JavaScriptPrimitive = unknown
+
+/**
+ * @deprecated use `unknown` instead
+ */
+export type JavaScriptValue = unknown
+
+/**
+ * @deprecated use `unknown` instead
+ */
+export type JavaScriptObject = unknown
+
+/**
+ * @deprecated use `unknown` instead
+ */
+export type JavaScriptArray = unknown
+
 export type Reviver = (key: string, value: JSONValue) => unknown
 
 export type NumberParser = (value: string) => unknown
