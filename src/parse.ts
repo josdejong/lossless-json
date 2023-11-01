@@ -1,7 +1,7 @@
 import { parseLosslessNumber } from './numberParsers.js'
 import { revive } from './revive.js'
 import type { NumberParser, Reviver } from './types'
-import { GenericObject, JavaScriptValue } from './types'
+import { GenericObject } from './types'
 
 /**
  * The LosslessJSON.parse() method parses a string as JSON, optionally transforming
@@ -29,7 +29,7 @@ export function parse(
   text: string,
   reviver?: Reviver,
   parseNumber: NumberParser = parseLosslessNumber
-): JavaScriptValue {
+): unknown {
   let i = 0
   const value = parseValue()
   expectValue(value)

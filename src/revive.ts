@@ -29,11 +29,7 @@ function reviveValue(
   } else if (value && typeof value === 'object' && !isLosslessNumber(value)) {
     // note the special case for LosslessNumber,
     // we don't want to iterate over the internals of a LosslessNumber
-    return reviver.call(
-      context,
-      key,
-      reviveObject(value as unknown as GenericObject<unknown>, reviver)
-    )
+    return reviver.call(context, key, reviveObject(value as GenericObject<unknown>, reviver))
   } else {
     return reviver.call(context, key, value)
   }

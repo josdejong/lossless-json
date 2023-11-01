@@ -217,11 +217,11 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
 
 - **@param** `{string} text`
   The string to parse as JSON. See the JSON object for a description of JSON syntax.
-- **@param** `{(key: string, value: JSONValue) => JavaScriptValue} [reviver]`
+- **@param** `{(key: string, value: JSONValue) => unknown} [reviver]`
   If a function, prescribes how the value originally produced by parsing is transformed, before being returned.
-- **@param** `{function(value: string) : JavaScriptValue} [parseNumber]`
+- **@param** `{function(value: string) : unknown} [parseNumber]`
   Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
-- **@returns** `{JavaScriptValue}`
+- **@returns** `{unknown}`
   Returns the Object corresponding to the given JSON text.
 - **@throws** Throws a SyntaxError exception if the string to parse is not valid JSON.
 
@@ -229,13 +229,13 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
 
 The `LosslessJSON.stringify()` function converts a JavaScript value to a JSON string, optionally replacing values if a replacer function is specified, or optionally including only the specified properties if a replacer array is specified.
 
-- **@param** `{JavaScriptValue} value`
+- **@param** `{unknown} value`
   The value to convert to a JSON string.
-- **@param** `{((key: string, value: JavaScriptValue) => JSONValue) | Array.<string | number>} [replacer]`
+- **@param** `{((key: string, value: unknown) => unknown) | Array.<string | number>} [replacer]`
   A function that alters the behavior of the stringification process, or an array with strings or numbers that serve as a whitelist for selecting the properties of the value object to be included in the JSON string. If this value is `null` or not provided, all properties of the object are included in the resulting JSON string.
 - **@param** `{number | string | undefined} [space]`
   A `string` or `number` that is used to insert white space into the output JSON string for readability purposes. If this is a `number`, it indicates the number of space characters to use as white space. Values less than 1 indicate that no space should be used. If this is a `string`, the `string` is used as white space. If this parameter is not provided (or is `null`), no white space is used.
-- **@param** `{Array<{test: (value: JavaScriptValue) => boolean, stringify: (value: JavaScriptValue) => string}>} [numberStringifiers]`
+- **@param** `{Array<{test: (value: unknown) => boolean, stringify: (value: unknown) => string}>} [numberStringifiers]`
   An optional list with additional number stringifiers, for example to serialize a `BigNumber`. The output of the function must be valid stringified JSON number. When `undefined` is returned, the property will be deleted from the object. The difference with using a `replacer` is that the output of a `replacer` must be JSON and will be stringified afterwards, whereas the output of the `numberStringifiers` is already stringified JSON.
 - **@returns** `{string | undefined}`
   Returns the string representation of the JSON object.

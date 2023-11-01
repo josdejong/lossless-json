@@ -7,7 +7,7 @@ import {
   reviveDate,
   stringify
 } from '../src'
-import { GenericObject, JSONValue } from '../src/types'
+import { GenericObject } from '../src/types'
 import { isDeepEqual } from '../src/parse'
 
 // helper function to create a lossless number
@@ -21,7 +21,7 @@ function expectDeepEqual(a: unknown, b: unknown) {
 }
 
 // turn a JavaScript object into plain JSON
-function jsonify(obj: unknown): JSONValue {
+function jsonify(obj: unknown): unknown {
   return JSON.parse(JSON.stringify(obj))
 }
 
@@ -115,7 +115,7 @@ test('reviver - replace values', function () {
     }
   }
 
-  function reviver(key: string, value: JSONValue) {
+  function reviver(key: string, value: unknown) {
     return {
       type: typeof value,
       value
@@ -129,9 +129,9 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   const text = '{"a":123,"b":"str","c":null,"22":22,"d":false,"e":[1,2,3]}'
 
   interface Log {
-    context: JSONValue
+    context: unknown
     key: string
-    value: JSONValue
+    value: unknown
   }
 
   const expected: Log[] = [
@@ -192,7 +192,7 @@ test('reviver - invoke callbacks with key/value and correct context', function (
     return JSON.parse(stringify(json))
   }
 
-  function reviver(key: string, value: JSONValue) {
+  function reviver(key: string, value: unknown): unknown {
     return key === 'd' ? undefined : key === '1' ? null : value
   }
 
