@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import Decimal from 'decimal.js'
 import {
   isLosslessNumber,
@@ -6,9 +7,9 @@ import {
   parseNumberAndBigInt,
   reviveDate,
   stringify
-} from '../src'
-import { GenericObject } from '../src/types'
-import { isDeepEqual } from '../src/parse'
+} from './index'
+import { GenericObject } from './types'
+import { isDeepEqual } from './parse'
 
 // helper function to create a lossless number
 function lln(value: string) {

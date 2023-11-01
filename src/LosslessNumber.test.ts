@@ -1,4 +1,5 @@
-import { isLosslessNumber, LosslessNumber, toLosslessNumber } from '../src'
+import { test, expect } from 'vitest'
+import { isLosslessNumber, LosslessNumber, toLosslessNumber } from './index'
 
 test('create a LosslessNumber from string', function () {
   const n = new LosslessNumber('42')

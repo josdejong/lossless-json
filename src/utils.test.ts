@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest'
 import {
   extractSignificantDigits,
   getUnsafeNumberReason,
@@ -6,7 +7,7 @@ import {
   isSafeNumber,
   toSafeNumberOrThrow,
   UnsafeNumberReason
-} from '../src/utils'
+} from './utils'
 
 test('isInteger', () => {
   expect(isInteger('4250')).toEqual(true)

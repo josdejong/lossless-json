@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest'
 import {
   getUnsafeNumberReason,
   isInteger,
@@ -12,7 +13,7 @@ import {
   stringify,
   toLosslessNumber,
   toSafeNumberOrThrow
-} from '../src'
+} from './index'
 
 test('Public API', function () {
   expect(parse('{}')).toEqual({})

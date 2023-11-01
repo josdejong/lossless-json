@@ -1,6 +1,7 @@
+import { test, expect } from 'vitest'
 import Decimal from 'decimal.js'
-import { LosslessNumber, stringify } from '../src'
-import type { GenericObject } from '../src/types'
+import { LosslessNumber, stringify } from './index'
+import type { GenericObject } from './types'
 
 // helper function to create a lossless number
 function lln(value: string) {

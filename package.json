@@ -19,8 +19,9 @@
     "url": "https://github.com/josdejong/lossless-json.git"
   },
   "scripts": {
-    "test": "jest --rootDir=test --runInBand",
-    "lint": "prettier --check . && eslint src/**/*.ts test/**/*.ts test-lib/**/*.mjs tools/**/*.mjs",
+    "test": "vitest watch src",
+    "test-ci": "vitest run src",
+    "lint": "prettier --check . && eslint src/**/*.ts test-lib/**/*.mjs tools/**/*.mjs",
     "format": "prettier --write . && npm run lint -- --fix",
     "build": "npm-run-all build:**",
     "build:clean": "del-cli lib",
@@ -29,8 +30,8 @@
     "build:umd": "rollup --config rollup.config.mjs",
     "build:umd:cpy": "cpy tools/cjs/package.json lib/umd --flat",
     "build:types": "tsc --project tsconfig-types.json",
-    "build:validate": "jest --rootDir='test-lib' --runInBand",
-    "build-and-test": "npm test && npm run lint && npm run build",
+    "build:validate": "vitest run test-lib",
+    "build-and-test": "npm run test-ci && npm run lint && npm run build",
     "release": "npm-run-all release:**",
     "release:build-and-test": "npm run build-and-test",
     "release:version": "standard-version",
@@ -64,7 +65,6 @@
     "@commitlint/config-conventional": "18.1.0",
     "@rollup/plugin-terser": "0.4.4",
     "@types/benchmark": "2.1.4",
-    "@types/jest": "29.5.7",
     "@types/node": "20.8.10",
     "@typescript-eslint/eslint-plugin": "6.9.1",
     "@typescript-eslint/parser": "6.9.1",
@@ -79,12 +79,10 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "6.1.1",
     "husky": "8.0.3",
-    "jest": "29.7.0",
     "npm-run-all": "4.1.5",
     "prettier": "3.0.3",
     "rollup": "4.2.0",
     "standard-version": "9.5.0",
-    "ts-jest": "29.1.1",
     "typescript": "5.2.2"
   },
   "files": [
@@ -93,5 +91,8 @@
     "HISTORY.md",
     "LICENSE.md",
     "README.md"
-  ]
+  ],
+  "dependencies": {
+    "vitest": "0.34.6"
+  }
 }
