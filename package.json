@@ -83,7 +83,8 @@
     "prettier": "3.0.3",
     "rollup": "4.2.0",
     "standard-version": "9.5.0",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "vitest": "0.34.6"
   },
   "files": [
     "dist",
@@ -91,8 +92,5 @@
     "HISTORY.md",
     "LICENSE.md",
     "README.md"
-  ],
-  "dependencies": {
-    "vitest": "0.34.6"
-  }
+  ]
 }
