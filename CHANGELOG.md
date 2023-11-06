@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/josdejong/lossless-json/compare/v3.0.0...v3.0.1) (2023-11-06)
+
+
+### Bug Fixes
+
+* [#252](https://github.com/josdejong/lossless-json/issues/252) move `vitest` from `dependencies` to `devDependencies` ([2732ecc](https://github.com/josdejong/lossless-json/commit/2732ecc6930fefe85c931c857f4f69da0b852ccc))
+
 ## [3.0.0](https://github.com/josdejong/lossless-json/compare/v2.0.11...v3.0.0) (2023-11-01)
 
 

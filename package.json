@@ -1,6 +1,6 @@
 {
   "name": "lossless-json",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Parse JSON without risk of losing numeric information",
   "main": "lib/umd/lossless-json.js",
   "module": "lib/esm/index.js",
