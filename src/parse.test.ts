@@ -388,7 +388,15 @@ describe('throw meaningful exceptions', () => {
     },
     { input: 'foo', expectedError: "JSON value expected but got 'f' at position 0" },
     { input: '"\\a"', expectedError: "Invalid escape character '\\a' at position 1" },
-    { input: '"\\u26"', expectedError: "Invalid unicode character '\\u26' at position 1" },
+    { input: '"\\u2', expectedError: "Invalid unicode character '\\u2' at position 1" },
+    { input: '"\\u26', expectedError: "Invalid unicode character '\\u26' at position 1" },
+    { input: '"\\u260', expectedError: "Invalid unicode character '\\u260' at position 1" },
+    {
+      input: '"\\u2605',
+      expectedError: "End of string '\"' expected but reached end of input at position 7"
+    },
+    { input: '{"s \\ud', expectedError: "Invalid unicode character '\\ud' at position 4" },
+    { input: '"\\u26"', expectedError: "Invalid unicode character '\\u26\"' at position 1" },
     { input: '"\\uZ000"', expectedError: "Invalid unicode character '\\uZ000' at position 1" }
   ]
 

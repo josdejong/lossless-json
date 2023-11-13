@@ -300,11 +300,7 @@ export function parse(
   }
 
   function throwInvalidUnicodeCharacter(start: number) {
-    let end = start + 2
-    while (/\w/.test(text[end])) {
-      end++
-    }
-    const chars = text.slice(start, end)
+    const chars = text.slice(start, start + 6)
     throw new SyntaxError(`Invalid unicode character '${chars}' ${pos()}`)
   }
 
