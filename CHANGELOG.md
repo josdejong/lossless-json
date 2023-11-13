@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.2](https://github.com/josdejong/lossless-json/compare/v3.0.1...v3.0.2) (2023-11-13)
+
+
+### Bug Fixes
+
+* crash when input ends with a truncated unicode character ([fe6a1e3](https://github.com/josdejong/lossless-json/commit/fe6a1e3d1cb92665b8a152fb0cf1686fb9e7ca25))
+
 ### [3.0.1](https://github.com/josdejong/lossless-json/compare/v3.0.0...v3.0.1) (2023-11-06)
 
 
