@@ -1,12 +1,4 @@
-export type JSONPrimitive = string | number | boolean | null
-export type JSONValue =
-  | { [key: string]: JSONValue } // object
-  | JSONValue[] // array
-  | JSONPrimitive
-export type JSONObject = { [key: string]: JSONValue }
-export type JSONArray = JSONValue[]
-
-export type Reviver = (key: string, value: JSONValue) => unknown
+export type Reviver = (key: string, value: unknown) => unknown
 
 export type NumberParser = (value: string) => unknown
 
@@ -20,6 +12,29 @@ export interface NumberStringifier {
 }
 
 export type GenericObject<T> = Record<string, T>
+
+/**
+ * @deprecated use `unknown` or `string | number | boolean | null` instead
+ */
+export type JSONPrimitive = string | number | boolean | null
+
+/**
+ * @deprecated use `unknown` instead
+ */
+export type JSONValue =
+  | { [key: string]: JSONValue } // object
+  | JSONValue[] // array
+  | JSONPrimitive
+
+/**
+ * @deprecated use `unknown` or a Record instead
+ */
+export type JSONObject = { [key: string]: JSONValue }
+
+/**
+ * @deprecated use `unknown` or an Array instead
+ */
+export type JSONArray = JSONValue[]
 
 /**
  * @deprecated use `unknown` instead

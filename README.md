@@ -217,7 +217,7 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
 
 - **@param** `{string} text`
   The string to parse as JSON. See the JSON object for a description of JSON syntax.
-- **@param** `{(key: string, value: JSONValue) => unknown} [reviver]`
+- **@param** `{(key: string, value: unknown) => unknown} [reviver]`
   If a function, prescribes how the value originally produced by parsing is transformed, before being returned.
 - **@param** `{function(value: string) : unknown} [parseNumber]`
   Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
