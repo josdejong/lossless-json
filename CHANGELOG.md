@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/josdejong/lossless-json/compare/v3.0.2...v4.0.0) (2023-12-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* The usages of types `JSONValue`, `JSONObject`, `JSONArray`, and `JSONPrimitive`
+must be replaced with `unknown`. Only relevant when using a `replacer`.
+
+### Bug Fixes
+
+* replace `JSONValue` with `unknown` ([7f4d81b](https://github.com/josdejong/lossless-json/commit/7f4d81be5f18376f94f2fb8de9ca8da933243635))
+
 ### [3.0.2](https://github.com/josdejong/lossless-json/compare/v3.0.1...v3.0.2) (2023-11-13)
 
 
