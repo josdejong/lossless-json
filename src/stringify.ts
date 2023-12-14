@@ -37,7 +37,7 @@ import { isNumber } from './utils.js'
  */
 export function stringify(
   value: unknown,
-  replacer?: Replacer,
+  replacer?: Replacer | null,
   space?: number | string,
   numberStringifiers?: NumberStringifier[]
 ): string | undefined {
@@ -51,11 +51,11 @@ export function stringify(
   /**
    * Stringify a value
    */
-  function stringifyValue(value: unknown, indent: string): string | undefined {
+  function stringifyValue(value: unknown, indent: string | undefined): string | undefined {
     if (Array.isArray(numberStringifiers)) {
       const stringifier = numberStringifiers.find((item) => item.test(value))
       if (stringifier) {
-        const str = stringifier.stringify(value)
+        const str: unknown = stringifier.stringify(value)
         if (typeof str !== 'string' || !isNumber(str)) {
           throw new Error(
             'Invalid JSON number: ' +
@@ -109,7 +109,7 @@ export function stringify(
   /**
    * Stringify an array
    */
-  function stringifyArray(array: Array<unknown>, indent: string): string {
+  function stringifyArray(array: Array<unknown>, indent: string | undefined): string {
     if (array.length === 0) {
       return '[]'
     }
@@ -143,7 +143,10 @@ export function stringify(
   /**
    * Stringify an object
    */
-  function stringifyObject(object: GenericObject<unknown>, indent: string): string {
+  function stringifyObject(
+    object: GenericObject<unknown>,
+    indent: string | undefined
+  ): string | undefined {
     if (typeof object.toJSON === 'function') {
       return stringify(object.toJSON(), replacer, space, undefined)
     }

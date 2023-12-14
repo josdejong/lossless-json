@@ -69,7 +69,7 @@ test('number', function () {
   expect(parse('23')).toEqual(lln('23'))
   expect(parse('0')).toEqual(lln('0'))
   expect(parse('0e+2')).toEqual(lln('0e+2'))
-  expect(parse('0e+2').valueOf()).toEqual(0)
+  expect((parse('0e+2') as LosslessNumber).valueOf()).toEqual(0)
   expect(parse('0.0')).toEqual(lln('0.0'))
   expect(parse('-0')).toEqual(lln('-0'))
   expect(parse('2.3')).toEqual(lln('2.3'))
@@ -190,7 +190,8 @@ test('reviver - invoke callbacks with key/value and correct context', function (
 
   // convert LosslessNumbers to numbers for easy comparison with native JSON
   function toRegularJSON(json: unknown) {
-    return JSON.parse(stringify(json))
+    const str = stringify(json)
+    return str !== undefined ? JSON.parse(str) : undefined
   }
 
   function reviver(key: string, value: unknown): unknown {
@@ -211,6 +212,8 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   const logsActual: Log[] = []
   parse(text, function (key, value) {
     logsActual.push({
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
       context: toRegularJSON(this),
       key,
       value: toRegularJSON(value)

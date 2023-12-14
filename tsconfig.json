@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "allowJs": false,
     "checkJs": false,
+    "strict": true,
     "noImplicitAny": true,
     "declaration": true,
     "declarationDir": "lib/types",

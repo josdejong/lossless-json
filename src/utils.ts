@@ -110,7 +110,7 @@ export function toSafeNumberOrThrow(
       ? unsafeReason && unsafeReason !== UnsafeNumberReason.truncate_float
       : unsafeReason
   ) {
-    const unsafeReasonText = unsafeReason.replace(/_\w+$/, '')
+    const unsafeReasonText = unsafeReason?.replace(/_\w+$/, '')
     throw new Error(
       'Cannot safely convert to number: ' +
         `the value '${value}' would ${unsafeReasonText} and become ${number}`

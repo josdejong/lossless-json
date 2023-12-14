@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest'
 import Decimal from 'decimal.js'
-import { LosslessNumber, stringify } from './index'
+import { LosslessNumber, NumberStringifier, stringify } from './index'
 import type { GenericObject } from './types'
 
 // helper function to create a lossless number
@@ -10,6 +10,8 @@ function lln(value: string) {
 
 test('stringify', function () {
   expect(stringify(undefined)).toEqual(undefined)
+  expect(stringify(function () {})).toEqual(undefined)
+  expect(stringify(Symbol('test'))).toEqual(undefined)
 
   expect(stringify(null)).toEqual('null')
 
@@ -106,9 +108,9 @@ test('stringify Date', function () {
 })
 
 test('stringify Decimal', function () {
-  const decimalStringifier = {
-    test: (value: string) => Decimal.isDecimal(value),
-    stringify: (value: string) => value.toString()
+  const decimalStringifier: NumberStringifier = {
+    test: (value: unknown) => Decimal.isDecimal(value),
+    stringify: (value: unknown) => (value as Decimal).toString()
   }
   const numberStringifiers = [decimalStringifier]
 
@@ -135,8 +137,8 @@ test('should not have a .toJSON method implemented', function () {
 
 test('should throw an error when the output of a number stringifier is not a number', function () {
   const wrongStringifier = {
-    test: (value: string) => typeof value === 'number',
-    stringify: (value: string) => 'oopsie' + value // <-- does not return a valid number
+    test: (value: unknown) => typeof value === 'number',
+    stringify: (value: unknown) => 'oopsie' + value // <-- does not return a valid number
   }
 
   expect(() => stringify([4], undefined, undefined, [wrongStringifier])).toThrow(
@@ -207,6 +209,8 @@ test('stringify with replacer function', function () {
 
   const logs: Log[] = []
   stringify(json, function (key, value) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     logs.push({ context: this, key, value })
     return value
   })

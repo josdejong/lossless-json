@@ -27,7 +27,7 @@ import { GenericObject } from './types'
  */
 export function parse(
   text: string,
-  reviver?: Reviver,
+  reviver?: Reviver | null,
   parseNumber: NumberParser = parseLosslessNumber
 ): unknown {
   let i = 0
@@ -57,6 +57,7 @@ export function parse(
         const key = parseString()
         if (key === undefined) {
           throwObjectKeyExpected()
+          return // To make TS happy
         }
 
         skipWhitespace()
@@ -65,6 +66,7 @@ export function parse(
 
         if (value === undefined) {
           throwObjectValueExpected()
+          return // To make TS happy
         }
 
         // TODO: test deep equal instead of strict equal
