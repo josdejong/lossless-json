@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.1](https://github.com/josdejong/lossless-json/compare/v4.0.0...v4.0.1) (2023-12-14)
+
+
+### Bug Fixes
+
+* allow replacer and reviver to be `null` ([b280774](https://github.com/josdejong/lossless-json/commit/b2807742f05f01f583632a982743388ba68ae2e5))
+
 ## [4.0.0](https://github.com/josdejong/lossless-json/compare/v3.0.2...v4.0.0) (2023-12-13)
 
 
