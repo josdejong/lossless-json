@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.2](https://github.com/josdejong/lossless-json/compare/v4.0.1...v4.0.2) (2024-09-18)
+
+
+### Bug Fixes
+
+* use `Number.parseFloat`, `Number.parseInt`, etc and use string templates consistently ([af946b1](https://github.com/josdejong/lossless-json/commit/af946b11688bc7c22da382b08692c269d3a3e57e))
+
 ### [4.0.1](https://github.com/josdejong/lossless-json/compare/v4.0.0...v4.0.1) (2023-12-14)
 
 
