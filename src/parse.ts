@@ -1,7 +1,7 @@
 import { parseLosslessNumber } from './numberParsers.js'
 import { revive } from './revive.js'
 import type { NumberParser, Reviver } from './types'
-import { GenericObject } from './types'
+import type { GenericObject } from './types'
 
 /**
  * The LosslessJSON.parse() method parses a string as JSON, optionally transforming
@@ -164,7 +164,7 @@ export function parse(
               isHex(text.charCodeAt(i + 4)) &&
               isHex(text.charCodeAt(i + 5))
             ) {
-              result += String.fromCharCode(parseInt(text.slice(i + 2, i + 6), 16))
+              result += String.fromCharCode(Number.parseInt(text.slice(i + 2, i + 6), 16))
               i += 5
             } else {
               throwInvalidUnicodeCharacter(i)
@@ -316,7 +316,7 @@ export function parse(
   }
 
   function gotAt(): string {
-    return got() + ' ' + pos()
+    return `${got()} ${pos()}`
   }
 }
 

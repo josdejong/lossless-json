@@ -1,11 +1,11 @@
-import { test, expect } from 'vitest'
+import { expect, test } from 'vitest'
 import {
+  LosslessNumber,
   getUnsafeNumberReason,
   isInteger,
   isLosslessNumber,
   isNumber,
   isSafeNumber,
-  LosslessNumber,
   parse,
   parseLosslessNumber,
   parseNumberAndBigInt,
@@ -15,7 +15,7 @@ import {
   toSafeNumberOrThrow
 } from './index'
 
-test('Public API', function () {
+test('Public API', () => {
   expect(parse('{}')).toEqual({})
   expect(stringify({})).toEqual('{}')
   expect(new LosslessNumber('2').isLosslessNumber).toBe(true)

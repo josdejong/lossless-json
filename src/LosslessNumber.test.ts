@@ -1,13 +1,13 @@
-import { test, expect } from 'vitest'
-import { isLosslessNumber, LosslessNumber, toLosslessNumber } from './index'
+import { expect, test } from 'vitest'
+import { LosslessNumber, isLosslessNumber, toLosslessNumber } from './index'
 
-test('create a LosslessNumber from string', function () {
+test('create a LosslessNumber from string', () => {
   const n = new LosslessNumber('42')
   expect(n.isLosslessNumber).toBe(true)
   expect(n.value).toBe('42')
 })
 
-test('throw an error when when creating a LosslessNumber from invalid string', function () {
+test('throw an error when when creating a LosslessNumber from invalid string', () => {
   // invalid
   expect(() => new LosslessNumber('a')).toThrow(/Invalid number/)
   expect(() => new LosslessNumber('22.')).toThrow(/Invalid number/)
@@ -24,7 +24,7 @@ test('throw an error when when creating a LosslessNumber from invalid string', f
   expect(new LosslessNumber('-42E-4').toString()).toEqual('-42E-4')
 })
 
-test('test whether something is a LosslessNumber', function () {
+test('test whether something is a LosslessNumber', () => {
   const n = new LosslessNumber('42')
   expect(isLosslessNumber(n)).toBe(true)
   expect(isLosslessNumber(42)).toBe(false)
@@ -34,17 +34,17 @@ test('test whether something is a LosslessNumber', function () {
   expect(isLosslessNumber(undefined)).toBe(false)
 })
 
-test('create a LosslessNumber from number', function () {
+test('create a LosslessNumber from number', () => {
   expect(toLosslessNumber(42)).toEqual(new LosslessNumber('42'))
   expect(toLosslessNumber(2.47)).toEqual(new LosslessNumber('2.47'))
 
   expect(() => toLosslessNumber(2 / 3)).toThrow('Invalid number: contains more than 15 digits')
-  expect(() => toLosslessNumber(NaN)).toThrow('Invalid number: NaN')
-  expect(() => toLosslessNumber(Infinity)).toThrow('Invalid number: Infinity')
-  expect(() => toLosslessNumber(-Infinity)).toThrow('Invalid number: -Infinity')
+  expect(() => toLosslessNumber(Number.NaN)).toThrow('Invalid number: NaN')
+  expect(() => toLosslessNumber(Number.POSITIVE_INFINITY)).toThrow('Invalid number: Infinity')
+  expect(() => toLosslessNumber(Number.NEGATIVE_INFINITY)).toThrow('Invalid number: -Infinity')
 })
 
-test('use LosslessNumber.valueOf()', function () {
+test('use LosslessNumber.valueOf()', () => {
   // safe number
   expect(new LosslessNumber('23.4').valueOf()).toBe(23.4)
   expect(new LosslessNumber('23e4').valueOf()).toBe(230000)
@@ -69,11 +69,10 @@ test('use LosslessNumber.valueOf()', function () {
 })
 
 test('can do operations like add a number and a LosslessNumber', () => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   expect(new LosslessNumber('3') + 2).toBe(5)
 })
 
-test('LosslessNumber - toString', function () {
+test('LosslessNumber - toString', () => {
   expect(new LosslessNumber('23.4').toString()).toBe('23.4')
 })

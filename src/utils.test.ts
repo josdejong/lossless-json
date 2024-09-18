@@ -1,12 +1,12 @@
-import { test, expect } from 'vitest'
+import { expect, test } from 'vitest'
 import {
+  UnsafeNumberReason,
   extractSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
   isNumber,
   isSafeNumber,
-  toSafeNumberOrThrow,
-  UnsafeNumberReason
+  toSafeNumberOrThrow
 } from './utils'
 
 test('isInteger', () => {

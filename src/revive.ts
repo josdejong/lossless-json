@@ -26,27 +26,29 @@ function reviveValue(
 ): unknown {
   if (Array.isArray(value)) {
     return reviver.call(context, key, reviveArray(value, reviver))
-  } else if (value && typeof value === 'object' && !isLosslessNumber(value)) {
+  }
+
+  if (value && typeof value === 'object' && !isLosslessNumber(value)) {
     // note the special case for LosslessNumber,
     // we don't want to iterate over the internals of a LosslessNumber
     return reviver.call(context, key, reviveObject(value as GenericObject<unknown>, reviver))
-  } else {
-    return reviver.call(context, key, value)
   }
+
+  return reviver.call(context, key, value)
 }
 
 /**
  * Revive the properties of an object
  */
 function reviveObject(object: GenericObject<unknown>, reviver: Reviver) {
-  Object.keys(object).forEach((key) => {
+  for (const key of Object.keys(object)) {
     const value = reviveValue(object, key, object[key], reviver)
     if (value !== undefined) {
       object[key] = value
     } else {
       delete object[key]
     }
-  })
+  }
 
   return object
 }
@@ -56,7 +58,7 @@ function reviveObject(object: GenericObject<unknown>, reviver: Reviver) {
  */
 function reviveArray(array: Array<unknown>, reviver: Reviver): Array<unknown> {
   for (let i = 0; i < array.length; i++) {
-    array[i] = reviveValue(array, i + '', array[i], reviver)
+    array[i] = reviveValue(array, String(i), array[i], reviver)
   }
 
   return array

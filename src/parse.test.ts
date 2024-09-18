@@ -1,15 +1,15 @@
-import { describe, test, expect } from 'vitest'
 import Decimal from 'decimal.js'
+import { describe, expect, test } from 'vitest'
 import {
-  isLosslessNumber,
   LosslessNumber,
+  isLosslessNumber,
   parse,
   parseNumberAndBigInt,
   reviveDate,
   stringify
 } from './index'
-import { GenericObject } from './types'
 import { isDeepEqual } from './parse'
+import type { GenericObject } from './types'
 
 // helper function to create a lossless number
 function lln(value: string) {
@@ -26,7 +26,7 @@ function jsonify(obj: unknown): unknown {
   return JSON.parse(JSON.stringify(obj))
 }
 
-test('full JSON object', function () {
+test('full JSON object', () => {
   const text = '{"a":2.3e100,"b":"str","c":null,"d":false,"e":[1,2,3]}'
   const expected: GenericObject<unknown> = {
     a: lln('2.3e100'),
@@ -40,7 +40,7 @@ test('full JSON object', function () {
   expect(jsonify(parsed)).toEqual(jsonify(expected))
 })
 
-test('object', function () {
+test('object', () => {
   expect(parse('{}')).toEqual({})
   expect(parse('  { \n } \t ')).toEqual({})
   expect(parse('{"a": {}}')).toEqual({ a: {} })
@@ -48,7 +48,7 @@ test('object', function () {
   expect(parse('{"a": 2}')).toEqual({ a: lln('2') })
 })
 
-test('array', function () {
+test('array', () => {
   expect(parse('[]')).toEqual([])
   expect(parse('[{}]')).toEqual([{}])
   expect(parse('{"a":[]}')).toEqual({ a: [] })
@@ -63,7 +63,7 @@ test('array', function () {
   ])
 })
 
-test('number', function () {
+test('number', () => {
   expect(isLosslessNumber(parse('2.3e500'))).toBe(true)
   expect(isLosslessNumber(parse('123456789012345678901234567890'))).toBe(true)
   expect(parse('23')).toEqual(lln('23'))
@@ -80,7 +80,7 @@ test('number', function () {
   expect(parse('2.3e-3')).toEqual(lln('2.3e-3'))
 })
 
-test('LosslessNumber', function () {
+test('LosslessNumber', () => {
   const str = '22222222222222222222'
   expectDeepEqual(parse(str), lln(str))
 
@@ -91,7 +91,7 @@ test('LosslessNumber', function () {
   expectDeepEqual(parse(str3), lln(str3))
 })
 
-test('string', function () {
+test('string', () => {
   expect(parse('"str"')).toEqual('str')
   expect(JSON.parse('"\\"\\\\\\/\\b\\f\\n\\r\\t"')).toEqual('"\\/\b\f\n\r\t')
   expect(parse('"\\"\\\\\\/\\b\\f\\n\\r\\t"')).toEqual('"\\/\b\f\n\r\t')
@@ -99,13 +99,13 @@ test('string', function () {
   expect(parse('"\\u260E"')).toEqual('\u260E')
 })
 
-test('keywords', function () {
+test('keywords', () => {
   expect(parse('true')).toEqual(true)
   expect(parse('false')).toEqual(false)
   expect(parse('null')).toEqual(null)
 })
 
-test('reviver - replace values', function () {
+test('reviver - replace values', () => {
   const text = '{"a":123,"b":"str"}'
 
   const expected = {
@@ -116,7 +116,7 @@ test('reviver - replace values', function () {
     }
   }
 
-  function reviver(key: string, value: unknown) {
+  function reviver(_key: string, value: unknown) {
     return {
       type: typeof value,
       value
@@ -126,7 +126,7 @@ test('reviver - replace values', function () {
   expect(parse(text, reviver)).toEqual(expected)
 })
 
-test('reviver - invoke callbacks with key/value and correct context', function () {
+test('reviver - invoke callbacks with key/value and correct context', () => {
   const text = '{"a":123,"b":"str","c":null,"22":22,"d":false,"e":[1,2,3]}'
 
   interface Log {
@@ -212,7 +212,6 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   const logsActual: Log[] = []
   parse(text, function (key, value) {
     logsActual.push({
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       context: toRegularJSON(this),
       key,
@@ -225,7 +224,7 @@ test('reviver - invoke callbacks with key/value and correct context', function (
   expect(logsActual).toEqual(expected)
 })
 
-test('correctly handle strings equaling a JSON delimiter', function () {
+test('correctly handle strings equaling a JSON delimiter', () => {
   expect(parse('""')).toEqual('')
   expect(parse('"["')).toEqual('[')
   expect(parse('"]"')).toEqual(']')
@@ -235,12 +234,12 @@ test('correctly handle strings equaling a JSON delimiter', function () {
   expect(parse('","')).toEqual(',')
 })
 
-test('reviver - revive a lossless number correctly', function () {
+test('reviver - revive a lossless number correctly', () => {
   const text = '2.3e+500'
   const expected = [{ key: '', value: lln('2.3e+500') }]
   const logs: Array<{ key: string; value: unknown }> = []
 
-  parse(text, function (key, value) {
+  parse(text, (key, value) => {
     logs.push({ key, value })
     return value
   })
@@ -287,7 +286,9 @@ test('supports unicode characters in a key', () => {
   expect(parse('{"★":true}')).toStrictEqual({ '★': true })
   expect(parse('{"\u2605":true}')).toStrictEqual({ '\u2605': true })
   expect(parse('{"😀":true}')).toStrictEqual({ '😀': true })
-  expect(parse('{"\ud83d\ude00":true}')).toStrictEqual({ '\ud83d\ude00': true })
+  expect(parse('{"\ud83d\ude00":true}')).toStrictEqual({
+    '\ud83d\ude00': true
+  })
 })
 
 test('throws an error when an invalid character is encountered in a string', () => {
@@ -311,10 +312,16 @@ test('does not throw a duplicate key error for build in methods like toString', 
 })
 
 test('does not throw a duplicate key error when the values are equal', () => {
-  expect(parse('{"name": "Joe", "name": "Joe"}')).toStrictEqual({ name: 'Joe' })
-  expect(parse('{"name": "Joe", "name": "Joe", "name": "Joe"}')).toStrictEqual({ name: 'Joe' })
+  expect(parse('{"name": "Joe", "name": "Joe"}')).toStrictEqual({
+    name: 'Joe'
+  })
+  expect(parse('{"name": "Joe", "name": "Joe", "name": "Joe"}')).toStrictEqual({
+    name: 'Joe'
+  })
 
-  expect(parse('{"age": 41, "age": 41}')).toStrictEqual({ age: new LosslessNumber('41') })
+  expect(parse('{"age": 41, "age": 41}')).toStrictEqual({
+    age: new LosslessNumber('41')
+  })
 
   expect(
     parse('{"address": {"city": "Rotterdam"}, "address": {"city": "Rotterdam"}}')
@@ -324,7 +331,9 @@ test('does not throw a duplicate key error when the values are equal', () => {
     scores: [new LosslessNumber('2.3'), new LosslessNumber('7.1')]
   })
 
-  expect(parse('{"scores": [2.3, 7.1], "scores": [2.3, 7.1]}', null, parseFloat)).toStrictEqual({
+  expect(
+    parse('{"scores": [2.3, 7.1], "scores": [2.3, 7.1]}', null, Number.parseFloat)
+  ).toStrictEqual({
     scores: [2.3, 7.1]
   })
 })
@@ -337,8 +346,14 @@ test('throw a duplicate key error when using a build in method name twice', () =
 
 describe('throw meaningful exceptions', () => {
   const cases = [
-    { input: '', expectedError: 'JSON value expected but reached end of input at position 0' },
-    { input: '  ', expectedError: 'JSON value expected but reached end of input at position 2' },
+    {
+      input: '',
+      expectedError: 'JSON value expected but reached end of input at position 0'
+    },
+    {
+      input: '  ',
+      expectedError: 'JSON value expected but reached end of input at position 2'
+    },
     {
       input: '{',
       expectedError:
@@ -352,8 +367,14 @@ describe('throw meaningful exceptions', () => {
       input: '{"a":}',
       expectedError: "Object value expected after ':' at position 5"
     },
-    { input: '{a:2}', expectedError: "Quoted object key expected but got 'a' at position 1" },
-    { input: '{"a":2,}', expectedError: "Quoted object key expected but got '}' at position 7" },
+    {
+      input: '{a:2}',
+      expectedError: "Quoted object key expected but got 'a' at position 1"
+    },
+    {
+      input: '{"a":2,}',
+      expectedError: "Quoted object key expected but got '}' at position 7"
+    },
     {
       input: '{"a" "b"}',
       expectedError: "Colon ':' expected after property name but got '\"' at position 5"
@@ -362,21 +383,39 @@ describe('throw meaningful exceptions', () => {
       input: '{"a":2 "b":3}',
       expectedError: "Comma ',' expected after value but got '\"' at position 7"
     },
-    { input: '{}{}', expectedError: "Expected end of input but got '{' at position 2" },
+    {
+      input: '{}{}',
+      expectedError: "Expected end of input but got '{' at position 2"
+    },
     {
       input: '[',
       expectedError:
         "Array item or end of array ']' expected but reached end of input at position 1"
     },
-    { input: '[2,]', expectedError: "Array item expected but got ']' at position 3" },
-    { input: '[2,,3]', expectedError: "Array item expected but got ',' at position 3" },
-    { input: '[2 3]', expectedError: "Comma ',' expected after value but got '3' at position 3" },
-    { input: '2.3.4', expectedError: "Expected end of input but got '.' at position 3" },
+    {
+      input: '[2,]',
+      expectedError: "Array item expected but got ']' at position 3"
+    },
+    {
+      input: '[2,,3]',
+      expectedError: "Array item expected but got ',' at position 3"
+    },
+    {
+      input: '[2 3]',
+      expectedError: "Comma ',' expected after value but got '3' at position 3"
+    },
+    {
+      input: '2.3.4',
+      expectedError: "Expected end of input but got '.' at position 3"
+    },
     {
       input: '2..3',
       expectedError: "Invalid number '2.', expecting a digit but got '.' at position 2"
     },
-    { input: '2e3.4', expectedError: "Expected end of input but got '.' at position 3" },
+    {
+      input: '2e3.4',
+      expectedError: "Expected end of input but got '.' at position 3"
+    },
     {
       input: '2e',
       expectedError: "Invalid number '2e', expecting a digit but reached end of input at position 2"
@@ -389,25 +428,49 @@ describe('throw meaningful exceptions', () => {
       input: '"a',
       expectedError: "End of string '\"' expected but reached end of input at position 2"
     },
-    { input: 'foo', expectedError: "JSON value expected but got 'f' at position 0" },
-    { input: '"\\a"', expectedError: "Invalid escape character '\\a' at position 1" },
-    { input: '"\\u2', expectedError: "Invalid unicode character '\\u2' at position 1" },
-    { input: '"\\u26', expectedError: "Invalid unicode character '\\u26' at position 1" },
-    { input: '"\\u260', expectedError: "Invalid unicode character '\\u260' at position 1" },
+    {
+      input: 'foo',
+      expectedError: "JSON value expected but got 'f' at position 0"
+    },
+    {
+      input: '"\\a"',
+      expectedError: "Invalid escape character '\\a' at position 1"
+    },
+    {
+      input: '"\\u2',
+      expectedError: "Invalid unicode character '\\u2' at position 1"
+    },
+    {
+      input: '"\\u26',
+      expectedError: "Invalid unicode character '\\u26' at position 1"
+    },
+    {
+      input: '"\\u260',
+      expectedError: "Invalid unicode character '\\u260' at position 1"
+    },
     {
       input: '"\\u2605',
       expectedError: "End of string '\"' expected but reached end of input at position 7"
     },
-    { input: '{"s \\ud', expectedError: "Invalid unicode character '\\ud' at position 4" },
-    { input: '"\\u26"', expectedError: "Invalid unicode character '\\u26\"' at position 1" },
-    { input: '"\\uZ000"', expectedError: "Invalid unicode character '\\uZ000' at position 1" }
+    {
+      input: '{"s \\ud',
+      expectedError: "Invalid unicode character '\\ud' at position 4"
+    },
+    {
+      input: '"\\u26"',
+      expectedError: "Invalid unicode character '\\u26\"' at position 1"
+    },
+    {
+      input: '"\\uZ000"',
+      expectedError: "Invalid unicode character '\\uZ000' at position 1"
+    }
   ]
 
-  cases.forEach(({ input, expectedError }) => {
+  for (const { input, expectedError } of cases) {
     test(`should throw when parsing '${input}'`, () => {
       expect(() => parse(input)).toThrow(expectedError)
     })
-  })
+  }
 })
 
 describe('isDeepEqual', () => {

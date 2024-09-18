@@ -6,5 +6,5 @@ export function parseLosslessNumber(value: string): LosslessNumber {
 }
 
 export function parseNumberAndBigInt(value: string): number | bigint {
-  return isInteger(value) ? BigInt(value) : parseFloat(value)
+  return isInteger(value) ? BigInt(value) : Number.parseFloat(value)
 }

@@ -31,7 +31,7 @@ export function isSafeNumber(
     approx: boolean
   }
 ): boolean {
-  const num = parseFloat(value)
+  const num = Number.parseFloat(value)
   const str = String(num)
 
   const v = extractSignificantDigits(value)
@@ -80,8 +80,8 @@ export function getUnsafeNumberReason(value: string): UnsafeNumberReason | undef
     return UnsafeNumberReason.truncate_integer
   }
 
-  const num = parseFloat(value)
-  if (!isFinite(num)) {
+  const num = Number.parseFloat(value)
+  if (!Number.isFinite(num)) {
     return UnsafeNumberReason.overflow
   }
 
@@ -102,7 +102,7 @@ export function toSafeNumberOrThrow(
     approx: boolean
   }
 ): number {
-  const number = parseFloat(value)
+  const number = Number.parseFloat(value)
 
   const unsafeReason = getUnsafeNumberReason(value)
   if (
@@ -112,8 +112,7 @@ export function toSafeNumberOrThrow(
   ) {
     const unsafeReasonText = unsafeReason?.replace(/_\w+$/, '')
     throw new Error(
-      'Cannot safely convert to number: ' +
-        `the value '${value}' would ${unsafeReasonText} and become ${number}`
+      `Cannot safely convert to number: the value '${value}' would ${unsafeReasonText} and become ${number}`
     )
   }
 

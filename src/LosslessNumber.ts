@@ -1,9 +1,9 @@
 import {
+  UnsafeNumberReason,
   extractSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
-  isNumber,
-  UnsafeNumberReason
+  isNumber
 } from './utils.js'
 
 /**
@@ -18,7 +18,7 @@ export class LosslessNumber {
 
   constructor(value: string) {
     if (!isNumber(value)) {
-      throw new Error('Invalid number (value: "' + value + '")')
+      throw new Error(`Invalid number (value: "${value}")`)
     }
 
     this.value = value
@@ -40,7 +40,7 @@ export class LosslessNumber {
 
     // safe or truncate_float
     if (unsafeReason === undefined || unsafeReason === UnsafeNumberReason.truncate_float) {
-      return parseFloat(this.value)
+      return Number.parseFloat(this.value)
     }
 
     // truncate_integer
@@ -50,8 +50,7 @@ export class LosslessNumber {
 
     // overflow or underflow
     throw new Error(
-      'Cannot safely convert to number: ' +
-        `the value '${this.value}' would ${unsafeReason} and become ${parseFloat(this.value)}`
+      `Cannot safely convert to number: the value '${this.value}' would ${unsafeReason} and become ${Number.parseFloat(this.value)}`
     )
   }
 
@@ -71,7 +70,6 @@ export class LosslessNumber {
  * Test whether a value is a LosslessNumber
  */
 export function isLosslessNumber(value: unknown): value is LosslessNumber {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return (value && typeof value === 'object' && value.isLosslessNumber === true) || false
 }
@@ -81,19 +79,18 @@ export function isLosslessNumber(value: unknown): value is LosslessNumber {
  * If the value has too many digits, or is NaN or Infinity, an error will be thrown
  */
 export function toLosslessNumber(value: number): LosslessNumber {
-  if (extractSignificantDigits(value + '').length > 15) {
+  if (extractSignificantDigits(String(value)).length > 15) {
     throw new Error(
-      'Invalid number: contains more than 15 digits and is most likely truncated and unsafe by itself ' +
-        `(value: ${value})`
+      `Invalid number: contains more than 15 digits and is most likely truncated and unsafe by itself (value: ${value})`
     )
   }
 
-  if (isNaN(value)) {
+  if (Number.isNaN(value)) {
     throw new Error('Invalid number: NaN')
   }
 
-  if (!isFinite(value)) {
-    throw new Error('Invalid number: ' + value)
+  if (!Number.isFinite(value)) {
+    throw new Error(`Invalid number: ${value}`)
   }
 
   return new LosslessNumber(String(value))

@@ -58,9 +58,7 @@ export function stringify(
         const str: unknown = stringifier.stringify(value)
         if (typeof str !== 'string' || !isNumber(str)) {
           throw new Error(
-            'Invalid JSON number: ' +
-              'output of a number stringifier must be a string containing a JSON number ' +
-              `(output: ${str})`
+            `Invalid JSON number: output of a number stringifier must be a string containing a JSON number (output: ${str})`
           )
         }
         return str
@@ -82,9 +80,8 @@ export function stringify(
     }
 
     // lossless number, the secret ingredient :)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (value && value.isLosslessNumber) {
+    if (value?.isLosslessNumber) {
       return value.toString()
     }
 
@@ -136,7 +133,7 @@ export function stringify(
       }
     }
 
-    str += resolvedSpace ? '\n' + indent + ']' : ']'
+    str += resolvedSpace ? `\n${indent}]` : ']'
     return str
   }
 
@@ -161,7 +158,7 @@ export function stringify(
     let first = true
     let str = resolvedSpace ? '{\n' : '{'
 
-    keys.forEach((key) => {
+    for (const key of keys) {
       const value =
         typeof replacer === 'function' ? replacer.call(object, key, object[key]) : object[key]
 
@@ -173,20 +170,20 @@ export function stringify(
         }
 
         const keyStr = JSON.stringify(key)
-        str += resolvedSpace ? childIndent + keyStr + ': ' : keyStr + ':'
+        str += resolvedSpace ? `${childIndent + keyStr}: ` : `${keyStr}:`
 
         str += stringifyValue(value, childIndent)
       }
-    })
+    }
 
-    str += resolvedSpace ? '\n' + indent + '}' : '}'
+    str += resolvedSpace ? `\n${indent}}` : '}'
     return str
   }
 
   /**
    * Test whether to include a property in a stringified object or not.
    */
-  function includeProperty(key: string, value: unknown): boolean {
+  function includeProperty(_key: string, value: unknown): boolean {
     return typeof value !== 'undefined' && typeof value !== 'function' && typeof value !== 'symbol'
   }
 }
