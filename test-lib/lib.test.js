@@ -1,14 +1,14 @@
+import { strictEqual } from 'node:assert'
+import cp from 'node:child_process'
+import path from 'node:path'
 import { describe, test } from 'vitest'
-import { strictEqual } from 'assert'
-import cp from 'child_process'
-import path from 'path'
 
 describe('lib', () => {
   test('should load the library using ESM', () =>
     new Promise((resolve) => {
       const filename = path.join(__dirname, 'apps/esmApp.mjs')
 
-      cp.exec(`node ${filename}`, function (error, result) {
+      cp.exec(`node ${filename}`, (error, result) => {
         strictEqual(error, null)
         strictEqual(
           result,
@@ -22,7 +22,7 @@ describe('lib', () => {
     new Promise((resolve) => {
       const filename = path.join(__dirname, 'apps/umdApp.cjs')
 
-      cp.exec(`node ${filename}`, function (error, result) {
+      cp.exec(`node ${filename}`, (error, result) => {
         strictEqual(error, null)
         strictEqual(
           result,

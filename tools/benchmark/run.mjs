@@ -1,6 +1,6 @@
-import { parse, stringify } from '../../lib/esm/index.js'
+import assert from 'node:assert'
 import Benchmark from 'benchmark'
-import assert from 'assert'
+import { parse, stringify } from '../../lib/esm/index.js'
 
 const text = generateText()
 console.log(`Document size: ${Math.round(text.length / 1024)} kB`)
@@ -16,7 +16,7 @@ suite
   .add('LosslessJSON.parse    ', () => parse(text))
   .add('        JSON.stringify', () => JSON.stringify(json))
   .add('LosslessJSON.stringify', () => stringify(losslessJSON))
-  .on('cycle', function (event) {
+  .on('cycle', (event) => {
     console.log(String(event.target))
   })
   .run()
@@ -34,7 +34,7 @@ function generateText(itemCount = 100) {
   const json = [...new Array(itemCount)].map((value, index) => {
     return {
       id: index,
-      name: 'Item ' + index,
+      name: `Item ${index}`,
       details: {
         description: 'Here we try out control characters and unicode',
         newline: 'Some text with a newline \n',
