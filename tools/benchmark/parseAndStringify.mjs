@@ -1,5 +1,4 @@
 import assert from 'node:assert'
-import Benchmark from 'benchmark'
 import { Bench } from 'tinybench'
 import { parse, stringify } from '../../lib/esm/index.js'
 
