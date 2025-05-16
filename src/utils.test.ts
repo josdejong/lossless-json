@@ -1,11 +1,13 @@
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import {
   UnsafeNumberReason,
+  compareNumber,
   extractSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
   isNumber,
   isSafeNumber,
+  splitNumber,
   toSafeNumberOrThrow
 } from './utils'
 
@@ -102,6 +104,81 @@ test('toSafeNumberOrThrow({ approx: true })', () => {
     "Cannot safely convert to number: the value '12345678901234567890' would truncate and become 12345678901234567000"
   )
   expect(toSafeNumberOrThrow('0.66666666666666666667', { approx: true })).toBe(0.6666666666666666)
+})
+
+describe('splitNumber', () => {
+  test.each([
+    { value: '0', expected: { sign: '', digits: '0', exponent: 0 } },
+    { value: '1', expected: { sign: '', digits: '1', exponent: 0 } },
+    { value: '2.3', expected: { sign: '', digits: '23', exponent: 0 } },
+    { value: '23.50', expected: { sign: '', digits: '235', exponent: 1 } },
+    { value: '-2.3', expected: { sign: '-', digits: '23', exponent: 0 } },
+    { value: '02.3', expected: { sign: '', digits: '23', exponent: 0 } },
+    { value: '2300', expected: { sign: '', digits: '23', exponent: 3 } },
+    { value: '0.00023', expected: { sign: '', digits: '23', exponent: -4 } },
+    { value: '000.0002300', expected: { sign: '', digits: '23', exponent: -4 } },
+    { value: '002300', expected: { sign: '', digits: '23', exponent: 3 } },
+    { value: '2.3e3', expected: { sign: '', digits: '23', exponent: 3 } },
+    { value: '2.3E3', expected: { sign: '', digits: '23', exponent: 3 } },
+    { value: '2.3e+3', expected: { sign: '', digits: '23', exponent: 3 } },
+    { value: '-2.3e3', expected: { sign: '-', digits: '23', exponent: 3 } },
+    { value: '23e3', expected: { sign: '', digits: '23', exponent: 4 } },
+    { value: '-23e3', expected: { sign: '-', digits: '23', exponent: 4 } },
+    { value: '2.3e-3', expected: { sign: '', digits: '23', exponent: -3 } },
+    { value: '23e-3', expected: { sign: '', digits: '23', exponent: -2 } },
+    { value: '000e+003', expected: { sign: '', digits: '0', exponent: 3 } },
+    { value: '-23e-3', expected: { sign: '-', digits: '23', exponent: -2 } },
+    { value: '99.99', expected: { sign: '', digits: '9999', exponent: 1 } },
+    { value: '-01200', expected: { sign: '-', digits: '12', exponent: 3 } }
+  ])(
+    'splitNumber($value) -> {sign: $expected.sign, digits: $expected.digits, exponent: $expected.exponent}',
+    ({ value, expected }) => {
+      expect(splitNumber(value)).toEqual(expected)
+    }
+  )
+
+  test('should throw an error when splitting invalid input', () => {
+    expect(() => splitNumber('')).toThrow('Invalid number')
+    expect(() => splitNumber('2.3.4')).toThrow('Invalid number')
+    expect(() => splitNumber('2e3.2')).toThrow('Invalid number')
+    expect(() => splitNumber('+2e3')).toThrow('Invalid number')
+    expect(() => splitNumber('  2  ')).toThrow('Invalid number')
+    expect(() => splitNumber('2a')).toThrow('Invalid number')
+    expect(() => splitNumber('--2')).toThrow('Invalid number')
+  })
+})
+
+describe('compareNumber', () => {
+  test.each([
+    { a: '0', b: '0', expected: 0 },
+    { a: '-0', b: '-0', expected: 0 },
+    { a: '-0', b: '0', expected: 0 },
+    { a: '0', b: '-0', expected: 0 },
+    { a: '1', b: '1', expected: 0 },
+    { a: '2', b: '3', expected: -1 },
+    { a: '3', b: '2', expected: 1 },
+    { a: '-3', b: '4', expected: -1 },
+    { a: '-3', b: '-4', expected: 1 },
+    { a: '3', b: '-4', expected: 1 },
+    { a: '777', b: '8', expected: 1 },
+    { a: '2e2', b: '200', expected: 0 },
+    { a: '2e2', b: '201', expected: -1 },
+    { a: '1e2', b: '1e3', expected: -1 },
+    { a: '1e2', b: '1e-3', expected: 1 },
+    { a: '1e-3', b: '1e2', expected: -1 },
+    { a: '1e2', b: '1e2', expected: 0 },
+    { a: '1e3', b: '1e2', expected: 1 },
+    { a: '2.30', b: '2.3', expected: 0 },
+    { a: '2.31', b: '2.3', expected: 1 },
+    { a: '2.299', b: '2.3', expected: -1 }
+  ])('compareNumber($a, $b) -> $expected', ({ a, b, expected }) => {
+    expect(compareNumber(a, b)).toEqual(expected)
+  })
+
+  test('should sort numbers using compareNumber', () => {
+    const values = ['4', '2.3', '-2.3', '0.025e2', '-1', '0']
+    expect(values.slice().sort(compareNumber)).toEqual(['-2.3', '-1', '0', '2.3', '0.025e2', '4'])
+  })
 })
 
 test('extractSignificantDigits', () => {

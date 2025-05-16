@@ -1,5 +1,6 @@
 import {
   UnsafeNumberReason,
+  compareNumber,
   extractSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
@@ -71,7 +72,7 @@ export class LosslessNumber {
  */
 export function isLosslessNumber(value: unknown): value is LosslessNumber {
   // @ts-ignore
-  return (value && typeof value === 'object' && value.isLosslessNumber === true) || false
+  return (value && typeof value === 'object' && value.isLosslessNumber) || false
 }
 
 /**
@@ -94,4 +95,13 @@ export function toLosslessNumber(value: number): LosslessNumber {
   }
 
   return new LosslessNumber(String(value))
+}
+
+/**
+ * Compare two lossless numbers.
+ * Returns 1 when a is larger than b, 0 when they are equal,
+ * and -1 when a is smaller than b.
+ */
+export function compareLosslessNumber(a: LosslessNumber, b: LosslessNumber): 1 | 0 | -1 {
+  return compareNumber(a.value, b.value)
 }

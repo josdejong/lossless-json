@@ -1,3 +1,5 @@
+import type { NumberSplit } from './types'
+
 /**
  * Test whether a string contains an integer number
  */
@@ -117,6 +119,71 @@ export function toSafeNumberOrThrow(
   }
 
   return number
+}
+
+/**
+ * Split a number into sign, digits, and exponent.
+ * The value can be constructed again from a split number by inserting a dot
+ * at the second character of the digits if there is more than one digit,
+ * prepending it with the sign, and appending the exponent like `e${exponent}`
+ */
+export function splitNumber(value: string): NumberSplit {
+  const match = value.match(/^(-?)(\d+\.?\d*)([eE]([+-]?\d+))?$/)
+  if (!match) {
+    throw new SyntaxError(`Invalid number: ${value}`)
+  }
+
+  const sign = match[1] as '-' | ''
+  const digitsStr = match[2]
+  let exponent = match[4] !== undefined ? Number.parseInt(match[4]) : 0
+
+  const dot = digitsStr.indexOf('.')
+  exponent += dot !== -1 ? dot - 1 : digitsStr.length - 1
+
+  const digits = digitsStr
+    .replace('.', '') // remove the dot (must be removed before removing leading zeros)
+    .replace(/^0*/, (zeros: string) => {
+      // remove leading zeros, add their count to the exponent
+      exponent -= zeros.length
+      return ''
+    })
+    .replace(/0*$/, '') // remove trailing zeros
+
+  return digits.length > 0
+    ? { sign, digits, exponent }
+    : { sign, digits: '0', exponent: exponent + 1 }
+}
+
+/**
+ * Compare two strings containing a numeric value
+ * Returns 1 when a is larger than b, 0 when they are equal,
+ * and -1 when a is smaller than b.
+ */
+export function compareNumber(a: string, b: string): 1 | 0 | -1 {
+  if (a === b) {
+    return 0
+  }
+
+  const aa = splitNumber(a)
+  const bb = splitNumber(b)
+
+  type Sign = -1 | 1
+
+  const sign: Sign = aa.sign === '-' ? -1 : 1
+
+  if (aa.sign !== bb.sign) {
+    if (aa.digits === '0' && bb.digits === '0') {
+      return 0
+    }
+
+    return sign
+  }
+
+  if (aa.exponent !== bb.exponent) {
+    return aa.exponent > bb.exponent ? sign : aa.exponent < bb.exponent ? (-sign as Sign) : 0
+  }
+
+  return aa.digits > bb.digits ? sign : aa.digits < bb.digits ? (-sign as Sign) : 0
 }
 
 /**

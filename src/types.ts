@@ -13,6 +13,12 @@ export interface NumberStringifier {
 
 export type GenericObject<T> = Record<string, T>
 
+export interface NumberSplit {
+  sign: '-' | ''
+  digits: string
+  exponent: number
+}
+
 /**
  * @deprecated use `unknown` or `string | number | boolean | null` instead
  */
