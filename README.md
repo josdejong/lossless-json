@@ -344,8 +344,7 @@ new LosslessNumber(value: number | string) : LosslessNumber
 - `splitNumber(value: string) : { sign: '-' | '', digits: string, exponent: number }`
   Split a number in its sign, digits, and exponent. For example `splitNumber("23.50")` returns `{sign: '', digits: '235', exp: 1 }`. The value can be constructed again from a split number by inserting a dot at the second character of the digits if there is more than one digit, prepending it with the sign, and appending the exponent like `e${exponent}`
 - `compareNumber(a: string, b: string) : -1 | 0 | 1`
-  Compare two strings containing a numeric value based on their numerical value. The function returns `1` when `a` is larger than `b`, `0` when they are equal,
-  and `-1` when `a` is smaller than `b`. This method works safely for large numbers, it does not use JavaScript's floating point `number` which has limited precision. 
+  Compare two strings containing a numeric value based on their numerical value. For example, the numeric value of `"5e3"` is larger than `"70"`, but comparing the string characters concludes otherwise. The function returns `1` when `a` is larger than `b`, `0` when they are equal,  and `-1` when `a` is smaller than `b`. This method works safely for large numbers, it does not use JavaScript's floating point `number` which has limited precision. 
 
 ## Alternatives
 
