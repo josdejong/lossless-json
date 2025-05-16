@@ -14,6 +14,8 @@ export {
   isNumber,
   isSafeNumber,
   toSafeNumberOrThrow,
-  getUnsafeNumberReason
+  getUnsafeNumberReason,
+  splitNumber,
+  compareNumber
 } from './utils.js'
 export * from './types.js'

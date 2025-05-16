@@ -71,7 +71,7 @@ export class LosslessNumber {
  */
 export function isLosslessNumber(value: unknown): value is LosslessNumber {
   // @ts-ignore
-  return (value && typeof value === 'object' && value.isLosslessNumber === true) || false
+  return (value && typeof value === 'object' && value.isLosslessNumber) || false
 }
 
 /**
