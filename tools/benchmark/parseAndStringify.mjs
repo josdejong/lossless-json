@@ -1,5 +1,6 @@
 import assert from 'node:assert'
 import Benchmark from 'benchmark'
+import { Bench } from 'tinybench'
 import { parse, stringify } from '../../lib/esm/index.js'
 
 const text = generateText()
@@ -10,16 +11,15 @@ const losslessJSON = parse(text)
 
 assert.deepStrictEqual(JSON.parse(stringify(losslessJSON)), json)
 
-const suite = new Benchmark.Suite('parse and stringify benchmark')
-suite
+const bench = new Bench({ time: 100 })
   .add('        JSON.parse    ', () => JSON.parse(text))
   .add('LosslessJSON.parse    ', () => parse(text))
   .add('        JSON.stringify', () => JSON.stringify(json))
   .add('LosslessJSON.stringify', () => stringify(losslessJSON))
-  .on('cycle', (event) => {
-    console.log(String(event.target))
-  })
-  .run()
+
+await bench.run()
+
+console.table(bench.table())
 
 /**
  * create a JSON document containing all different things that JSON can have:
