@@ -4,7 +4,8 @@ export { stringify } from './stringify.js'
 export {
   LosslessNumber,
   isLosslessNumber,
-  toLosslessNumber
+  toLosslessNumber,
+  compareLosslessNumber
 } from './LosslessNumber.js'
 export { reviveDate } from './reviveDate.js'
 export { parseLosslessNumber, parseNumberAndBigInt } from './numberParsers.js'

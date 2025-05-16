@@ -290,12 +290,15 @@ new LosslessNumber(value: number | string) : LosslessNumber
 ### Utility functions
 
 - `isInteger(value: string) : boolean`
+
   Test whether a string contains an integer value, like `'2300'` or `10`.
 
 - `isNumber(value: string) : boolean`
+
   Test whether a string contains a numeric value, like `'2.4'` or `'1.4e+3'`.
 
 - `isSafeNumber(value: string, config?: { approx: boolean }): boolean`
+
   Test whether a string contains a numeric value which can be safely represented by a JavaScript `number` without losing any information. Returns false when digits would be truncated of an integer or decimal, or when the number would overflow or underflow. When passing `{ approx: true }` as config, the function will be less strict and allow losing insignificant digits of a decimal value. Examples:
 
   ```js
@@ -309,24 +312,31 @@ new LosslessNumber(value: number | string) : LosslessNumber
   ```
 
 - `toSafeNumberOrThrow(value: string, config?: { approx: boolean }) : number`
+
   Convert a string into a number when it is safe to do so, otherwise throw an informative error.
 
 - `getUnsafeNumberReason(value): UnsafeNumberReason | undefined`
+
   When the provided `value` is an unsafe number, describe what the reason is: `overflow`, `underflow`, `truncate_integer`, `truncate_float`. Returns `undefined` when the value is safe.
 
 - `isLosslessNumber(value: unknown) : boolean`
+
   Test whether a value is a `LosslessNumber`.
 
 - `toLosslessNumber(value: number) : LosslessNumber`
+
   Convert a `number` into a `LosslessNumber`. The function will throw an exception when the `number` is exceeding the maximum safe limit of 15 digits (hence being truncated itself) or is `NaN` or `Infinity`.
 
 - `parseLosslessNumber(value: string) : LosslessNumber`
+
   The default `numberParser` used by `parse`. Creates a `LosslessNumber` from a string containing a numeric value.
 
 - `parseNumberAndBigInt(value: string) : number | bigint`
+
   A custom `numberParser` that can be used by `parse`. The parser will convert integer values into `bigint`, and converts al other values into a regular `number`.
 
 - `reviveDate(key, value)`
+
   Revive strings containing an ISO 8601 date string into a JavaScript `Date` object. This reviver is not turned on by default because there is a small risk of parsing a text field that _accidentally_ contains a date into a `Date`. Whether `reviveDate` is safe to use depends on the use case. Usage:
 
   ```js
@@ -342,9 +352,31 @@ new LosslessNumber(value: number | string) : LosslessNumber
   An alternative solution is to stringify a `Date` in a specific recognizable object like `{'$date':'2022-08-25T09:39:19.288Z'}`, and use a reviver and replacer to turn this object into a `Date` and vice versa.
 
 - `splitNumber(value: string) : { sign: '-' | '', digits: string, exponent: number }`
+
   Split a number in its sign, digits, and exponent. For example `splitNumber("23.50")` returns `{sign: '', digits: '235', exp: 1 }`. The value can be constructed again from a split number by inserting a dot at the second character of the digits if there is more than one digit, prepending it with the sign, and appending the exponent like `e${exponent}`
 - `compareNumber(a: string, b: string) : -1 | 0 | 1`
-  Compare two strings containing a numeric value based on their numerical value. For example, the numeric value of `"5e3"` is larger than `"70"`, but comparing the string characters concludes otherwise. The function returns `1` when `a` is larger than `b`, `0` when they are equal,  and `-1` when `a` is smaller than `b`. This method works safely for large numbers, it does not use JavaScript's floating point `number` which has limited precision. 
+
+  Compare two strings containing a numeric value based on their numerical value. For example, the numeric value of `"5e3"` is larger than `"70"`, but comparing the string characters concludes otherwise. The function returns `1` when `a` is larger than `b`, `0` when they are equal,  and `-1` when `a` is smaller than `b`. This method works safely for large numbers, it does not use JavaScript's floating point `number` which has limited precision.
+- `compareLosslessNumber(a: LosslessNumber, b: LosslessNumber) : -1 | 0 | 1`
+
+  Compare two lossless numbers numerically. The function returns `1` when `a` is larger than `b`, `0` when they are equal,  and `-1` when `a` is smaller than `b`. The compare function can be used to sort an array with `LosslessNumber` for example:
+
+  ```js
+  import { LosslessNumber, compareLosslessNumber } from 'lossless-json'
+  
+  const values = [
+    new LosslessNumber('5e3'),
+    new LosslessNumber('70'),
+    new LosslessNumber('0.02e5')
+  ]
+  
+  const sorted = values.toSorted(compareLosslessNumber)
+  // sorted = [
+  //  new LosslessNumber('70'),
+  //  new LosslessNumber('0.02e5'),
+  //  new LosslessNumber('5e3')
+  //]
+  ```
 
 ## Alternatives
 

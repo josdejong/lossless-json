@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { LosslessNumber, isLosslessNumber, toLosslessNumber } from './index'
+import { LosslessNumber, compareLosslessNumber, isLosslessNumber, toLosslessNumber } from './index'
 
 test('create a LosslessNumber from string', () => {
   const n = new LosslessNumber('42')
@@ -42,6 +42,10 @@ test('create a LosslessNumber from number', () => {
   expect(() => toLosslessNumber(Number.NaN)).toThrow('Invalid number: NaN')
   expect(() => toLosslessNumber(Number.POSITIVE_INFINITY)).toThrow('Invalid number: Infinity')
   expect(() => toLosslessNumber(Number.NEGATIVE_INFINITY)).toThrow('Invalid number: -Infinity')
+})
+
+test('compareLosslessNumber', () => {
+  expect(compareLosslessNumber(new LosslessNumber('5e3'), new LosslessNumber('70'))).toEqual(1)
 })
 
 test('use LosslessNumber.valueOf()', () => {
