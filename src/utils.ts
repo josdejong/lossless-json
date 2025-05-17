@@ -36,10 +36,14 @@ export function isSafeNumber(
   const num = Number.parseFloat(value)
   const str = String(num)
 
-  const v = extractSignificantDigits(value)
-  const s = extractSignificantDigits(str)
+  if (value === str) {
+    return true
+  }
 
-  if (v === s) {
+  const valueDigits = countSignificantDigits(value)
+  const strDigits = countSignificantDigits(str)
+
+  if (valueDigits === strDigits) {
     return true
   }
 
@@ -49,11 +53,7 @@ export function isSafeNumber(
     // 2. it has at least 14 digits
     // 3. the first 14 digits are equal
     const requiredDigits = 14
-    if (
-      !isInteger(value) &&
-      s.length >= requiredDigits &&
-      v.startsWith(s.substring(0, requiredDigits))
-    ) {
+    if (strDigits >= requiredDigits && !isInteger(value)) {
       return true
     }
   }
@@ -187,32 +187,40 @@ export function compareNumber(a: string, b: string): 1 | 0 | -1 {
 }
 
 /**
- * Get the significant digits of a number.
+ * Count the significant digits of a number.
  *
  * For example:
- *   '2.34' returns '234'
- *   '-77' returns '77'
- *   '0.003400' returns '34'
- *   '120.5e+30' returns '1205'
+ *   '2.34' returns 3
+ *   '-77' returns 2
+ *   '0.003400' returns 2
+ *   '120.5e+30' returns 4
  **/
-export function extractSignificantDigits(value: string): string {
-  return (
-    value
-      // from "-0.250e+30" to "-0.250"
-      .replace(EXPONENTIAL_PART_REGEX, '')
+export function countSignificantDigits(value: string): number {
+  let start = 0
+  if (value[0] === '-') {
+    start++
+  }
+  while (value[start] === '0' || value[start] === '.') {
+    start++
+  }
 
-      // from "-0.250" to "-0250"
-      .replace(DOT_REGEX, '')
+  let end = value.lastIndexOf('e')
+  if (end === -1) {
+    end = value.lastIndexOf('E')
+  }
+  if (end === -1) {
+    end = value.length
+  }
+  while (value[end - 1] === '0' || value[end - 1] === '.') {
+    end--
+  }
 
-      // from "-0250" to "-025"
-      .replace(TRAILING_ZEROS_REGEX, '')
+  let digits = end >= start ? end - start : 0
 
-      // from "-025" to "25"
-      .replace(LEADING_MINUS_AND_ZEROS_REGEX, '')
-  )
+  const dot = value.indexOf('.', start)
+  if (dot !== -1 && dot < end) {
+    digits--
+  }
+
+  return digits
 }
-
-const EXPONENTIAL_PART_REGEX = /[eE][+-]?\d+$/
-const LEADING_MINUS_AND_ZEROS_REGEX = /^-?(0*)?/
-const DOT_REGEX = /\./
-const TRAILING_ZEROS_REGEX = /0+$/
