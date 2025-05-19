@@ -7,11 +7,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* implement `compareLosslessNumber` as a wrapper around `compareNumber` ([f27979a](https://github.com/josdejong/lossless-json/commit/f27979a352ded8fecf02c975f807c511033e9461))
-* implement helper functions `splitNumber` and `compareNumber` ([ccc5dad](https://github.com/josdejong/lossless-json/commit/ccc5dada6e9d24cb776230cb9cf7e08da8fec976))
 * implement helper functions `splitNumber`, `compareNumber`, and `compareLosslessNumber` ([9b9497e](https://github.com/josdejong/lossless-json/commit/9b9497ec57f331f9acae6a9e99b58bae3ede099e))
 * improve the performance of util functions `toLosslessNumber`, `isSafeNumber`, and others ([3796e12](https://github.com/josdejong/lossless-json/commit/3796e1293e3edcb732eb53c2b351bff94f33dacc))
-* improve the performance of util functions `toLosslessNumber`, `isSafeNumber`, and others ([07b207a](https://github.com/josdejong/lossless-json/commit/07b207af169ade7f7bfbbc65c38d96e2d1b8c611))
 
 ### [4.0.2](https://github.com/josdejong/lossless-json/compare/v4.0.1...v4.0.2) (2024-09-18)
 
