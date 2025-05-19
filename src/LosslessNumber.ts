@@ -1,7 +1,7 @@
 import {
   UnsafeNumberReason,
   compareNumber,
-  extractSignificantDigits,
+  countSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
   isNumber
@@ -80,7 +80,8 @@ export function isLosslessNumber(value: unknown): value is LosslessNumber {
  * If the value has too many digits, or is NaN or Infinity, an error will be thrown
  */
 export function toLosslessNumber(value: number): LosslessNumber {
-  if (extractSignificantDigits(String(value)).length > 15) {
+  const maxDigits = 15
+  if (countSignificantDigits(String(value)) > maxDigits) {
     throw new Error(
       `Invalid number: contains more than 15 digits and is most likely truncated and unsafe by itself (value: ${value})`
     )

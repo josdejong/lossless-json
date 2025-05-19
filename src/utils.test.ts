@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import {
   UnsafeNumberReason,
   compareNumber,
-  extractSignificantDigits,
+  countSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
   isNumber,
@@ -32,12 +32,15 @@ test('isSafeNumber', () => {
   expect(isSafeNumber('2.3')).toEqual(true)
   expect(isSafeNumber('2.3e4')).toEqual(true)
   expect(isSafeNumber('1234567890')).toEqual(true)
+  expect(isSafeNumber('0.30000000000000004')).toEqual(true)
+  expect(isSafeNumber('0.9999999999999999')).toEqual(true)
 
   expect(isSafeNumber('2e500')).toEqual(false)
   expect(isSafeNumber('2e-500')).toEqual(false)
   expect(isSafeNumber('0.66666666666666666667')).toEqual(false)
   expect(isSafeNumber('12345678901234567890')).toEqual(false)
   expect(isSafeNumber('1.2345678901234567890')).toEqual(false)
+  expect(isSafeNumber('0.99999999999999999')).toEqual(false)
 
   // the following number loses formatting, but the value stays the same and hence is safe
   expect(isSafeNumber('2.300')).toEqual(true)
@@ -45,6 +48,7 @@ test('isSafeNumber', () => {
 
 test('isSafeNumber({ approx: false })', () => {
   expect(isSafeNumber('0.66666666666666666667', { approx: false })).toEqual(false)
+  expect(isSafeNumber('1.2345678901234567890', { approx: false })).toEqual(false)
   expect(isSafeNumber('1.2345678901234567890', { approx: false })).toEqual(false)
 })
 
@@ -57,6 +61,8 @@ test('isSafeNumber({ approx: true })', () => {
   expect(isSafeNumber('0.666666666666667', { approx: true })).toEqual(true)
   expect(isSafeNumber('0.66666666666667', { approx: true })).toEqual(true)
   expect(isSafeNumber('0.2345678901234567890', { approx: true })).toEqual(true)
+  // expect(isSafeNumber('0.99999999999999999', { approx: true })).toEqual(true) // TODO: this becomes 1
+  // expect(isSafeNumber('0.3000000000000000004', { approx: true })).toEqual(true) // TODO: this becomes 0.3
 
   expect(isSafeNumber('2e500', { approx: true })).toEqual(false)
   expect(isSafeNumber('2e-500', { approx: true })).toEqual(false)
@@ -181,15 +187,24 @@ describe('compareNumber', () => {
   })
 })
 
-test('extractSignificantDigits', () => {
-  expect(extractSignificantDigits('2.345')).toEqual('2345')
-  expect(extractSignificantDigits('23e4')).toEqual('23')
-  expect(extractSignificantDigits('230000')).toEqual('23')
-  expect(extractSignificantDigits('-77')).toEqual('77')
-  expect(extractSignificantDigits('0.003400')).toEqual('34')
-  expect(extractSignificantDigits('120.5e+30')).toEqual('1205')
-  expect(extractSignificantDigits('120.5e-30')).toEqual('1205')
-  expect(extractSignificantDigits('0120.50E-30')).toEqual('1205')
-  expect(extractSignificantDigits('01200')).toEqual('12')
-  expect(extractSignificantDigits('-01200')).toEqual('12')
+test('countSignificantDigits', () => {
+  expect(countSignificantDigits('2.345')).toEqual(4)
+  expect(countSignificantDigits('2300')).toEqual(2)
+  expect(countSignificantDigits('2.03')).toEqual(3)
+  expect(countSignificantDigits('2.0300')).toEqual(3)
+  expect(countSignificantDigits('0.0325900')).toEqual(4)
+  expect(countSignificantDigits('0.0325900000000000000000000001')).toEqual(27)
+  expect(countSignificantDigits('3259000.00000000000000000001')).toEqual(27)
+  expect(countSignificantDigits('0200')).toEqual(1)
+  expect(countSignificantDigits('0')).toEqual(0)
+  expect(countSignificantDigits('000')).toEqual(0)
+  expect(countSignificantDigits('0.0')).toEqual(0)
+  expect(countSignificantDigits('1')).toEqual(1)
+  expect(countSignificantDigits('23e3')).toEqual(2)
+  expect(countSignificantDigits('230e-3')).toEqual(2)
+  expect(countSignificantDigits('230E-3')).toEqual(2)
+  expect(countSignificantDigits('.2')).toEqual(1)
+  expect(countSignificantDigits('.002')).toEqual(1)
+  expect(countSignificantDigits('20.00')).toEqual(1)
+  expect(countSignificantDigits('2030.00')).toEqual(3)
 })
