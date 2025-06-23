@@ -3,13 +3,13 @@ import {
   UnsafeNumberReason,
   compareNumber,
   countSignificantDigits,
+  extractSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
   isNumber,
   isSafeNumber,
   splitNumber,
-  toSafeNumberOrThrow,
-  extractSignificantDigits
+  toSafeNumberOrThrow
 } from './utils'
 
 test('isInteger', () => {
