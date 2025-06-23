@@ -21,9 +21,6 @@ const nums = values.map(Number.parseFloat)
 const bench = new Bench({ time: 100 })
   .add('toLosslessNumber', () => nums.map((value) => toLosslessNumber(value)))
   .add('isSafeNumber', () => values.map((value) => isSafeNumber(value)))
-  .add('isSafeNumber (approx: true)', () =>
-    values.map((value) => isSafeNumber(value, { approx: true }))
-  )
   .add('toSafeNumberOrThrow', () => values.map((value) => toSafeNumberOrThrow(value)))
   .add('getUnsafeNumberReason', () => values.map((value) => getUnsafeNumberReason(value)))
 
