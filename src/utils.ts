@@ -36,6 +36,10 @@ export function isSafeNumber(
   const num = Number.parseFloat(value)
   const parsed = String(num)
 
+  if (value === parsed) {
+    return true
+  }
+
   const valueDigits = extractSignificantDigits(value)
   const parsedDigits = extractSignificantDigits(parsed)
 
