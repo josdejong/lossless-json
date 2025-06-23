@@ -34,16 +34,12 @@ export function isSafeNumber(
   }
 ): boolean {
   const num = Number.parseFloat(value)
-  const str = String(num)
+  const parsed = String(num)
 
-  if (value === str) {
-    return true
-  }
+  const valueDigits = extractSignificantDigits(value)
+  const parsedDigits = extractSignificantDigits(parsed)
 
-  const valueDigits = countSignificantDigits(value)
-  const strDigits = countSignificantDigits(str)
-
-  if (valueDigits === strDigits) {
+  if (valueDigits === parsedDigits) {
     return true
   }
 
@@ -53,7 +49,11 @@ export function isSafeNumber(
     // 2. it has at least 14 digits
     // 3. the first 14 digits are equal
     const requiredDigits = 14
-    if (strDigits >= requiredDigits && !isInteger(value)) {
+    if (
+      !isInteger(value) &&
+      parsedDigits.length >= requiredDigits &&
+      valueDigits.startsWith(parsedDigits.substring(0, requiredDigits))
+    ) {
       return true
     }
   }
@@ -196,6 +196,50 @@ export function compareNumber(a: string, b: string): 1 | 0 | -1 {
  *   '120.5e+30' returns 4
  **/
 export function countSignificantDigits(value: string): number {
+  const { start, end } = getSignificantDigitRange(value)
+
+  const dot = value.indexOf('.')
+  if (dot === -1 || dot < start || dot > end) {
+    return end - start
+  }
+
+  return end - start - 1
+}
+
+/**
+ * Get the significant digits of a number.
+ *
+ * For example:
+ *   '2.34' returns '234'
+ *   '-77' returns '77'
+ *   '0.003400' returns '34'
+ *   '120.5e+30' returns '1205'
+ **/
+export function extractSignificantDigits(value: string): string {
+  const { start, end } = getSignificantDigitRange(value)
+
+  const digits = value.substring(start, end)
+
+  const dot = digits.indexOf('.')
+  if (dot === -1) {
+    return digits
+  }
+
+  return digits.substring(0, dot) + digits.substring(dot + 1)
+}
+
+/**
+ * Returns the range (start to end) of the significant digits of a value.
+ * Note that this range _may_ contain the decimal dot.
+ *
+ * For example:
+ *
+ *     getSignificantDigitRange('0.0325900') // { start: 3, end: 7 }
+ *     getSignificantDigitRange('2.0300')    // { start: 0, end: 3 }
+ *     getSignificantDigitRange('0.0')       // { start: 3, end: 3 }
+ *
+ */
+function getSignificantDigitRange(value: string): { start: number; end: number } {
   let start = 0
   if (value[0] === '-') {
     start++
@@ -211,16 +255,9 @@ export function countSignificantDigits(value: string): number {
   if (end === -1) {
     end = value.length
   }
-  while (value[end - 1] === '0' || value[end - 1] === '.') {
+  while ((value[end - 1] === '0' || value[end - 1] === '.') && end > start) {
     end--
   }
 
-  let digits = end >= start ? end - start : 0
-
-  const dot = value.indexOf('.', start)
-  if (dot !== -1 && dot < end) {
-    digits--
-  }
-
-  return digits
+  return { start, end }
 }

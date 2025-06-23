@@ -8,7 +8,8 @@ import {
   isNumber,
   isSafeNumber,
   splitNumber,
-  toSafeNumberOrThrow
+  toSafeNumberOrThrow,
+  extractSignificantDigits
 } from './utils'
 
 test('isInteger', () => {
@@ -29,6 +30,8 @@ test('isNumber', () => {
 })
 
 test('isSafeNumber', () => {
+  expect(isSafeNumber('0')).toEqual(true)
+  expect(isSafeNumber('0.0')).toEqual(true)
   expect(isSafeNumber('2.3')).toEqual(true)
   expect(isSafeNumber('2.3e4')).toEqual(true)
   expect(isSafeNumber('1234567890')).toEqual(true)
@@ -39,6 +42,8 @@ test('isSafeNumber', () => {
   expect(isSafeNumber('2e-500')).toEqual(false)
   expect(isSafeNumber('0.66666666666666666667')).toEqual(false)
   expect(isSafeNumber('12345678901234567890')).toEqual(false)
+  expect(isSafeNumber('0.30000000000000000004')).toEqual(false)
+  expect(isSafeNumber('10038000307000729')).toEqual(false) // is parsed into 10038000307000728 (wrongly rounded)
   expect(isSafeNumber('1.2345678901234567890')).toEqual(false)
   expect(isSafeNumber('0.99999999999999999')).toEqual(false)
 
@@ -212,4 +217,17 @@ test('countSignificantDigits', () => {
   expect(countSignificantDigits('.002')).toEqual(1)
   expect(countSignificantDigits('20.00')).toEqual(1)
   expect(countSignificantDigits('2030.00')).toEqual(3)
+})
+
+test('extractSignificantDigits', () => {
+  expect(extractSignificantDigits('2.345')).toEqual('2345')
+  expect(extractSignificantDigits('23e4')).toEqual('23')
+  expect(extractSignificantDigits('230000')).toEqual('23')
+  expect(extractSignificantDigits('-77')).toEqual('77')
+  expect(extractSignificantDigits('0.003400')).toEqual('34')
+  expect(extractSignificantDigits('120.5e+30')).toEqual('1205')
+  expect(extractSignificantDigits('120.5e-30')).toEqual('1205')
+  expect(extractSignificantDigits('0120.50E-30')).toEqual('1205')
+  expect(extractSignificantDigits('01200')).toEqual('12')
+  expect(extractSignificantDigits('-01200')).toEqual('12')
 })
