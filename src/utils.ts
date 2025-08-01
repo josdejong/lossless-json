@@ -33,6 +33,10 @@ export function isSafeNumber(
     approx: boolean
   }
 ): boolean {
+  if (isInteger(value)) {
+    return Number.isSafeInteger(Number.parseInt(value, 10))
+  }
+
   const num = Number.parseFloat(value)
   const parsed = String(num)
 
