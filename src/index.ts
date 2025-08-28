@@ -1,22 +1,22 @@
 export { config } from './config.js'
-export { parse } from './parse.js'
-export { stringify } from './stringify.js'
 export {
-  LosslessNumber,
+  compareLosslessNumber,
   isLosslessNumber,
-  toLosslessNumber,
-  compareLosslessNumber
+  LosslessNumber,
+  toLosslessNumber
 } from './LosslessNumber.js'
-export { reviveDate } from './reviveDate.js'
 export { parseLosslessNumber, parseNumberAndBigInt } from './numberParsers.js'
+export { parse } from './parse.js'
+export { reviveDate } from './reviveDate.js'
+export { stringify } from './stringify.js'
+export * from './types.js'
 export {
-  UnsafeNumberReason,
+  compareNumber,
+  getUnsafeNumberReason,
   isInteger,
   isNumber,
   isSafeNumber,
-  toSafeNumberOrThrow,
-  getUnsafeNumberReason,
   splitNumber,
-  compareNumber
+  toSafeNumberOrThrow,
+  UnsafeNumberReason
 } from './utils.js'
-export * from './types.js'

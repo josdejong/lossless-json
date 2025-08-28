@@ -30,7 +30,7 @@ console.table(bench.table())
  * - indentation and newlines
  */
 function generateText(itemCount = 100) {
-  const json = [...new Array(itemCount)].map((value, index) => {
+  const json = [...new Array(itemCount)].map((_value, index) => {
     return {
       id: index,
       name: `Item ${index}`,

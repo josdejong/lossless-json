@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest'
 import {
-  UnsafeNumberReason,
   compareNumber,
   countSignificantDigits,
   extractSignificantDigits,
@@ -9,7 +8,8 @@ import {
   isNumber,
   isSafeNumber,
   splitNumber,
-  toSafeNumberOrThrow
+  toSafeNumberOrThrow,
+  UnsafeNumberReason
 } from './utils'
 
 test('isInteger', () => {

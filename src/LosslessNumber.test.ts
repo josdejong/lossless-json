@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { LosslessNumber, compareLosslessNumber, isLosslessNumber, toLosslessNumber } from './index'
+import { compareLosslessNumber, isLosslessNumber, LosslessNumber, toLosslessNumber } from './index'
 
 test('create a LosslessNumber from string', () => {
   const n = new LosslessNumber('42')
@@ -73,7 +73,7 @@ test('use LosslessNumber.valueOf()', () => {
 })
 
 test('can do operations like add a number and a LosslessNumber', () => {
-  // @ts-ignore
+  // @ts-expect-error
   expect(new LosslessNumber('3') + 2).toBe(5)
 })
 

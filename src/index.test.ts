@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest'
 import {
-  LosslessNumber,
   getUnsafeNumberReason,
   isInteger,
   isLosslessNumber,
   isNumber,
   isSafeNumber,
+  LosslessNumber,
   parse,
   parseLosslessNumber,
   parseNumberAndBigInt,

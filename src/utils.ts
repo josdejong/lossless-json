@@ -139,7 +139,7 @@ export function splitNumber(value: string): NumberSplit {
 
   const sign = match[1] as '-' | ''
   const digitsStr = match[2]
-  let exponent = match[4] !== undefined ? Number.parseInt(match[4]) : 0
+  let exponent = match[4] !== undefined ? Number.parseInt(match[4], 10) : 0
 
   const dot = digitsStr.indexOf('.')
   exponent += dot !== -1 ? dot - 1 : digitsStr.length - 1

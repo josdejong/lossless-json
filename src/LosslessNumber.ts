@@ -1,10 +1,10 @@
 import {
-  UnsafeNumberReason,
   compareNumber,
   countSignificantDigits,
   getUnsafeNumberReason,
   isInteger,
-  isNumber
+  isNumber,
+  UnsafeNumberReason
 } from './utils.js'
 
 /**
@@ -71,7 +71,7 @@ export class LosslessNumber {
  * Test whether a value is a LosslessNumber
  */
 export function isLosslessNumber(value: unknown): value is LosslessNumber {
-  // @ts-ignore
+  // @ts-expect-error
   return (value && typeof value === 'object' && value.isLosslessNumber) || false
 }
 

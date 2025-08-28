@@ -1,7 +1,6 @@
 import { parseLosslessNumber } from './numberParsers.js'
 import { revive } from './revive.js'
-import type { NumberParser, Reviver } from './types'
-import type { GenericObject } from './types'
+import type { GenericObject, NumberParser, Reviver } from './types'
 
 /**
  * The LosslessJSON.parse() method parses a string as JSON, optionally transforming
@@ -69,7 +68,7 @@ export function parse(
           return // To make TS happy
         }
 
-        // TODO: test deep equal instead of strict equal
+        // biome-ignore lint/suspicious/noPrototypeBuiltins: TODO: replace with hasOwn one day, when browser support is high enough
         if (Object.prototype.hasOwnProperty.call(object, key) && !isDeepEqual(value, object[key])) {
           // Note that we could also test `if(key in object) {...}`
           // or `if (object[key] !== 'undefined') {...}`, but that is slower.
