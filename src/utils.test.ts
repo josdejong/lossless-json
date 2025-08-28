@@ -51,6 +51,14 @@ test('isSafeNumber', () => {
 
   // the following number loses formatting, but the value stays the same and hence is safe
   expect(isSafeNumber('2.300')).toEqual(true)
+
+  // test edge cases around MAX_SAFE_INTEGER
+  expect(isSafeNumber('9007199254740991')).toEqual(true) // Number.MAX_SAFE_INTEGER
+  expect(isSafeNumber('9007199254740992')).toEqual(false) // Number.MAX_SAFE_INTEGER + 1
+  expect(isSafeNumber('9007199254740993')).toEqual(false) // Number.MAX_SAFE_INTEGER + 2
+  expect(isSafeNumber('-9007199254740991')).toEqual(true) // Number.MIN_SAFE_INTEGER
+  expect(isSafeNumber('-9007199254740992')).toEqual(false) // Number.MIN_SAFE_INTEGER + 1
+  expect(isSafeNumber('-9007199254740993')).toEqual(false) // Number.MIN_SAFE_INTEGER + 2
 })
 
 test('isSafeNumber({ approx: false })', () => {
