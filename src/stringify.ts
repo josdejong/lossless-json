@@ -1,6 +1,5 @@
 import type { GenericObject, NumberStringifier, Replacer } from './types'
 import { isNumber } from './utils.js'
-import { LosslessNumber } from './LosslessNumber'
 
 /**
  * The LosslessJSON.stringify() method converts a JavaScript value to a JSON string,
