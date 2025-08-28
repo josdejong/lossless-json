@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/josdejong/lossless-json/compare/v4.1.1...v4.2.0) (2025-08-28)
+
+
+### Features
+
+* [#268](https://github.com/josdejong/lossless-json/issues/268) make `isSafeNumber` compatible with `Number.isSafeInteger` ([#269](https://github.com/josdejong/lossless-json/issues/269)) ([df63f20](https://github.com/josdejong/lossless-json/commit/df63f20e3f9ce45be38bc4fa63c1a73fbf04e27e))
+
 ### [4.1.1](https://github.com/josdejong/lossless-json/compare/v4.1.0...v4.1.1) (2025-06-23)
 
 
