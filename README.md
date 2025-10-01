@@ -233,7 +233,7 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
 
 #### options
 
-The `options` argument in the function `parse` is either an object with properties `{ parseNumber, onDuplicateKey}`, or it is a `parseNumber` function (for backward compatibility). has the following properties:
+The `options` argument in the function `parse` is either an object with properties `{ parseNumber, onDuplicateKey }`, or it is a `parseNumber` function (for backward compatibility). It has the following properties:
 
 - **@param** `{function(value: string) : unknown} [parseNumber]`
   Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
