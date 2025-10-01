@@ -1,8 +1,10 @@
 import Decimal from 'decimal.js'
 import { describe, expect, test } from 'vitest'
 import {
+  type DuplicateKeyInfo,
   isLosslessNumber,
   LosslessNumber,
+  type ParseOptions,
   parse,
   parseNumberAndBigInt,
   reviveDate,
@@ -304,6 +306,57 @@ test('throws an error when an invalid character is encountered in a key', () => 
 test('throws an error when a duplicate key is encountered', () => {
   expect(() => parse('{"name": "Joe", "name": "Sarah"}')).toThrow(
     "Duplicate key 'name' encountered at position 17"
+  )
+})
+
+test('configure to keep the first duplicate value', () => {
+  const options: ParseOptions = {
+    onDuplicateKey: ({ oldValue }) => oldValue
+  }
+
+  expect(parse('{"name": "Joe", "name": "Sarah"}', null, options)).toEqual({
+    name: 'Joe'
+  })
+})
+
+test('configure to keep the last duplicate value', () => {
+  const options: ParseOptions = {
+    onDuplicateKey: ({ newValue }) => newValue
+  }
+
+  expect(parse('{"name": "Joe", "name": "Sarah"}', null, options)).toEqual({
+    name: 'Sarah'
+  })
+})
+
+test('option onDuplicateKey should pass all context information', () => {
+  let loggedInfo: DuplicateKeyInfo | undefined
+
+  const options: ParseOptions = {
+    onDuplicateKey: (info) => {
+      loggedInfo = info
+    }
+  }
+
+  const json = parse('{"name": "Joe", "name": "Sarah"}', null, options)
+  expect(json).toEqual({ name: 'Joe' })
+  expect(loggedInfo).toEqual({
+    key: 'name',
+    position: 17,
+    oldValue: 'Joe',
+    newValue: 'Sarah'
+  })
+})
+
+test('configure to throw a custom error in case of a duplicate value', () => {
+  const options: ParseOptions = {
+    onDuplicateKey: () => {
+      throw new Error('My duplicate key error')
+    }
+  }
+
+  expect(() => parse('{"name": "Joe", "name": "Sarah"}', null, options)).toThrow(
+    'My duplicate key error'
   )
 })
 
