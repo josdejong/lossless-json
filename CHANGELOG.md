@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.0](https://github.com/josdejong/lossless-json/compare/v4.2.0...v4.3.0) (2025-10-03)
+
+
+### Features
+
+* [#244](https://github.com/josdejong/lossless-json/issues/244) implement an option `onDuplicateKey`  ([#271](https://github.com/josdejong/lossless-json/issues/271)) ([cb0aae1](https://github.com/josdejong/lossless-json/commit/cb0aae156b753fd7f9e4796afd1515ba87630227))
+
 ## [4.2.0](https://github.com/josdejong/lossless-json/compare/v4.1.1...v4.2.0) (2025-08-28)
 
 
