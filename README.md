@@ -36,7 +36,7 @@ Features:
 - Works in browsers and node.js.
 - Comes with TypeScript typings included.
 - Modular: ES module functions, only load and bundle what you use.
-- The full bundle is less than 4kB in size when minified and gzipped.
+- Small: the full bundle is less than `4 kB` in size when minified and gzipped.
 
 ## Install
 
@@ -88,13 +88,15 @@ JavaScript natively supports `bigint`: big integers that can hold a large number
 ```js
 import { parse, isInteger } from 'lossless-json'
 
-// parse integer values into a bigint, and use a regular number otherwise
-export function customNumberParser(value) {
-  return isInteger(value) ? BigInt(value) : parseFloat(value)
+const options = {
+  // parse integer values into a bigint, and use a regular number otherwise
+  numberParser: (value) => {
+    return isInteger(value) ? BigInt(value) : parseFloat(value)
+  }
 }
 
 const text = '[123456789123456789123456789, 2.3, 123]'
-const json = parse(text, null, customNumberParser)
+const json = parse(text, null, options)
 // output:
 // [
 //   123456789123456789123456789n, // bigint
@@ -112,21 +114,23 @@ If you want parse a json string into an object with regular numbers, but want to
 ```js
 import { parse, isSafeNumber } from 'lossless-json'
 
-function parseAndValidateNumber(value) {
-  if (!isSafeNumber(value)) {
-    throw new Error(`Cannot safely convert value '${value}' into a number`)
-  }
+const options = {
+  parseNumber: (value) => {
+      if (!isSafeNumber(value)) {
+        throw new Error(`Cannot safely convert value '${value}' into a number`)
+      }
 
-  return parseFloat(value)
+      return parseFloat(value)
+    }
 }
 
 // will parse with success if all values can be represented with a number
-let json = parse('[1,2,3]', undefined, parseAndValidateNumber)
+let json = parse('[1,2,3]', undefined, options)
 console.log(json) // [1, 2, 3] (regular numbers)
 
 // will throw an error when some of the values are too large to represent correctly as number
 try {
-  let json = parse('[1,2e+500,3]', undefined, parseAndValidateNumber)
+  let json = parse('[1,2e+500,3]', undefined, options)
 } catch (err) {
   console.log(err) // throws Error 'Cannot safely convert value '2e+500' into a number'
 }
@@ -149,11 +153,14 @@ const decimalStringifier = {
 
 // parse JSON, operate on a Decimal value, then stringify again
 const text = '{"value":2.3e500}'
-const json = parse(text, undefined, parseDecimal) // {value: new Decimal('2.3e500')}
+const json = parse(text, undefined, { parseNumber: parseDecimal }) 
+// {value: new Decimal('2.3e500')}
+
 const output = {
-  // {result: new Decimal('4.6e500')}
   result: json.value.times(2)
 }
+// {result: new Decimal('4.6e500')}
+
 const str = stringify(output, undefined, undefined, [decimalStringifier])
 // '{"result":4.6e500}'
 ```
@@ -211,7 +218,7 @@ console.log(parsed)
 
 ## API
 
-### parse(text [, reviver [, parseNumber]])
+### parse(text [, reviver [, options]])
 
 The `LosslessJSON.parse()` function parses a string as JSON, optionally transforming the value produced by parsing.
 
@@ -219,11 +226,38 @@ The `LosslessJSON.parse()` function parses a string as JSON, optionally transfor
   The string to parse as JSON. See the JSON object for a description of JSON syntax.
 - **@param** `{(key: string, value: unknown) => unknown} [reviver]`
   If a function, prescribes how the value originally produced by parsing is transformed, before being returned.
-- **@param** `{function(value: string) : unknown} [parseNumber]`
-  Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
+- **@param** `ParseOptions | ParseNumber [options]` Pass options to customize the way numbers are parsed and duplicate keys are handled. See description below. For backward compatibility it is possible to pass a `parseNumber` function here instead of an object with property `parseNumber`. 
 - **@returns** `{unknown}`
   Returns the Object corresponding to the given JSON text.
 - **@throws** Throws a SyntaxError exception if the string to parse is not valid JSON.
+
+#### options
+
+The `options` argument in the function `parse` is either an object with properties `{ parseNumber, onDuplicateKey }`, or it is a `parseNumber` function (for backward compatibility). It has the following properties:
+
+- **@param** `{function(value: string) : unknown} [parseNumber]`
+  Pass an optional custom number parser. Input is a string, and the output can be any numeric value: `number`, `bigint`, `LosslessNumber`, or a custom `BigNumber` library. By default, all numeric values are parsed into a `LosslessNumber`.
+- **@param** `{function(info: { key: string, position: number, oldValue: unknown, newValue: unknown }) : unknown | undefined} [onDuplicateKey]`
+  Customize the behavior in case of duplicate keys. By default, and error is thrown in case of duplicate keys. To alter this behavior, a custom `onDuplicateKey` callback can be provided. There are a few typical cases:
+  - Return the `oldValue` (first value) in order to keep that in case of duplicates.
+    ```js
+    onDuplicateKey: ({ oldValue }) => oldValue
+    ```
+  - Return the `newValue` (latest value) in order to keep that in case of duplicates:
+    ```js
+    onDuplicateKey: ({ newValue }) => newValue
+    ```
+  - Return `undefined` in order to ignore duplicate keys and keep the `oldValue` (first value):
+    ```js
+    onDuplicateKey: () => {}
+    ```
+  - Throw a custom error message. Can also be used for logging all occurrences:
+    ```js
+    onDuplicateKey: ({ key, position, oldValue, newValue }) => {
+      console.error('Duplicate key error', { key, position, oldValue, newValue })
+      throw new Error(`Duplicate key ${key} at position ${position}`)
+    }
+    ```
 
 ### stringify(value [, replacer [, space [, numberStringifiers]]])
 

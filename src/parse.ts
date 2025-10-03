@@ -1,6 +1,6 @@
 import { parseLosslessNumber } from './numberParsers.js'
 import { revive } from './revive.js'
-import type { GenericObject, NumberParser, Reviver } from './types'
+import type { DuplicateKeyInfo, GenericObject, NumberParser, ParseOptions, Reviver } from './types'
 
 /**
  * The LosslessJSON.parse() method parses a string as JSON, optionally transforming
@@ -16,7 +16,7 @@ import type { GenericObject, NumberParser, Reviver } from './types'
  * If a function, prescribes how the value originally produced by parsing is
  * transformed, before being returned.
  *
- * @param [parseNumber=parseLosslessNumber]
+ * @param [options=ParseOptions | NumberParserArgument]
  * Pass a custom number parser. Input is a string, and the output can be unknown
  * numeric value: number, bigint, LosslessNumber, or a custom BigNumber library.
  *
@@ -27,8 +27,12 @@ import type { GenericObject, NumberParser, Reviver } from './types'
 export function parse(
   text: string,
   reviver?: Reviver | null,
-  parseNumber: NumberParser = parseLosslessNumber
+  options?: ParseOptions | NumberParser
 ): unknown {
+  const optionsObj = typeof options === 'function' ? { parseNumber: options } : options
+  const parseNumber = optionsObj?.parseNumber ?? parseLosslessNumber
+  const onDuplicateKey = optionsObj?.onDuplicateKey ?? throwDuplicateKey
+
   let i = 0
   const value = parseValue()
   expectValue(value)
@@ -68,14 +72,24 @@ export function parse(
           return // To make TS happy
         }
 
+        // handle duplicate keys
         // biome-ignore lint/suspicious/noPrototypeBuiltins: TODO: replace with hasOwn one day, when browser support is high enough
         if (Object.prototype.hasOwnProperty.call(object, key) && !isDeepEqual(value, object[key])) {
           // Note that we could also test `if(key in object) {...}`
           // or `if (object[key] !== 'undefined') {...}`, but that is slower.
-          throwDuplicateKey(key, start + 1)
-        }
+          const returnedValue = onDuplicateKey({
+            key,
+            position: start + 1,
+            oldValue: object[key],
+            newValue: value
+          })
 
-        object[key] = value
+          if (returnedValue !== undefined) {
+            object[key] = returnedValue
+          }
+        } else {
+          object[key] = value
+        }
       }
 
       if (text.charCodeAt(i) !== codeClosingBrace) {
@@ -275,8 +289,8 @@ export function parse(
     throw new SyntaxError(`Quoted object key expected ${gotAt()}`)
   }
 
-  function throwDuplicateKey(key: string, pos: number) {
-    throw new SyntaxError(`Duplicate key '${key}' encountered at position ${pos}`)
+  function throwDuplicateKey({ key, position }: DuplicateKeyInfo) {
+    throw new SyntaxError(`Duplicate key '${key}' encountered at position ${position}`)
   }
 
   function throwObjectKeyOrEndExpected() {

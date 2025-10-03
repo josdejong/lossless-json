@@ -1,6 +1,20 @@
 export type Reviver = (key: string, value: unknown) => unknown
 
+export interface ParseOptions {
+  parseNumber?: NumberParser
+  onDuplicateKey?: OnDuplicateKey
+}
+
 export type NumberParser = (value: string) => unknown
+
+export interface DuplicateKeyInfo {
+  key: string
+  position: number
+  oldValue: unknown
+  newValue: unknown
+}
+
+export type OnDuplicateKey = (info: DuplicateKeyInfo) => unknown | undefined
 
 export type Replacer =
   | ((key: string, value: unknown) => unknown | undefined)
