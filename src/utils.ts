@@ -179,11 +179,20 @@ export function compareNumber(a: string, b: string): 1 | 0 | -1 {
 
   const sign: Sign = aa.sign === '-' ? -1 : 1
 
-  if (aa.sign !== bb.sign) {
-    if (aa.digits === '0' && bb.digits === '0') {
+  // treat any zero as zero regardless of its sign or non-canonical exponent (like 0e5 or 0.0),
+  // else comparing against its bogus exponent gives a wrong ordering
+  const aZero = aa.digits === '0'
+  const bZero = bb.digits === '0'
+  if (aZero || bZero) {
+    if (aZero && bZero) {
       return 0
     }
 
+    const bSign: Sign = bb.sign === '-' ? -1 : 1
+    return aZero ? (-bSign as Sign) : sign
+  }
+
+  if (aa.sign !== bb.sign) {
     return sign
   }
 
