@@ -147,15 +147,26 @@ describe('splitNumber', () => {
     { value: '-23e3', expected: { sign: '-', digits: '23', exponent: 4 } },
     { value: '2.3e-3', expected: { sign: '', digits: '23', exponent: -3 } },
     { value: '23e-3', expected: { sign: '', digits: '23', exponent: -2 } },
-    { value: '000e+003', expected: { sign: '', digits: '0', exponent: 3 } },
+    { value: '000e+003', expected: { sign: '', digits: '0', exponent: 0 } },
     { value: '-23e-3', expected: { sign: '-', digits: '23', exponent: -2 } },
     { value: '99.99', expected: { sign: '', digits: '9999', exponent: 1 } },
-    { value: '-01200', expected: { sign: '-', digits: '12', exponent: 3 } }
+    { value: '-01200', expected: { sign: '-', digits: '12', exponent: 3 } },
+    { value: '0e5', expected: { sign: '', digits: '0', exponent: 0 } },
+    { value: '0.0', expected: { sign: '', digits: '0', exponent: 0 } },
+    { value: '-0.0', expected: { sign: '', digits: '0', exponent: 0 } },
+    { value: '-0', expected: { sign: '', digits: '0', exponent: 0 } }
   ])('splitNumber($value) -> {sign: $expected.sign, digits: $expected.digits, exponent: $expected.exponent}', ({
     value,
     expected
   }) => {
-    expect(splitNumber(value)).toEqual(expected)
+    const split = splitNumber(value)
+
+    expect(split).toEqual(expected)
+
+    const { sign, digits, exponent } = split
+    const reconstructed = `${sign}${digits[0]}.${digits.slice(1)}e${exponent}`
+
+    expect(parseFloat(reconstructed) === parseFloat(value)).toBe(true)
   })
 
   test('should throw an error when splitting invalid input', () => {
@@ -196,7 +207,11 @@ describe('compareNumber', () => {
     { a: '2000000000000000000000000', b: '2000000000000000000000000', expected: 0 },
     { a: '2000000000000000000000000', b: '2000000000000000000000001', expected: -1 },
     { a: '2000000000000000000000000', b: '200000000000000000000000', expected: 1 },
-    { a: '2000000000000000000000000', b: '1999999999999999999999999', expected: 1 }
+    { a: '2000000000000000000000000', b: '1999999999999999999999999', expected: 1 },
+    { a: '1', b: '0e5', expected: 1 },
+    { a: '0e5', b: '1', expected: -1 },
+    { a: '0', b: '0e5', expected: 0 },
+    { a: '0.0', b: '0', expected: 0 }
   ])('compareNumber($a, $b) -> $expected', ({ a, b, expected }) => {
     expect(compareNumber(a, b)).toEqual(expected)
   })

@@ -131,9 +131,14 @@ export function toSafeNumberOrThrow(
 
 /**
  * Split a number into sign, digits, and exponent.
+ * Leading zeros and non-canonical zeros are normalized.
+ *
  * The value can be constructed again from a split number by inserting a dot
  * at the second character of the digits if there is more than one digit,
- * prepending it with the sign, and appending the exponent like `e${exponent}`
+ * prepending it with the sign, and appending an "e" and the exponent as follows:
+ *
+ *     const reconstructed = `${sign}${digits[0]}.${digits.slice(1)}e${exponent}`
+ *
  */
 export function splitNumber(value: string): NumberSplit {
   const match = value.match(/^(-?)(\d+\.?\d*)([eE]([+-]?\d+))?$/)
@@ -157,9 +162,8 @@ export function splitNumber(value: string): NumberSplit {
     })
     .replace(/0*$/, '') // remove trailing zeros
 
-  return digits.length > 0
-    ? { sign, digits, exponent }
-    : { sign, digits: '0', exponent: exponent + 1 }
+  // normalize zero, for example normalizes 0e5 or -0 into 0
+  return digits.length > 0 ? { sign, digits, exponent } : { sign: '', digits: '0', exponent: 0 }
 }
 
 /**
