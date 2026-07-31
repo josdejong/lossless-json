@@ -184,10 +184,6 @@ export function compareNumber(a: string, b: string): 1 | 0 | -1 {
   const sign: Sign = aa.sign === '-' ? -1 : 1
 
   if (aa.sign !== bb.sign) {
-    if (aa.digits === '0' && bb.digits === '0') {
-      return 0
-    }
-
     return sign
   }
 
