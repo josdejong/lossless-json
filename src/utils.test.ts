@@ -155,19 +155,19 @@ describe('splitNumber', () => {
     { value: '0.0', expected: { sign: '', digits: '0', exponent: 0 } },
     { value: '-0.0', expected: { sign: '', digits: '0', exponent: 0 } },
     { value: '-0', expected: { sign: '', digits: '0', exponent: 0 } }
-  ])('splitNumber($value) -> {sign: $expected.sign, digits: $expected.digits, exponent: $expected.exponent}', ({
-    value,
-    expected
-  }) => {
-    const split = splitNumber(value)
+  ])(
+    'splitNumber($value) -> {sign: $expected.sign, digits: $expected.digits, exponent: $expected.exponent}',
+    ({ value, expected }) => {
+      const split = splitNumber(value)
 
-    expect(split).toEqual(expected)
+      expect(split).toEqual(expected)
 
-    const { sign, digits, exponent } = split
-    const reconstructed = `${sign}${digits[0]}.${digits.slice(1)}e${exponent}`
+      const { sign, digits, exponent } = split
+      const reconstructed = `${sign}${digits[0]}.${digits.slice(1)}e${exponent}`
 
-    expect(parseFloat(reconstructed) === parseFloat(value)).toBe(true)
-  })
+      expect(parseFloat(reconstructed) === parseFloat(value)).toBe(true)
+    }
+  )
 
   test('should throw an error when splitting invalid input', () => {
     expect(() => splitNumber('')).toThrow('Invalid number')

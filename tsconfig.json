@@ -3,6 +3,7 @@
     "moduleResolution": "bundler",
     "module": "es2020",
     "lib": ["es2020", "dom"],
+    "rootDir": "./src",
     "target": "es2020",
     "sourceMap": true,
     "esModuleInterop": true,

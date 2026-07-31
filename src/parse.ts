@@ -73,7 +73,7 @@ export function parse(
         }
 
         // handle duplicate keys
-        // biome-ignore lint/suspicious/noPrototypeBuiltins: TODO: replace with hasOwn one day, when browser support is high enough
+        // TODO: replace with hasOwn one day, when browser support is high enough
         if (Object.prototype.hasOwnProperty.call(object, key) && !isDeepEqual(value, object[key])) {
           // Note that we could also test `if(key in object) {...}`
           // or `if (object[key] !== 'undefined') {...}`, but that is slower.
