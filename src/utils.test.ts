@@ -220,6 +220,11 @@ describe('compareNumber', () => {
     const values = ['4', '2.3', '-2.3', '0.025e2', '-1', '0']
     expect(values.slice().sort(compareNumber)).toEqual(['-2.3', '-1', '0', '2.3', '0.025e2', '4'])
   })
+
+  test('should sort non-canonical zeros using compareNumber', () => {
+    const values = ['1', '0e5', '2']
+    expect(values.slice().sort(compareNumber)).toEqual(['0e5', '1', '2'])
+  })
 })
 
 test('countSignificantDigits', () => {
