@@ -58,7 +58,20 @@ function reviveObject(object: GenericObject<unknown>, reviver: Reviver) {
  */
 function reviveArray(array: Array<unknown>, reviver: Reviver): Array<unknown> {
   for (let i = 0; i < array.length; i++) {
-    array[i] = reviveValue(array, String(i), array[i], reviver)
+    const value = reviveValue(array, String(i), array[i], reviver)
+
+    if (value === undefined) {
+      // Remove the own property entirely, like native JSON.parse does: the
+      // position becomes a genuine hole (no own key, and `Object.keys` omits
+      // it) while the length stays unchanged. Assigning `array[i] = undefined`
+      // would leave an own property holding `undefined` instead.
+      delete array[i]
+    } else {
+      // Assign right away rather than after the loop: the reviver observes the
+      // holder through `this`, so later items must see the already revived
+      // values (e.g. a preceding `null` replacement).
+      array[i] = value
+    }
   }
 
   return array

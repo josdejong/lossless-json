@@ -248,6 +248,24 @@ test('reviver - revive a lossless number correctly', () => {
   expectDeepEqual(logs, expected)
 })
 
+test('reviver - deleting an array element leaves a hole, like JSON.parse', () => {
+  const text = '[1,2,3]'
+  const reviver = (key: string, value: unknown): unknown =>
+    key === '1' ? undefined : value
+
+  // native JSON.parse removes the element entirely (a genuine hole), it does
+  // not create an own key holding `undefined`
+  const native = JSON.parse(text, reviver) as unknown[]
+  const result = parse(text, reviver) as unknown as unknown[]
+
+  expect(Object.keys(result)).toEqual(Object.keys(native))
+  expect(Object.keys(result)).toEqual(['0', '2'])
+  expect(result.length).toBe(native.length)
+  expect(1 in result).toBe(false)
+  expect(String(result[0])).toBe('1')
+  expect(String(result[2])).toBe('3')
+})
+
 test('parse with a custom number parser creating bigint', () => {
   const json = parse('[123456789123456789123456789, 2.3, 123]', null, parseNumberAndBigInt)
   expect(json).toEqual([123456789123456789123456789n, 2.3, 123n])
