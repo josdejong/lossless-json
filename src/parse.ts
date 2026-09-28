@@ -85,10 +85,10 @@ export function parse(
           })
 
           if (returnedValue !== undefined) {
-            object[key] = returnedValue
+            setObjectKey(object, key, returnedValue)
           }
         } else {
-          object[key] = value
+          setObjectKey(object, key, value)
         }
       }
 
@@ -330,6 +330,22 @@ export function parse(
 
   function gotAt(): string {
     return `${got()} ${pos()}`
+  }
+}
+
+function setObjectKey(object: GenericObject<unknown>, key: string, value: unknown): void {
+  if (key === '__proto__') {
+    // Plain assignment would trigger the `__proto__` setter inherited from
+    // Object.prototype, changing the object's prototype instead of storing the
+    // key. Define an ordinary own property, like JSON.parse does.
+    Object.defineProperty(object, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    })
+  } else {
+    object[key] = value
   }
 }
 
