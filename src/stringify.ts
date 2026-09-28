@@ -148,7 +148,11 @@ export function stringify(
       return stringify(object.toJSON(), replacer, space, undefined)
     }
 
-    const keys: string[] = Array.isArray(replacer) ? replacer.map(String) : Object.keys(object)
+    // A replacer array is a property whitelist: duplicates must not produce
+    // duplicate keys in the output.
+    const keys: string[] = Array.isArray(replacer)
+      ? [...new Set(replacer.map(String))]
+      : Object.keys(object)
 
     if (keys.length === 0) {
       return '{}'
