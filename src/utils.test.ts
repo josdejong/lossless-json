@@ -186,6 +186,26 @@ describe('compareNumber', () => {
     { a: '-0', b: '-0', expected: 0 },
     { a: '-0', b: '0', expected: 0 },
     { a: '0', b: '-0', expected: 0 },
+    { a: '0', b: '0.5', expected: -1 },
+    { a: '0.5', b: '0', expected: 1 },
+    { a: '0', b: '1e-500', expected: -1 },
+    { a: '1e-500', b: '0', expected: 1 },
+    { a: '-0', b: '0.5', expected: -1 },
+    { a: '0.5', b: '-0', expected: 1 },
+    { a: '-0', b: '1e-500', expected: -1 },
+    { a: '1e-500', b: '-0', expected: 1 },
+    { a: '0.0', b: '0.5', expected: -1 },
+    { a: '0.5', b: '0.0', expected: 1 },
+    { a: '0.0', b: '1e-500', expected: -1 },
+    { a: '1e-500', b: '0.0', expected: 1 },
+    { a: '0e5', b: '0.5', expected: -1 },
+    { a: '0.5', b: '0e5', expected: 1 },
+    { a: '0e5', b: '1e-500', expected: -1 },
+    { a: '1e-500', b: '0e5', expected: 1 },
+    { a: '-0e-5', b: '0.5', expected: -1 },
+    { a: '0.5', b: '-0e-5', expected: 1 },
+    { a: '-0e-5', b: '1e-500', expected: -1 },
+    { a: '1e-500', b: '-0e-5', expected: 1 },
     { a: '1', b: '1', expected: 0 },
     { a: '2', b: '3', expected: -1 },
     { a: '3', b: '2', expected: 1 },
@@ -219,6 +239,11 @@ describe('compareNumber', () => {
   test('should sort numbers using compareNumber', () => {
     const values = ['4', '2.3', '-2.3', '0.025e2', '-1', '0']
     expect(values.slice().sort(compareNumber)).toEqual(['-2.3', '-1', '0', '2.3', '0.025e2', '4'])
+  })
+
+  test('should sort zero before positive fractions', () => {
+    const values = ['0.5', '0e5', '-0.5', '1e-500', '-0']
+    expect(values.slice().sort(compareNumber)).toEqual(['-0.5', '0e5', '-0', '1e-500', '0.5'])
   })
 
   test('should sort non-canonical zeros using compareNumber', () => {

@@ -187,6 +187,14 @@ export function compareNumber(a: string, b: string): 1 | 0 | -1 {
     return sign
   }
 
+  if (aa.digits === '0') {
+    return bb.digits === '0' ? 0 : -1
+  }
+
+  if (bb.digits === '0') {
+    return 1
+  }
+
   if (aa.exponent !== bb.exponent) {
     return aa.exponent > bb.exponent ? sign : aa.exponent < bb.exponent ? (-sign as Sign) : 0
   }
