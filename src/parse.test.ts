@@ -253,17 +253,28 @@ test('reviver - deleting an array element leaves a hole, like JSON.parse', () =>
   const reviver = (key: string, value: unknown): unknown =>
     key === '1' ? undefined : value
 
-  // native JSON.parse removes the element entirely (a genuine hole), it does
-  // not create an own key holding `undefined`
-  const native = JSON.parse(text, reviver) as unknown[]
-  const result = parse(text, reviver) as unknown as unknown[]
+  const result = parse(text, reviver) as unknown[]
 
-  expect(Object.keys(result)).toEqual(Object.keys(native))
-  expect(Object.keys(result)).toEqual(['0', '2'])
-  expect(result.length).toBe(native.length)
+  const expected: unknown[] = []
+  expected[0] = lln('1')
+  expected[2] = lln('3')
+
+  expectDeepEqual(result, expected)
   expect(1 in result).toBe(false)
-  expect(String(result[0])).toBe('1')
-  expect(String(result[2])).toBe('3')
+  expect(result.length).toBe(3)
+  expect(Object.keys(result)).toEqual(['0', '2'])
+})
+
+test('reviver - deleting an object property removes the key', () => {
+  const text = '{"a":1,"b":2,"c":3}'
+  const reviver = (key: string, value: unknown): unknown =>
+    key === 'b' ? undefined : value
+
+  const result = parse(text, reviver) as Record<string, unknown>
+
+  expectDeepEqual(result, { a: lln('1'), c: lln('3') })
+  expect('b' in result).toBe(false)
+  expect(Object.keys(result)).toEqual(['a', 'c'])
 })
 
 test('parse with a custom number parser creating bigint', () => {
