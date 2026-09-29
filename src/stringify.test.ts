@@ -330,3 +330,26 @@ test('stringify an empty object', () => {
   expect(stringify({}, null, 2)).toEqual('{}')
   expect(stringify({}, null, '    ')).toEqual('{}')
 })
+
+test('stringify with space capped at 10 and values below 1', () => {
+  const json = { a: 1 }
+
+  // Capped at 10 spaces
+  expect(stringify(json, null, 15)).toBe(JSON.stringify(json, null, 10))
+  expect(stringify(json, null, 100)).toBe(JSON.stringify(json, null, 10))
+
+  // Truncate floating space
+  expect(stringify(json, null, 2.5)).toBe(JSON.stringify(json, null, 2))
+
+  // Values less than 1 mean no space
+  expect(stringify(json, null, 0)).toBe(JSON.stringify(json, null, 0))
+  expect(stringify(json, null, -1)).toBe(JSON.stringify(json, null, -1))
+  expect(stringify(json, null, -10)).toBe(JSON.stringify(json, null, -10))
+  expect(stringify(json, null, Number.NaN)).toBe(JSON.stringify(json, null, Number.NaN))
+
+  // String space longer than 10 characters capped to 10 characters
+  const longIndent = 'abcdefghijklm'
+  expect(stringify(json, null, longIndent)).toBe(JSON.stringify(json, null, longIndent))
+  expect(stringify(json, null, longIndent)).toBe('{\n' + 'abcdefghij' + '"a": 1\n' + '}')
+})
+
