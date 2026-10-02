@@ -273,8 +273,7 @@ test('reviver - revive a lossless number correctly', () => {
 
 test('reviver - deleting an array element leaves a hole, like JSON.parse', () => {
   const text = '[1,2,3]'
-  const reviver = (key: string, value: unknown): unknown =>
-    key === '1' ? undefined : value
+  const reviver = (key: string, value: unknown): unknown => (key === '1' ? undefined : value)
 
   const result = parse(text, reviver) as unknown[]
 
@@ -290,8 +289,7 @@ test('reviver - deleting an array element leaves a hole, like JSON.parse', () =>
 
 test('reviver - deleting an object property removes the key', () => {
   const text = '{"a":1,"b":2,"c":3}'
-  const reviver = (key: string, value: unknown): unknown =>
-    key === 'b' ? undefined : value
+  const reviver = (key: string, value: unknown): unknown => (key === 'b' ? undefined : value)
 
   const result = parse(text, reviver) as Record<string, unknown>
 
