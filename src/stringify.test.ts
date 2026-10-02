@@ -273,6 +273,14 @@ test('stringify with replacer Array', () => {
   expect(stringify(json, replacer)).toEqual(expected)
 })
 
+test('stringify with replacer Array containing duplicates', () => {
+  const json = { a: 1, b: 2, c: 3 }
+  const replacer = ['b', 'b', 'a', 'b', 'missing', 'a']
+
+  expect(stringify(json, replacer)).toBe(JSON.stringify(json, replacer))
+  expect(stringify(json, replacer)).toBe('{"b":2,"a":1}')
+})
+
 test('stringify with numeric space', () => {
   const json: unknown = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
 
