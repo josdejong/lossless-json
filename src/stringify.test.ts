@@ -355,4 +355,3 @@ test('stringify should forward numberStringifiers when object defines toJSON', (
     '{"num":1.23456789123456789123456789e+26}'
   )
 })
-
