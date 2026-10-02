@@ -63,7 +63,10 @@ test('parse an object with __proto__ key', () => {
 
 test('parse an object with __proto__ key using a reviver', () => {
   const text = '{"__proto__":1}'
-  const parsed = parse(text, (key, value) => (key === '__proto__' ? 2 : value)) as Record<string, unknown>
+  const parsed = parse(text, (key, value) => (key === '__proto__' ? 2 : value)) as Record<
+    string,
+    unknown
+  >
 
   expect(Object.prototype.hasOwnProperty.call(parsed, '__proto__')).toBe(true)
   expect(Object.getPrototypeOf(parsed)).toBe(Object.prototype)
