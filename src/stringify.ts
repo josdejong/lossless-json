@@ -189,16 +189,24 @@ export function stringify(
 }
 
 /**
+ * The number of spaces or characters a space is capped to, like JSON.stringify does
+ */
+const MAX_SPACE_LENGTH = 10
+
+/**
  * Resolve a JSON stringify space:
  * replace a number with a string containing that number of spaces
  */
 function resolveSpace(space: number | string | undefined): string | undefined {
   if (typeof space === 'number') {
-    return ' '.repeat(space)
+    // same rules as JSON.stringify: truncate towards zero, cap at 10,
+    // and treat anything below 1 (including NaN and negatives) as no indent
+    const count = Math.min(Math.trunc(space), MAX_SPACE_LENGTH)
+    return count >= 1 ? ' '.repeat(count) : undefined
   }
 
   if (typeof space === 'string' && space !== '') {
-    return space
+    return space.slice(0, MAX_SPACE_LENGTH)
   }
 
   return undefined
