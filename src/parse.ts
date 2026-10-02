@@ -214,6 +214,10 @@ export function parse(
       while (isDigit(text.charCodeAt(i))) {
         i++
       }
+    } else {
+      // A JSON number must have an integer part, so a leading dot like '.5'
+      // is not a number at all.
+      return undefined
     }
 
     if (text.charCodeAt(i) === codeDot) {

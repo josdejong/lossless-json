@@ -574,6 +574,19 @@ describe('throw meaningful exceptions', () => {
       expect(() => parse(input)).toThrow(expectedError)
     })
   }
+
+  test('should throw SyntaxError when parsing a number without integer part', () => {
+    expect(() => parse('.5')).toThrow(SyntaxError)
+    expect(() => parse('.5')).toThrow("JSON value expected but got '.' at position 0")
+    expect(() => parse('[.5]')).toThrow(SyntaxError)
+    expect(() => parse('[.5]')).toThrow("Array item expected but got '.' at position 1")
+    expect(() => parse('{"a":.5}')).toThrow(SyntaxError)
+
+    // custom parseNumber must never receive invalid number tokens
+    expect(() => parse('.5', null, { parseNumber: (s) => s })).toThrow(SyntaxError)
+    expect(() => parse('[.5]', null, { parseNumber: (s) => s })).toThrow(SyntaxError)
+    expect(() => parse('{"a":.5}', null, { parseNumber: (s) => s })).toThrow(SyntaxError)
+  })
 })
 
 describe('isDeepEqual', () => {
