@@ -38,6 +38,9 @@ export function isSafeNumber(
   }
 
   const num = Number.parseFloat(value)
+  if (Number.isInteger(num) && !Number.isSafeInteger(num)) {
+    return false
+  }
   const parsed = String(num)
 
   if (value === parsed) {

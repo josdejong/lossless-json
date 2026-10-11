@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import {
   type DuplicateKeyInfo,
   isLosslessNumber,
+  isSafeNumber,
   LosslessNumber,
   type ParseOptions,
   parse,
@@ -251,6 +252,41 @@ test('reviver - revive a lossless number correctly', () => {
 test('parse with a custom number parser creating bigint', () => {
   const json = parse('[123456789123456789123456789, 2.3, 123]', null, parseNumberAndBigInt)
   expect(json).toEqual([123456789123456789123456789n, 2.3, 123n])
+})
+
+describe('parse with safe-number validation', () => {
+  const options = {
+    parseNumber: (value: string) => {
+      if (!isSafeNumber(value)) {
+        throw new Error(`Cannot safely convert value '${value}' into a number`)
+      }
+      return Number.parseFloat(value)
+    }
+  }
+  test.each([
+    { input: '[9007199254740992.0]', expectedJson: '[9007199254740992]' },
+    { input: '[9007199254740992e0]', expectedJson: '[9007199254740992]' },
+    { input: '[1.0000000000000002e19]', expectedJson: '[10000000000000002000]' },
+    { input: '[-1.0000000000000002e19]', expectedJson: '[-10000000000000002000]' },
+    { input: '[1e20]', expectedJson: '[100000000000000000000]' }
+  ])('rejects $input before and after serialization', ({ input, expectedJson }) => {
+    // Serialize without validation so both spellings can be checked.
+    const serialized = stringify(parse(input, undefined, Number)) as string
+    expect(serialized).toBe(expectedJson)
+    expect(() => parse(input, undefined, options)).toThrow('Cannot safely convert value')
+    expect(() => parse(serialized, undefined, options)).toThrow('Cannot safely convert value')
+  })
+
+  test.each([
+    '[9007199254740991.0]',
+    '[9.007199254740991e15]'
+  ])('parses %s with safe-number validation and reparses the serialized result', (input) => {
+    const parsed = parse(input, undefined, options)
+    expect(parsed).toEqual([Number.MAX_SAFE_INTEGER])
+    const serialized = stringify(parsed) as string
+    expect(serialized).toBe('[9007199254740991]')
+    expect(parse(serialized, undefined, options)).toEqual([Number.MAX_SAFE_INTEGER])
+  })
 })
 
 test('parse with a reviver to parse Date', () => {

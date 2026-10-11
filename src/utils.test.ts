@@ -127,6 +127,16 @@ test('toSafeNumberOrThrow({ approx: true })', () => {
   expect(toSafeNumberOrThrow('0.66666666666666666667', { approx: true })).toBe(0.6666666666666666)
 })
 
+test.each([
+  ['9007199254740992.0', '9007199254740992'],
+  ['1e20', '100000000000000000000']
+])('strict conversion rejects both %s and its serialized spelling', (value, serializedValue) => {
+  const serialized = JSON.stringify(Number.parseFloat(value))
+  expect(serialized).toBe(serializedValue)
+  expect(() => toSafeNumberOrThrow(value)).toThrow('Cannot safely convert to number')
+  expect(() => toSafeNumberOrThrow(serialized)).toThrow('Cannot safely convert to number')
+})
+
 describe('splitNumber', () => {
   test.each([
     { value: '0', expected: { sign: '', digits: '0', exponent: 0 } },
