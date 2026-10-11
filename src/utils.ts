@@ -55,13 +55,11 @@ export function isSafeNumber(
   }
 
   if (config?.approx === true) {
-    // A value is approximately equal when:
-    // 1. it is a floating point number, not an integer
-    // 2. it has at least 14 digits
-    // 3. the first 14 digits are equal
+    // A floating point value is approximately equal when:
+    // 1. it has at least 14 digits
+    // 2. the first 14 digits are equal
     const requiredDigits = 14
     if (
-      !isInteger(value) &&
       parsedDigits.length >= requiredDigits &&
       valueDigits.startsWith(parsedDigits.substring(0, requiredDigits))
     ) {
