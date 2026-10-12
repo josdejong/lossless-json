@@ -393,9 +393,7 @@ new LosslessNumber(value: number | string) : LosslessNumber
 
 - `isLosslessNumber(value: unknown) : boolean`
 
-  Test whether a value is a `LosslessNumber`. Separate library copies using the
-  shared symbol marker are supported. Instances from older versions without
-  this marker are not recognized.
+  Test whether a value is a `LosslessNumber`.
 
 - `toLosslessNumber(value: number) : LosslessNumber`
 
