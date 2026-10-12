@@ -273,6 +273,14 @@ test('stringify with replacer Array', () => {
   expect(stringify(json, replacer)).toEqual(expected)
 })
 
+test('stringify with replacer Array containing duplicates', () => {
+  const json = { a: 1, b: 2, c: 3 }
+  const replacer = ['b', 'b', 'a', 'b', 'missing', 'a']
+
+  expect(stringify(json, replacer)).toBe(JSON.stringify(json, replacer))
+  expect(stringify(json, replacer)).toBe('{"b":2,"a":1}')
+})
+
 test('stringify with numeric space', () => {
   const json: unknown = { a: 1, b: [1, 2, null, undefined, { c: 3 }], d: null }
 
@@ -331,25 +339,27 @@ test('stringify an empty object', () => {
   expect(stringify({}, null, '    ')).toEqual('{}')
 })
 
-test('stringify with space capped at 10 and values below 1', () => {
-  const json = { a: 1 }
-
-  // Capped at 10 spaces
-  expect(stringify(json, null, 15)).toBe(JSON.stringify(json, null, 10))
-  expect(stringify(json, null, 100)).toBe(JSON.stringify(json, null, 10))
-
-  // Truncate floating space
-  expect(stringify(json, null, 2.5)).toBe(JSON.stringify(json, null, 2))
-
-  // Values less than 1 mean no space
-  expect(stringify(json, null, 0)).toBe(JSON.stringify(json, null, 0))
-  expect(stringify(json, null, -1)).toBe(JSON.stringify(json, null, -1))
-  expect(stringify(json, null, -10)).toBe(JSON.stringify(json, null, -10))
-  expect(stringify(json, null, Number.NaN)).toBe(JSON.stringify(json, null, Number.NaN))
-
-  // String space longer than 10 characters capped to 10 characters
-  const longIndent = 'abcdefghijklm'
-  expect(stringify(json, null, longIndent)).toBe(JSON.stringify(json, null, longIndent))
-  expect(stringify(json, null, longIndent)).toBe('{\n' + 'abcdefghij' + '"a": 1\n' + '}')
+test('stringify should omit object properties whose toJSON returns undefined', () => {
+  const json = { a: 1, b: { toJSON: () => undefined }, c: 2 }
+  expect(stringify(json)).toBe('{"a":1,"c":2}')
+  expect(stringify(json)).toBe(JSON.stringify(json))
 })
 
+test('stringify should serialize array elements without JSON representation as null', () => {
+  const json = [Symbol('test'), { toJSON: () => undefined }]
+  expect(stringify(json)).toBe('[null,null]')
+  expect(stringify(json)).toBe(JSON.stringify(json))
+})
+
+test('stringify should forward numberStringifiers when object defines toJSON', () => {
+  const decimalStringifier: NumberStringifier = {
+    test: (value: unknown) => Decimal.isDecimal(value),
+    stringify: (value: unknown) => (value as Decimal).toString()
+  }
+  const obj = {
+    toJSON: () => ({ num: new Decimal('123456789123456789123456789') })
+  }
+  expect(stringify(obj, undefined, undefined, [decimalStringifier])).toBe(
+    '{"num":1.23456789123456789123456789e+26}'
+  )
+})

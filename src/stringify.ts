@@ -123,7 +123,10 @@ export function stringify(
       }
 
       if (typeof item !== 'undefined' && typeof item !== 'function') {
-        str += stringifyValue(item, childIndent)
+        const serialized = stringifyValue(item, childIndent)
+        // Values without a JSON representation (a symbol, or an object whose
+        // toJSON() returns undefined) become null inside an array.
+        str += serialized === undefined ? 'null' : serialized
       } else {
         str += 'null'
       }
@@ -145,10 +148,14 @@ export function stringify(
     indent: string | undefined
   ): string | undefined {
     if (typeof object.toJSON === 'function') {
-      return stringify(object.toJSON(), replacer, space, undefined)
+      return stringify(object.toJSON(), replacer, space, numberStringifiers)
     }
 
-    const keys: string[] = Array.isArray(replacer) ? replacer.map(String) : Object.keys(object)
+    // A replacer array is a property whitelist: duplicates must not produce
+    // duplicate keys in the output.
+    const keys: string[] = Array.isArray(replacer)
+      ? [...new Set(replacer.map(String))]
+      : Object.keys(object)
 
     if (keys.length === 0) {
       return '{}'
@@ -163,6 +170,13 @@ export function stringify(
         typeof replacer === 'function' ? replacer.call(object, key, object[key]) : object[key]
 
       if (includeProperty(key, value)) {
+        const serialized = stringifyValue(value, childIndent)
+        // Like JSON.stringify, omit properties that have no JSON
+        // representation (e.g. an object whose toJSON() returns undefined).
+        if (serialized === undefined) {
+          continue
+        }
+
         if (first) {
           first = false
         } else {
@@ -172,7 +186,7 @@ export function stringify(
         const keyStr = JSON.stringify(key)
         str += resolvedSpace ? `${childIndent + keyStr}: ` : `${keyStr}:`
 
-        str += stringifyValue(value, childIndent)
+        str += serialized
       }
     }
 

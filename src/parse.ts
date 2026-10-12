@@ -85,10 +85,10 @@ export function parse(
           })
 
           if (returnedValue !== undefined) {
-            object[key] = returnedValue
+            setObjectKey(object, key, returnedValue)
           }
         } else {
-          object[key] = value
+          setObjectKey(object, key, value)
         }
       }
 
@@ -214,6 +214,10 @@ export function parse(
       while (isDigit(text.charCodeAt(i))) {
         i++
       }
+    } else {
+      // A JSON number must have an integer part, so a leading dot like '.5'
+      // is not a number at all.
+      return undefined
     }
 
     if (text.charCodeAt(i) === codeDot) {
@@ -330,6 +334,22 @@ export function parse(
 
   function gotAt(): string {
     return `${got()} ${pos()}`
+  }
+}
+
+function setObjectKey(object: GenericObject<unknown>, key: string, value: unknown): void {
+  if (key === '__proto__') {
+    // Plain assignment would trigger the `__proto__` setter inherited from
+    // Object.prototype, changing the object's prototype instead of storing the
+    // key. Define an ordinary own property, like JSON.parse does.
+    Object.defineProperty(object, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    })
+  } else {
+    object[key] = value
   }
 }
 

@@ -50,6 +50,29 @@ test('object', () => {
   expect(parse('{"a": 2}')).toEqual({ a: lln('2') })
 })
 
+test('parse an object with __proto__ key', () => {
+  const text = '{"__proto__":{"polluted":true}}'
+  const parsed = parse(text) as Record<string, unknown>
+
+  expect(Object.prototype.hasOwnProperty.call(parsed, '__proto__')).toBe(true)
+  expect(Object.getPrototypeOf(parsed)).toBe(Object.prototype)
+  expect((parsed as any).polluted).toBeUndefined()
+  expect(Object.keys(parsed)).toEqual(['__proto__'])
+  expect(stringify(parsed)).toBe('{"__proto__":{"polluted":true}}')
+})
+
+test('parse an object with __proto__ key using a reviver', () => {
+  const text = '{"__proto__":1}'
+  const parsed = parse(text, (key, value) => (key === '__proto__' ? 2 : value)) as Record<
+    string,
+    unknown
+  >
+
+  expect(Object.prototype.hasOwnProperty.call(parsed, '__proto__')).toBe(true)
+  expect(Object.getPrototypeOf(parsed)).toBe(Object.prototype)
+  expect(parsed['__proto__']).toBe(2)
+})
+
 test('array', () => {
   expect(parse('[]')).toEqual([])
   expect(parse('[{}]')).toEqual([{}])
@@ -246,6 +269,33 @@ test('reviver - revive a lossless number correctly', () => {
     return value
   })
   expectDeepEqual(logs, expected)
+})
+
+test('reviver - deleting an array element leaves a hole, like JSON.parse', () => {
+  const text = '[1,2,3]'
+  const reviver = (key: string, value: unknown): unknown => (key === '1' ? undefined : value)
+
+  const result = parse(text, reviver) as unknown[]
+
+  const expected: unknown[] = []
+  expected[0] = lln('1')
+  expected[2] = lln('3')
+
+  expectDeepEqual(result, expected)
+  expect(1 in result).toBe(false)
+  expect(result.length).toBe(3)
+  expect(Object.keys(result)).toEqual(['0', '2'])
+})
+
+test('reviver - deleting an object property removes the key', () => {
+  const text = '{"a":1,"b":2,"c":3}'
+  const reviver = (key: string, value: unknown): unknown => (key === 'b' ? undefined : value)
+
+  const result = parse(text, reviver) as Record<string, unknown>
+
+  expectDeepEqual(result, { a: lln('1'), c: lln('3') })
+  expect('b' in result).toBe(false)
+  expect(Object.keys(result)).toEqual(['a', 'c'])
 })
 
 test('parse with a custom number parser creating bigint', () => {
@@ -524,6 +574,19 @@ describe('throw meaningful exceptions', () => {
       expect(() => parse(input)).toThrow(expectedError)
     })
   }
+
+  test('should throw SyntaxError when parsing a number without integer part', () => {
+    expect(() => parse('.5')).toThrow(SyntaxError)
+    expect(() => parse('.5')).toThrow("JSON value expected but got '.' at position 0")
+    expect(() => parse('[.5]')).toThrow(SyntaxError)
+    expect(() => parse('[.5]')).toThrow("Array item expected but got '.' at position 1")
+    expect(() => parse('{"a":.5}')).toThrow(SyntaxError)
+
+    // custom parseNumber must never receive invalid number tokens
+    expect(() => parse('.5', null, { parseNumber: (s) => s })).toThrow(SyntaxError)
+    expect(() => parse('[.5]', null, { parseNumber: (s) => s })).toThrow(SyntaxError)
+    expect(() => parse('{"a":.5}', null, { parseNumber: (s) => s })).toThrow(SyntaxError)
+  })
 })
 
 describe('isDeepEqual', () => {
