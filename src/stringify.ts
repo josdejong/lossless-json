@@ -1,3 +1,4 @@
+import { isLosslessNumber } from './LosslessNumber.js'
 import type { GenericObject, NumberStringifier, Replacer } from './types'
 import { isNumber } from './utils.js'
 
@@ -80,8 +81,7 @@ export function stringify(
     }
 
     // lossless number, the secret ingredient :)
-    // @ts-expect-error
-    if (value?.isLosslessNumber) {
+    if (isLosslessNumber(value)) {
       return value.toString()
     }
 

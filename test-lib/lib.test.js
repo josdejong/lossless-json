@@ -1,5 +1,6 @@
 import { strictEqual } from 'node:assert'
 import cp from 'node:child_process'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import { describe, test } from 'vitest'
 
@@ -31,4 +32,15 @@ describe('lib', () => {
         resolve()
       })
     }))
+})
+
+test('recognize genuine lossless numbers across the ESM and CommonJS builds', async () => {
+  const esm = await import('../lib/esm/index.js')
+  const cjs = createRequire(path.join(__dirname, 'lib.test.js'))('../lib/umd/lossless-json.js')
+  const esmNumber = new esm.LosslessNumber('9007199254740993')
+  const cjsNumber = new cjs.LosslessNumber('9007199254740993')
+  strictEqual(esm.isLosslessNumber(cjsNumber), true)
+  strictEqual(cjs.isLosslessNumber(esmNumber), true)
+  strictEqual(esm.stringify(cjsNumber), '9007199254740993')
+  strictEqual(cjs.stringify(esmNumber), '9007199254740993')
 })

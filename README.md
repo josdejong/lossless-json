@@ -355,8 +355,9 @@ new LosslessNumber(value: number | string) : LosslessNumber
 #### Properties
 
 - `{boolean} .isLosslessNumber : true`
-  Lossless numbers contain a property `isLosslessNumber` which can be used to
-  check whether some variable contains LosslessNumber.
+  Lossless numbers retain this boolean field for existing callers. Use the
+  `isLosslessNumber(value)` function to distinguish them from ordinary objects
+  containing a field with the same name.
 
 ### Utility functions
 
@@ -392,7 +393,9 @@ new LosslessNumber(value: number | string) : LosslessNumber
 
 - `isLosslessNumber(value: unknown) : boolean`
 
-  Test whether a value is a `LosslessNumber`.
+  Test whether a value is a `LosslessNumber`. Separate library copies using the
+  shared symbol marker are supported. Instances from older versions without
+  this marker are not recognized.
 
 - `toLosslessNumber(value: number) : LosslessNumber`
 

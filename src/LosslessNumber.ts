@@ -7,6 +7,9 @@ import {
   UnsafeNumberReason
 } from './utils.js'
 
+// A shared symbol recognizes numbers from separate library copies where instanceof fails.
+const losslessNumberMarker = Symbol.for('lossless-json.LosslessNumber')
+
 /**
  * A lossless number. Stores its numeric value as string
  */
@@ -16,6 +19,10 @@ export class LosslessNumber {
 
   // type information
   isLosslessNumber = true
+
+  get [losslessNumberMarker](): true {
+    return true
+  }
 
   constructor(value: string) {
     if (!isNumber(value)) {
@@ -71,8 +78,11 @@ export class LosslessNumber {
  * Test whether a value is a LosslessNumber
  */
 export function isLosslessNumber(value: unknown): value is LosslessNumber {
-  // @ts-expect-error
-  return (value && typeof value === 'object' && value.isLosslessNumber) || false
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    (value as LosslessNumber)[losslessNumberMarker] === true
+  )
 }
 
 /**
