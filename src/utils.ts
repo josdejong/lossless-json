@@ -141,7 +141,7 @@ export function toSafeNumberOrThrow(
  *
  */
 export function splitNumber(value: string): NumberSplit {
-  const match = value.match(/^(-?)(\d+\.?\d*)([eE]([+-]?\d+))?$/)
+  const match = value.match(/^(-?)(\d+(?:\.\d*)?)([eE]([+-]?\d+))?$/)
   if (!match) {
     throw new SyntaxError(`Invalid number: ${value}`)
   }
@@ -153,14 +153,10 @@ export function splitNumber(value: string): NumberSplit {
   const dot = digitsStr.indexOf('.')
   exponent += dot !== -1 ? dot - 1 : digitsStr.length - 1
 
-  const digits = digitsStr
-    .replace('.', '') // remove the dot (must be removed before removing leading zeros)
-    .replace(/^0*/, (zeros: string) => {
-      // remove leading zeros, add their count to the exponent
-      exponent -= zeros.length
-      return ''
-    })
-    .replace(/0*$/, '') // remove trailing zeros
+  const coefficient = digitsStr.replace('.', '')
+  const { start, end } = getSignificantDigitRange(coefficient)
+  exponent -= start
+  const digits = coefficient.slice(start, end)
 
   // normalize zero, for example normalizes 0e5 or -0 into 0
   return digits.length > 0 ? { sign, digits, exponent } : { sign: '', digits: '0', exponent: 0 }

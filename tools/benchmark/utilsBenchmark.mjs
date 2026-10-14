@@ -1,6 +1,11 @@
 import { Bench } from 'tinybench'
 import { toLosslessNumber } from '../../lib/esm/LosslessNumber.js'
-import { getUnsafeNumberReason, isSafeNumber, toSafeNumberOrThrow } from '../../lib/esm/utils.js'
+import {
+  getUnsafeNumberReason,
+  isSafeNumber,
+  splitNumber,
+  toSafeNumberOrThrow
+} from '../../lib/esm/utils.js'
 
 const values = [
   '2.345',
@@ -23,6 +28,7 @@ const bench = new Bench({ time: 100 })
   .add('isSafeNumber', () => values.map((value) => isSafeNumber(value)))
   .add('toSafeNumberOrThrow', () => values.map((value) => toSafeNumberOrThrow(value)))
   .add('getUnsafeNumberReason', () => values.map((value) => getUnsafeNumberReason(value)))
+  .add('splitNumber', () => values.map((value) => splitNumber(value)))
 
 await bench.run()
 

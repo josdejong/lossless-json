@@ -375,3 +375,38 @@ test.each([
 test('apply toJSON to ordinary objects bearing a lossless number marker', () => {
   expect(stringify({ isLosslessNumber: true, toJSON: () => 'literal' })).toBe('"literal"')
 })
+
+// The `space` parameter is capped at 10, see
+// https://tc39.es/ecma262/#sec-json.stringify
+const stringifiers = [
+  { name: 'lossless-json', stringifier: stringify },
+  { name: 'native', stringifier: JSON.stringify }
+]
+
+test.each(stringifiers)('stringify with numeric space capped at 10 ($name)', ({ stringifier }) => {
+  const json = { a: 1 }
+
+  // around the cap of 10: 9 and 10 are used as is, 11 and 100 are capped at 10
+  expect(stringifier(json, null, 9)).toEqual('{\n         "a": 1\n}')
+  expect(stringifier(json, null, 10)).toEqual('{\n          "a": 1\n}')
+  expect(stringifier(json, null, 11)).toEqual('{\n          "a": 1\n}')
+  expect(stringifier(json, null, 100)).toEqual('{\n          "a": 1\n}')
+
+  // a fractional space is truncated towards zero
+  expect(stringifier(json, null, 2.5)).toEqual('{\n  "a": 1\n}')
+
+  // values below 1 mean no indentation
+  expect(stringifier(json, null, 0)).toEqual('{"a":1}')
+  expect(stringifier(json, null, -1)).toEqual('{"a":1}')
+  expect(stringifier(json, null, -10)).toEqual('{"a":1}')
+  expect(stringifier(json, null, Number.NaN)).toEqual('{"a":1}')
+})
+
+test.each(stringifiers)('stringify with string space capped at 10 ($name)', ({ stringifier }) => {
+  const json = { a: 1 }
+
+  expect(stringifier(json, null, '~')).toEqual('{\n~"a": 1\n}')
+
+  // a string longer than 10 characters is capped to its first 10 characters
+  expect(stringifier(json, null, 'abcdefghijklm')).toEqual('{\nabcdefghij"a": 1\n}')
+})
