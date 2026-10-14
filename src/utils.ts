@@ -38,6 +38,7 @@ export function isSafeNumber(
   }
 
   const num = Number.parseFloat(value)
+  // Reject unsafe integers written as floats, like '9007199254740992.0', which isInteger(value) misses.
   if (Number.isInteger(num) && !Number.isSafeInteger(num)) {
     return false
   }
