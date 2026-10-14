@@ -277,16 +277,16 @@ describe('parse with safe-number validation', () => {
     expect(() => parse(serialized, undefined, options)).toThrow('Cannot safely convert value')
   })
 
-  test.each([
-    '[9007199254740991.0]',
-    '[9.007199254740991e15]'
-  ])('parses %s with safe-number validation and reparses the serialized result', (input) => {
-    const parsed = parse(input, undefined, options)
-    expect(parsed).toEqual([Number.MAX_SAFE_INTEGER])
-    const serialized = stringify(parsed) as string
-    expect(serialized).toBe('[9007199254740991]')
-    expect(parse(serialized, undefined, options)).toEqual([Number.MAX_SAFE_INTEGER])
-  })
+  test.each(['[9007199254740991.0]', '[9.007199254740991e15]'])(
+    'parses %s with safe-number validation and reparses the serialized result',
+    (input) => {
+      const parsed = parse(input, undefined, options)
+      expect(parsed).toEqual([Number.MAX_SAFE_INTEGER])
+      const serialized = stringify(parsed) as string
+      expect(serialized).toBe('[9007199254740991]')
+      expect(parse(serialized, undefined, options)).toEqual([Number.MAX_SAFE_INTEGER])
+    }
+  )
 })
 
 test('parse with a reviver to parse Date', () => {
