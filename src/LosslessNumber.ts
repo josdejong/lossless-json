@@ -19,7 +19,7 @@ export class LosslessNumber {
 
   /**
    * @deprecated Use the isLosslessNumber(value) function instead.
-   * 
+   *
    * Ordinary objects may also have an isLosslessNumber property, so this
    * field cannot reliably identify lossless numbers.
    */
