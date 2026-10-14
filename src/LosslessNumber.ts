@@ -17,7 +17,12 @@ export class LosslessNumber {
   // numeric value as string
   value: string
 
-  // type information
+  /**
+   * @deprecated Use the isLosslessNumber(value) function instead.
+   * 
+   * Ordinary objects may also have an isLosslessNumber property, so this
+   * field cannot reliably identify lossless numbers.
+   */
   isLosslessNumber = true
 
   get [losslessNumberMarker](): true {
