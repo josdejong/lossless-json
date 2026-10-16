@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.2](https://github.com/josdejong/lossless-json/compare/v4.3.1...v4.3.2) (2026-10-16)
+
+
+### Bug Fixes
+
+* `compareNumber` giving wrong result when comparing zero against positive fractions ([#274](https://github.com/josdejong/lossless-json/issues/274)) ([f90eafe](https://github.com/josdejong/lossless-json/commit/f90eafe4af5a849b7f25cb283ec1c24eb71be8f2))
+* cap the stringify space at 10 and treat values below 1 as no indentation ([#278](https://github.com/josdejong/lossless-json/issues/278)) ([c0bbfcc](https://github.com/josdejong/lossless-json/commit/c0bbfcc5ed3a092ab51612e8bb9d2dfaf69096c0))
+* de-duplicate an array replacer so it cannot emit duplicate keys ([#282](https://github.com/josdejong/lossless-json/issues/282)) ([134f581](https://github.com/josdejong/lossless-json/commit/134f5816469d341456705bf0d8e415c170fbf1fc)), closes [#281](https://github.com/josdejong/lossless-json/issues/281)
+* let a reviver delete an array element as a real hole ([#286](https://github.com/josdejong/lossless-json/issues/286)) ([51c2ad3](https://github.com/josdejong/lossless-json/commit/51c2ad3bd771d85d7d532c8e44d494a047512d41)), closes [#285](https://github.com/josdejong/lossless-json/issues/285)
+* never emit a literal `undefined` in stringify output ([#280](https://github.com/josdejong/lossless-json/issues/280)) ([794fc57](https://github.com/josdejong/lossless-json/commit/794fc5797e27adbe9055a1aef8ffb1a1cd7d9d63)), closes [#279](https://github.com/josdejong/lossless-json/issues/279)
+* normalize and reject splitNumber coefficients linearly ([#288](https://github.com/josdejong/lossless-json/issues/288)) ([a40b208](https://github.com/josdejong/lossless-json/commit/a40b208bce9d94c38933a3e05fb02f5c4e329ba4))
+* preserve literal lossless-number marker fields ([#289](https://github.com/josdejong/lossless-json/issues/289)) ([b8c3a84](https://github.com/josdejong/lossless-json/commit/b8c3a8465ff422a9011dd0cef04002134cf80367))
+* reject a number without an integer part ([#284](https://github.com/josdejong/lossless-json/issues/284)) ([f4ca71e](https://github.com/josdejong/lossless-json/commit/f4ca71ee7fc9b90414050d6c50c2a54e297ab7ff)), closes [#283](https://github.com/josdejong/lossless-json/issues/283)
+* reject unsafe integers in decimal and exponent notation ([#287](https://github.com/josdejong/lossless-json/issues/287)) ([82bd9e3](https://github.com/josdejong/lossless-json/commit/82bd9e33c2189a8a7399050eb77e1251883b5adf))
+* store a `__proto__` key as an own property ([#276](https://github.com/josdejong/lossless-json/issues/276)) ([a62e036](https://github.com/josdejong/lossless-json/commit/a62e036d5e3525c51e72e5fbfaad90fc0814bdeb))
+
 ### [4.3.1](https://github.com/josdejong/lossless-json/compare/v4.3.0...v4.3.1) (2026-07-31)
 
 
