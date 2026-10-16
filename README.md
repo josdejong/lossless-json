@@ -64,12 +64,12 @@ const text = stringify(json) // '{"foo":"bar"}'
 Numbers are parsed into a `LosslessNumber`, which can be used like a regular number in numeric operations. Converting to a number will throw an error when this would result in losing information due to truncation, overflow, or underflow.
 
 ```js
-import { parse } from 'lossless-json'
+import { isLosslessNumber, parse } from 'lossless-json'
 
 const text = '{"normal":2.3,"long":123456789012345678901,"big":2.3e+500}'
 const json = parse(text)
 
-console.log(json.normal.isLosslessNumber) // true
+console.log(isLosslessNumber(json.normal)) // true
 console.log(json.normal.valueOf()) // number, 2.3
 
 // LosslessNumbers can be used as regular numbers
@@ -355,8 +355,9 @@ new LosslessNumber(value: number | string) : LosslessNumber
 #### Properties
 
 - `{boolean} .isLosslessNumber : true`
-  Lossless numbers contain a property `isLosslessNumber` which can be used to
-  check whether some variable contains LosslessNumber.
+  **Deprecated.** Lossless numbers retain this boolean field for existing callers. Use the
+  `isLosslessNumber(value)` function to distinguish them from ordinary objects
+  containing a field with the same name.
 
 ### Utility functions
 

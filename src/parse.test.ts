@@ -630,3 +630,12 @@ describe('isDeepEqual', () => {
     expect(isDeepEqual([{ id: 2 }], [{ id: 3 }])).toEqual(false)
   })
 })
+
+test('visit ordinary marker fields and their children with a reviver', () => {
+  const visited: string[] = []
+  parse('{"isLosslessNumber":true,"nested":[42]}', (key, value) => {
+    visited.push(key)
+    return value
+  })
+  expect(visited).toEqual(['isLosslessNumber', '0', 'nested', ''])
+})

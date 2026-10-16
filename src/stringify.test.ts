@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 import { expect, test } from 'vitest'
-import { LosslessNumber, type NumberStringifier, stringify } from './index'
+import { LosslessNumber, type NumberStringifier, parse, stringify } from './index'
 import type { GenericObject } from './types'
 
 // helper function to create a lossless number
@@ -362,6 +362,18 @@ test('stringify should forward numberStringifiers when object defines toJSON', (
   expect(stringify(obj, undefined, undefined, [decimalStringifier])).toBe(
     '{"num":1.23456789123456789123456789e+26}'
   )
+})
+
+test.each([
+  '{"isLosslessNumber":true,"value":"42"}',
+  '{"isLosslessNumber":"yes","nested":[9007199254740993]}',
+  '{"isLosslessNumber":true,"toString":"literal","valueOf":"literal"}'
+])('preserve ordinary marker fields when stringifying %s', (code) => {
+  expect(stringify(parse(code))).toBe(code)
+})
+
+test('apply toJSON to ordinary objects bearing a lossless number marker', () => {
+  expect(stringify({ isLosslessNumber: true, toJSON: () => 'literal' })).toBe('"literal"')
 })
 
 // The `space` parameter is capped at 10, see
