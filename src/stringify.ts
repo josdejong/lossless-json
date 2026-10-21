@@ -148,7 +148,7 @@ export function stringify(
     indent: string | undefined
   ): string | undefined {
     if (typeof object.toJSON === 'function') {
-      return stringify(object.toJSON(), replacer, space, numberStringifiers)
+      return stringifyValue(object.toJSON(), indent)
     }
 
     // A replacer array is a property whitelist: duplicates must not produce

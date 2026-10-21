@@ -364,6 +364,30 @@ test('stringify should forward numberStringifiers when object defines toJSON', (
   )
 })
 
+test('stringify should respect indentation when nested object defines toJSON', () => {
+  const json = {
+    nested: {
+      toJSON: () => ({ a: 1, b: [2, 3] })
+    }
+  }
+  expect(stringify(json, null, 2)).toBe(JSON.stringify(json, null, 2))
+})
+
+test('stringify should respect indentation with deeply nested toJSON', () => {
+  const json = {
+    level1: {
+      toJSON: () => ({
+        level2: {
+          toJSON: () => ({
+            leaf: 'value'
+          })
+        }
+      })
+    }
+  }
+  expect(stringify(json, null, 2)).toBe(JSON.stringify(json, null, 2))
+})
+
 test.each([
   '{"isLosslessNumber":true,"value":"42"}',
   '{"isLosslessNumber":"yes","nested":[9007199254740993]}',
