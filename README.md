@@ -175,7 +175,7 @@ try {
 
 ### BigNumbers
 
-To use the library in conjunction with your favorite BigNumber library, for example [decimal.js](https://github.com/MikeMcl/decimal.js/). You have to define a custom number parser and stringifier:
+To use the library in conjunction with your favorite BigNumber library, for example [decimal.js](https://github.com/MikeMcl/decimal.js/), you have to define a custom number parser and stringifier:
 
 ```js
 import { parse, stringify } from 'lossless-json'
