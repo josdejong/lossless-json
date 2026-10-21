@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.3](https://github.com/josdejong/lossless-json/compare/v4.3.2...v4.3.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* preserve indentation when nested object defines toJSON ([#290](https://github.com/josdejong/lossless-json/issues/290)) ([eaed4c2](https://github.com/josdejong/lossless-json/commit/eaed4c241df663831069aced3e05fc982034261c))
+
 ### [4.3.2](https://github.com/josdejong/lossless-json/compare/v4.3.1...v4.3.2) (2026-10-16)
 
 
