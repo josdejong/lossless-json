@@ -388,6 +388,25 @@ test('stringify should respect indentation with deeply nested toJSON', () => {
   expect(stringify(json, null, 2)).toBe(JSON.stringify(json, null, 2))
 })
 
+test('stringify should not call toJSON again on the value it returns', () => {
+  const json = {
+    a: 1,
+    toJSON() {
+      return { ...this }
+    }
+  }
+  expect(stringify(json)).toBe('{"a":1}')
+  expect(stringify(json)).toBe(JSON.stringify(json))
+
+  const self = {
+    a: 1,
+    toJSON() {
+      return this
+    }
+  }
+  expect(stringify(self)).toBe(JSON.stringify(self))
+})
+
 test.each([
   '{"isLosslessNumber":true,"value":"42"}',
   '{"isLosslessNumber":"yes","nested":[9007199254740993]}',

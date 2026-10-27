@@ -52,7 +52,11 @@ export function stringify(
   /**
    * Stringify a value
    */
-  function stringifyValue(value: unknown, indent: string | undefined): string | undefined {
+  function stringifyValue(
+    value: unknown,
+    indent: string | undefined,
+    calledToJSON?: unknown
+  ): string | undefined {
     if (Array.isArray(numberStringifiers)) {
       const stringifier = numberStringifiers.find((item) => item.test(value))
       if (stringifier) {
@@ -97,7 +101,7 @@ export function stringify(
 
     // Object (test lastly!)
     if (value && typeof value === 'object') {
-      return stringifyObject(value as GenericObject<unknown>, indent)
+      return stringifyObject(value as GenericObject<unknown>, indent, calledToJSON)
     }
 
     return undefined
@@ -145,10 +149,12 @@ export function stringify(
    */
   function stringifyObject(
     object: GenericObject<unknown>,
-    indent: string | undefined
+    indent: string | undefined,
+    calledToJSON?: unknown
   ): string | undefined {
-    if (typeof object.toJSON === 'function') {
-      return stringifyValue(object.toJSON(), indent)
+    // don't call the same toJSON again on its result (like `{ ...this }`), it would never end
+    if (typeof object.toJSON === 'function' && object.toJSON !== calledToJSON) {
+      return stringifyValue(object.toJSON(), indent, object.toJSON)
     }
 
     // A replacer array is a property whitelist: duplicates must not produce
