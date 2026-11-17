@@ -185,14 +185,24 @@ export function parse(
           } else {
             throwInvalidEscapeCharacter(i)
           }
+          i++
         } else {
-          if (isValidStringCharacter(text.charCodeAt(i))) {
-            result += text[i]
-          } else {
-            throwInvalidCharacter(text[i])
+          // Append a whole run of unescaped characters with a single slice. Appending them
+          // one by one makes V8 build a cons-string with a node per character, which keeps
+          // ~30 bytes of heap per character alive until the string gets flattened.
+          const start = i
+          while (i < text.length) {
+            const code = text.charCodeAt(i)
+            if (code === codeDoubleQuote || code === codeBackslash) {
+              break
+            }
+            if (!isValidStringCharacter(code)) {
+              throwInvalidCharacter(text[i])
+            }
+            i++
           }
+          result += text.slice(start, i)
         }
-        i++
       }
       expectEndOfString()
       i++
