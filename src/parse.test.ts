@@ -370,6 +370,18 @@ test('supports escaped unicode characters in a string', () => {
   )
 })
 
+test('parses long strings and runs of characters between escapes', () => {
+  const long = 'x'.repeat(100_000)
+  expect(parse(JSON.stringify(long))).toBe(long)
+  expect(parse(JSON.stringify({ data: long }))).toStrictEqual({ data: long })
+
+  const mixed = `${'a'.repeat(1000)}"\\\n\t\u2605😀${'b'.repeat(1000)}\u0001end`
+  expect(parse(JSON.stringify(mixed))).toBe(mixed)
+  expect(parse('"\\n"')).toBe('\n')
+  expect(parse('"ab\\ncd\\"ef\\\\"')).toBe('ab\ncd"ef\\')
+  expect(parse('""')).toBe('')
+})
+
 test('supports unicode characters in a key', () => {
   expect(parse('{"★":true}')).toStrictEqual({ '★': true })
   expect(parse('{"\u2605":true}')).toStrictEqual({ '\u2605': true })
