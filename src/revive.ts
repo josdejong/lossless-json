@@ -43,11 +43,7 @@ function reviveValue(
 function reviveObject(object: GenericObject<unknown>, reviver: Reviver) {
   for (const key of Object.keys(object)) {
     const value = reviveValue(object, key, object[key], reviver)
-    if (value !== undefined) {
-      object[key] = value
-    } else {
-      delete object[key]
-    }
+    updateProperty(object, key, value)
   }
 
   return object
@@ -57,22 +53,30 @@ function reviveObject(object: GenericObject<unknown>, reviver: Reviver) {
  * Revive the properties of an Array
  */
 function reviveArray(array: Array<unknown>, reviver: Reviver): Array<unknown> {
-  for (let i = 0; i < array.length; i++) {
+  // A reviver can introduce an array proxy with a non-number length. Read and
+  // coerce it once, using the same range as JSON.parse's LengthOfArrayLike.
+  const length = Math.min(Math.max(Math.trunc(+array.length) || 0, 0), Number.MAX_SAFE_INTEGER)
+  for (let i = 0; i < length; i++) {
     const value = reviveValue(array, String(i), array[i], reviver)
-
-    if (value === undefined) {
-      // Remove the own property entirely, like native JSON.parse does: the
-      // position becomes a genuine hole (no own key, and `Object.keys` omits
-      // it) while the length stays unchanged. Assigning `array[i] = undefined`
-      // would leave an own property holding `undefined` instead.
-      delete array[i]
-    } else {
-      // Assign right away rather than after the loop: the reviver observes the
-      // holder through `this`, so later items must see the already revived
-      // values (e.g. a preceding `null` replacement).
-      array[i] = value
-    }
+    updateProperty(array, String(i), value)
   }
 
   return array
+}
+
+/**
+ * Apply a reviver result using the property operations of JSON.parse.
+ * A refused update or deletion is ignored, but an exception still propagates.
+ */
+function updateProperty(object: object, key: string, value: unknown): void {
+  if (value === undefined) {
+    Reflect.deleteProperty(object, key)
+  } else {
+    Reflect.defineProperty(object, key, {
+      value,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    })
+  }
 }
