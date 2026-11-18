@@ -66,12 +66,22 @@ export function stringify(
       }
     }
 
-    // boolean, null, number, string, or date
+    // primitives: same output as JSON.stringify, without calling it
+    if (typeof value === 'string') {
+      return JSON.stringify(value)
+    }
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? String(value) : 'null'
+    }
+    if (typeof value === 'boolean') {
+      return value ? 'true' : 'false'
+    }
+    if (value === null) {
+      return 'null'
+    }
+
+    // boxed boolean, number, or string, or date
     if (
-      typeof value === 'boolean' ||
-      typeof value === 'number' ||
-      typeof value === 'string' ||
-      value === null ||
       value instanceof Date ||
       value instanceof Boolean ||
       value instanceof Number ||

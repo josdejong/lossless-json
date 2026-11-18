@@ -396,6 +396,28 @@ test.each([
   expect(stringify(parse(code))).toBe(code)
 })
 
+test('stringify should call toJSON of boxed primitives', () => {
+  class Price extends Number {
+    toJSON() {
+      return `${this.valueOf()} EUR`
+    }
+  }
+  class Flag extends Boolean {
+    toJSON() {
+      return 'flag'
+    }
+  }
+  class Name extends String {
+    toJSON() {
+      return this.toUpperCase()
+    }
+  }
+  const json = { price: new Price(2.5), flag: new Flag(true), name: new Name('abc') }
+
+  expect(stringify(json)).toEqual('{"price":"2.5 EUR","flag":"flag","name":"ABC"}')
+  expect(stringify(json)).toEqual(JSON.stringify(json))
+})
+
 test('apply toJSON to ordinary objects bearing a lossless number marker', () => {
   expect(stringify({ isLosslessNumber: true, toJSON: () => 'literal' })).toBe('"literal"')
 })
