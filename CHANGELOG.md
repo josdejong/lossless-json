@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.3.4](https://github.com/josdejong/lossless-json/compare/v4.3.3...v4.3.4) (2026-11-18)
 
+### Features
+
+- Improve performance of `stringify` by stringifing primitive values without `JSON.stringify` where possible ([#294](https://github.com/josdejong/lossless-json/pull/294#pullrequestreview-5960073913))
+
+
 ### [4.3.3](https://github.com/josdejong/lossless-json/compare/v4.3.2...v4.3.3) (2026-10-21)
 
 
